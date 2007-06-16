@@ -78,7 +78,7 @@ class config:
 
         self._logger.unregister()
 
-    def init(self):
+    def init(self, project_name):
         """ init project config file """
 
         self._logger.register("init")
@@ -86,5 +86,42 @@ class config:
         swarm_config = "%s/swarmrc" % self.dot_swarm
         if self._swarm_config_is_set:
             self._logger.error("swarm config is already set for project root '%s'" % self.project_root)
+            if not self._force:
+                sys.exit(2)
+            self._logger.error("initializing anyway because of 'force' option")
+
+        project_root_exists = os.path.exists(self.project_root)
+        if not project_root_exists:
+            self._logger.entry("Attempting to create project root '%s'", % self.project_root, 2)
+            try:
+                os.mkdir(self.project_root)
+            except:
+                self._logger.error("Could not create project root '%s'. Does parent exist and do you have permissions to create this?" % self.project_root)
+                sys.exit(2)
+
+        dot_swarm_exists = os.path.exists(self.dot_swarm)
+        if not dot_swarm_exists:
+            self._logger.entry("Attempting to create dot swarm directory '%s'", % self.dot_swarm, 2)
+            try:
+                os.mkdir(self.dot_swarm)
+            except:
+                self._logger.error("Could not create directory '%s'. Does parent exist and do you have permissions to create this?" % self.project_root)
+                sys.exit(2)
+
+        swarmrc_exists = os.path.isfile(swarm_config)
+        if not swarmrc_exists:
+            self._logger.entry("Attempting to create swarm rc '%s'", % swarm_config, 2)
+            dbfile = "%s/swarm.db" % self.dot_swarm
+            self.swarm_configparser.add_section("main")
+            self.swarm_configparser.set("main", "project_name", project_name)
+            self.swarm_configparser.set("main", "dbfile", dbfile)
+            self.swarm_configparser.set("main", "dbtype", "sqlite")
+
+            fp = open(swarm_config, mode="w")
+            self.swarm_configparser.write(fp)
+            fp.close()
+            selt._swarm_config_is_set = True
 
         self._logger.unregister()
+
+    def get(self, section, setting, config_region=None):
