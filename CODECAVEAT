@@ -1,0 +1,18 @@
+It should be known that this is the developmental base of swarm. As such,
+nothing should be considered sacred here. Any interface, method, module,
+algorithm, tehcnique, comment, or any other chunk of code is free game
+for re-writing. Persons contributing to this project should know this and
+be aware that the only reasons *not* to rewrite/tinker with the code base
+is when the rewrite/tinker isn't technically sound or otherwise grants no
+benefit over the existing code.
+
+In many cases with Free and Open Source software this probably should go
+without saying, but I wanted to state this specifically so that persons
+knowing that code herein is *not* sacred, and that rewrites are
+encouraged.
+
+That being said, once we reach a certain state and have something stable,
+if we ever do change API or database schemas, we need to allow for some
+sort of sane deprecation and migration.
+
+
