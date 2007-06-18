@@ -25,9 +25,15 @@ class config:
     def __init__(self, cwd, log, force=False):
         self.project_root = cwd
         self.dot_swarm = "%s/.swarm" % self.project_root
-        self.system_configparser = ConfigParser.ConfigParser()
-        self.user_configparser = ConfigParser.ConfigParser()
-        self.swarm_configparser = ConfigParser.ConfigParser()
+        self._config = {}
+        # This is important for preference order
+        # swarm>user>system
+        # The last entry in this list will be the highest
+        # priority
+        self._config['regions'] = ['system', 'user', 'swarm']
+        self._config['system'] = ConfigParser.ConfigParser()
+        self._config['user'] = ConfigParser.ConfigParser()
+        self._config['swarm'] = ConfigParser.ConfigParser()
         self._swarm_config_is_set = False
         self._force = force
         self._logger = log.get_logger("config")
@@ -48,7 +54,7 @@ class config:
 
         self._logger.entry("Attempting to load system-wide config", 2)
 
-        filenames_read = self.system_configparser.read(system_configs)
+        filenames_read = self._config['system'].read(system_configs)
 
         if len(filenames_read):
             self._logger.enty("Read the following system-wide config files", 3)
@@ -61,7 +67,7 @@ class config:
         user_config = "%s/.swarm" % (os.path.expanduser("~"))
         if os.path.isfile(user_config):
             self._logger.entry("Attemping to load user config %s" % user_config, 2)
-            self.user_configparser.read(user_config)
+            self._config['user'].read(user_config)
         else:
             self._logger.entry("No user config file found. If you want to set user settings use '%s'" % user_config, 1)
 
@@ -70,7 +76,7 @@ class config:
         self._logger.entry("Attempting to read swarm config %s" % swarm_config, 2)
 
         if os.path.isfile(swarm_config):
-            self.swarm_configparser.read(swarm_config)
+            self._config['swarm'].read(swarm_config)
             self._swarm_config_is_set = True
         else:
             self._logger.entry("swarm config does not exist.", 2)
@@ -112,16 +118,32 @@ class config:
         if not swarmrc_exists:
             self._logger.entry("Attempting to create swarm rc '%s'", % swarm_config, 2)
             dbfile = "%s/swarm.db" % self.dot_swarm
-            self.swarm_configparser.add_section("main")
-            self.swarm_configparser.set("main", "project_name", project_name)
-            self.swarm_configparser.set("main", "dbfile", dbfile)
-            self.swarm_configparser.set("main", "dbtype", "sqlite")
+            self._config['swarm'].add_section("main")
+            self._config['swarm'].set("main", "project_name", project_name)
+            self._config['swarm'].set("main", "dbfile", dbfile)
+            self._config['swarm'].set("main", "dbtype", "sqlite")
 
             fp = open(swarm_config, mode="w")
-            self.swarm_configparser.write(fp)
+            self._config['swarm'].write(fp)
             fp.close()
             selt._swarm_config_is_set = True
 
         self._logger.unregister()
 
     def get(self, section, setting, config_region=None):
+        local_regions = self._config['regions']
+        result = None
+        if config_region and config_region in local_regions:
+            local_regions = config_region
+
+        for region in local_regions:
+            result = self._config[region].get(section, setting)
+
+        return result
+
+    def set(self, section, setting, config_region=None):
+        if config_region in self._config['regions']:
+            self._config[config_region].set(section, setting)
+
+    def add_section(self, section, config_region=None):
+        if config_region in self.
