@@ -18,5 +18,71 @@
 #
 # Author: Sam Hart
 
+#
+# Database schema
+#
+
+class column:
+    def __init__(self, name, auto_increment=False, primary_key=False, data_type='text', unique=False):
+        self.name = name
+        self.auto_increment = auto_increment
+        self.primary_key = primary_key
+        self.data_type = data_type
+        self.unique = unique
+
+class table:
+    def __init__(self, name):
+        self.name = name
+        self.columns = []
+    def __getitem__(self, objects):
+        self.columns = [ob for ob in objects if isinstance(ob, column)]
+        return self
+
+table_schema = [
+    # Issue tracking blob
+    table('issue')[
+        column('id', auto_increment=True, primary_key=True),
+
+        column('component'),
+        column('version'),
+        column('milestone'),
+
+        column('severity'),
+        column('priority'),
+
+        column('owner'),
+        column('reporter'),
+        column('cc'),
+        column('subscribers'),
+
+        column('summary'),
+        column('details'),
+        column('keywords'),
+
+        column('status'),
+        column('resolution'),
+
+        column('time', type='int'),
+        ],
+
+    # Issue relation blobs
+    table('parents')[
+        column('id', primary_key=True),
+        column('pid'),
+        ],
+
+    table('children')[
+        column('id', primary_key=True),
+        column('cid'),
+        ],
+
+    table('related')[
+        column('id', primary_key=True),
+        column('rid'),
+        ],
+
+     ]
+
+
 class swarmdb:
     def __init__(self, config):

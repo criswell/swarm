@@ -141,9 +141,9 @@ class config:
 
         return result
 
-    def set(self, section, setting, config_region=None):
+    def set(self, section, setting, value, config_region=None):
         if config_region in self._config['regions']:
-            self._config[config_region].set(section, setting)
+            self._config[config_region].set(section, setting, value)
 
     def add_section(self, section, config_region=None):
         if config_region in self.
