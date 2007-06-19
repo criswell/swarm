@@ -67,22 +67,21 @@ table_schema = [
 
     # Issue relation blobs
     table('parents')[
-        column('id', primary_key=True),
+        column('id'),
         column('pid'),
         ],
 
     table('children')[
-        column('id', primary_key=True),
+        column('id'),
         column('cid'),
         ],
 
     table('related')[
-        column('id', primary_key=True),
+        column('id'),
         column('rid'),
         ],
 
      ]
-
 
 class swarmdb:
     def __init__(self, config):
