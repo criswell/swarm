@@ -41,7 +41,7 @@ class table:
 table_schema = [
     # Issue tracking blob
     table('issue')[
-        column('id', auto_increment=True, primary_key=True),
+        column('id', unique=True),
 
         column('component'),
         column('version'),
@@ -63,7 +63,14 @@ table_schema = [
         column('resolution'),
 
         column('time', type='int'),
+        column('root'),
         ],
+
+    table('issue_custom')[
+        column('id'),
+        column('name'),
+        column('value'),
+    ],
 
     # Issue relation blobs
     table('parents')[
