@@ -103,11 +103,15 @@ def cli_parse(argv):
             post_opt.append(option)
 
     short_opts = ''
+    long_opts = []
     if option_dispatch[command].short_opts:
         for a in option_dispatch[command].short_opts:
             short_opts = short_opts + a
 
-    opts, args = getopt.getopt(pre_opt, short_opts, option_dispatch[command].long_opts)
+    if option_dispatch[command].long_opts:
+        long_opts = option_dispatch[command].long_opts
+
+    opts, args = getopt.getopt(pre_opt, short_opts, long_opts)
 
     return (opts, args, command, post_opt)
 
