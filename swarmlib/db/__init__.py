@@ -88,6 +88,15 @@ table_schema = [
         column('rid'),
         ],
 
+    #upstream tracker
+    table('upstream')[
+        column('id'),
+        column('uri'),
+        column('type'),
+        column('authentication'), # blob containing auth info
+        column('transport'), # blob containing transport info
+        ],
+
      ]
 
 class swarmdb:

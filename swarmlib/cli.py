@@ -18,12 +18,3 @@
 #
 # Author: Sam Hart
 
-import sys
-import getopt
-import swarmlib.cli as cli
-
-def main():
-    cli.run(sys.argv)
-
-if __name__ == "__main__":
-    main()
