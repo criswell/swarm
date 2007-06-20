@@ -41,7 +41,7 @@ def cli_help(pre_options, pre_args, command, post_options):
             print line
         print "\n"
         for com in option_dispatch.keys():
-            print "\t%s\t\t" % (com, option_dispatch[com].summary)
+            print "\t%s\t\t%s" % (com, option_dispatch[com].summary)
 
 def cli_init(pre_options, pre_args, command, post_options):
     print "Nobody home"
