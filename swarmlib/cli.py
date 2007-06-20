@@ -22,7 +22,7 @@ import sys
 import getopt
 
 class Command:
-    def __init__(short_opts=None, long_opts=None, usage, summary, desc, callback):
+    def __init__(short_opts, long_opts, usage, summary, desc, callback):
         self.short_opts = short_opts
         self.long_opts = long_opts
         self.usage = usage
