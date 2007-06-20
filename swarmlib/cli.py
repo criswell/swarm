@@ -21,47 +21,6 @@
 import sys
 import getopt
 
-class Command:
-    def __init__(short_opts, long_opts, usage, summary, desc, callback):
-        self.short_opts = short_opts
-        self.long_opts = long_opts
-        self.usage = usage
-        self.summary = summary
-        self.desc = desc
-        self.callback = callback
-
-# Defines
-option_dispatch = {
-    None : Command(
-        None,
-        None,
-        'Swarm DITS',
-        'Swarm Distributed Issue Tracking System',
-        ['basic commands, use "help" to get more details.'],
-        cli_Help),
-    'init' : Command(
-        ['v', 'f'],
-        ['verbose', 'force'],
-        '[OPTIONS] init [DEST]',
-        'Initialize a swarm DITS repository in given directory',
-        ['  Initializes a new swarm DITS repository. Will use the',
-         '  [DEST] directory for the new repository, or the current',
-         '   directory if nothing is specified.',
-         '',
-         '  OPTIONS:',
-         '  -v|--verbose    Be verbose about actions',
-         "  -f|--force      Force even if directory isn't empty"],
-         cli_init),
-    'help' : Command(
-        None,
-        None,
-        'help [COMMAND]',
-        'Gives help for swarm',
-        ['   If called with no [COMMAND], will give general help',
-         '   and exit. Otherwise, will print help for [COMMAND].'],
-         cli_help),
-}
-
 def cli_help(pre_options, pre_args, command, post_options):
     if post_options:
         for com in post_options:
@@ -83,6 +42,50 @@ def cli_help(pre_options, pre_args, command, post_options):
         print "\n"
         for com in option_dispatch.keys():
             print "\t%s\t\t" % (com, option_dispatch[com].summary)
+
+def cli_init(pre_options, pre_args, command, post_options):
+    print "Nobody home"
+
+class Command:
+    def __init__(self, short_opts, long_opts, usage, summary, desc, callback):
+        self.short_opts = short_opts
+        self.long_opts = long_opts
+        self.usage = usage
+        self.summary = summary
+        self.desc = desc
+        self.callback = callback
+
+# Defines
+option_dispatch = {
+    None : Command(
+        None,
+        None,
+        'Swarm DITS',
+        'Swarm Distributed Issue Tracking System',
+        ['basic commands, use "help" to get more details.'],
+        cli_help),
+    'init' : Command(
+        ['v', 'f'],
+        ['verbose', 'force'],
+        '[OPTIONS] init [DEST]',
+        'Initialize a swarm DITS repository in given directory',
+        ['  Initializes a new swarm DITS repository. Will use the',
+         '  [DEST] directory for the new repository, or the current',
+         '   directory if nothing is specified.',
+         '',
+         '  OPTIONS:',
+         '  -v|--verbose    Be verbose about actions',
+         "  -f|--force      Force even if directory isn't empty"],
+        cli_init),
+    'help' : Command(
+        None,
+        None,
+        'help [COMMAND]',
+        'Gives help for swarm',
+        ['   If called with no [COMMAND], will give general help',
+         '   and exit. Otherwise, will print help for [COMMAND].'],
+         cli_help),
+}
 
 def cli_parse(argv):
     pre_opt = []
