@@ -64,6 +64,10 @@ table_schema = [
 
         column('time', type='int'),
         column('root'),
+
+        column('parents'),
+        column('children'),
+        column('related'),
         ],
 
     table('issue_custom')[
@@ -72,21 +76,11 @@ table_schema = [
         column('value'),
     ],
 
-    # Issue relation blobs
-    table('parents')[
+    #root tracker
+    table('rootids')[
+        column('humanid'),
         column('id'),
-        column('pid'),
-        ],
-
-    table('children')[
-        column('id'),
-        column('cid'),
-        ],
-
-    table('related')[
-        column('id'),
-        column('rid'),
-        ],
+    ],
 
     #upstream tracker
     table('upstream')[
