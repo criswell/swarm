@@ -24,7 +24,6 @@ import getopt
 def cli_help(pre_options, pre_args, command, post_options):
     if post_options:
         for com in post_options:
-            print "\n"
             print option_dispatch[command].usage
             print "\n"
             print option_dispatch[command].summary
@@ -32,7 +31,6 @@ def cli_help(pre_options, pre_args, command, post_options):
             for line in option_dispatch[command].desc:
                 print line
     else:
-        print "\n"
         print option_dispatch[None].usage
         print "\n"
         print option_dispatch[None].summary
@@ -41,7 +39,7 @@ def cli_help(pre_options, pre_args, command, post_options):
             print line
         print "\n"
         for com in option_dispatch.keys():
-            print "\t%s\t\t%s" % (com, option_dispatch[com].summary)
+            print "   %s\t\t%s" % (com, option_dispatch[com].summary)
 
 def cli_init(pre_options, pre_args, command, post_options):
     print "Nobody home"
