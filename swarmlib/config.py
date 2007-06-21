@@ -153,7 +153,7 @@ class config:
             self._config[config_region].add_section(section)
         else:
             # Default is to last entry (swarm)
-            self._config[self._config['regions'][-1]]..add_section(section)
+            self._config[self._config['regions'][-1]].add_section(section)
 
     def save(self):
         # This probably should be made more generally,
