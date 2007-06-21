@@ -24,8 +24,8 @@ import time
 
 class log:
     def __init__(self, universal_loglevel=0):
-        self._logstart()
         self._universal_loglevel = universal_loglevel
+        self._logstart()
         self._out = sys.stdout
         self._mylogger = self._logger("log")
 
@@ -40,7 +40,7 @@ class log:
     def get_logger(self, module_name="Unkown", loglevel=None):
         if not loglevel:
             loglevel = self._universal_loglevel
-        return _logger(module_name, loglevel, self._out)
+        return self._logger(module_name, loglevel, self._out)
 
     def set_universal_loglevel(self, universal_loglevel=0):
         self._universal_loglevel = universal_loglevel

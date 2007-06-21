@@ -98,7 +98,7 @@ class config:
 
         project_root_exists = os.path.exists(self.project_root)
         if not project_root_exists:
-            self._logger.entry("Attempting to create project root '%s'", % self.project_root, 2)
+            self._logger.entry("Attempting to create project root '%s'" % self.project_root, 2)
             try:
                 os.mkdir(self.project_root)
             except:
@@ -107,7 +107,7 @@ class config:
 
         dot_swarm_exists = os.path.exists(self.dot_swarm)
         if not dot_swarm_exists:
-            self._logger.entry("Attempting to create dot swarm directory '%s'", % self.dot_swarm, 2)
+            self._logger.entry("Attempting to create dot swarm directory '%s'" % self.dot_swarm, 2)
             try:
                 os.mkdir(self.dot_swarm)
             except:
@@ -116,7 +116,7 @@ class config:
 
         swarmrc_exists = os.path.isfile(swarm_config)
         if not swarmrc_exists:
-            self._logger.entry("Attempting to create swarm rc '%s'", % swarm_config, 2)
+            self._logger.entry("Attempting to create swarm rc '%s'" % swarm_config, 2)
             dbfile = "%s/swarm.db" % self.dot_swarm
             self._config['swarm'].add_section("main")
             self._config['swarm'].set("main", "project_name", project_name)
@@ -146,4 +146,5 @@ class config:
             self._config[config_region].set(section, setting, value)
 
     def add_section(self, section, config_region=None):
-        if config_region in self.
+        #if config_region in self.
+        print "ERE I AM JH"
