@@ -24,20 +24,19 @@ import getopt
 def cli_help(pre_options, pre_args, command, post_options):
     if post_options:
         for com in post_options:
-            print option_dispatch[command].usage
-            print "\n"
-            print option_dispatch[command].summary
-            print "\n"
-            for line in option_dispatch[command].desc:
+            print option_dispatch[com].usage
+            print
+            print option_dispatch[com].summary
+            print
+            for line in option_dispatch[com].desc:
                 print line
     else:
         print option_dispatch[None].usage
-        print "\n"
         print option_dispatch[None].summary
-        print "\n"
-        for line in option_dispatch[command].desc:
+        print
+        for line in option_dispatch[None].desc:
             print line
-        print "\n"
+        print
         for com in option_dispatch.keys():
             if com:
                 print "   %s\t\t%s" % (com, option_dispatch[com].summary)
@@ -66,7 +65,7 @@ option_dispatch = {
     'init' : Command(
         ['v', 'f'],
         ['verbose', 'force'],
-        '[OPTIONS] init [DEST]',
+        'swarm [OPTIONS] init [DEST]',
         'Initialize a swarm DITS repository in given directory',
         ['  Initializes a new swarm DITS repository. Will use the',
          '  [DEST] directory for the new repository, or the current',
@@ -79,7 +78,7 @@ option_dispatch = {
     'help' : Command(
         None,
         None,
-        'help [COMMAND]',
+        'swarm help [COMMAND]',
         'Gives help for swarm',
         ['   If called with no [COMMAND], will give general help',
          '   and exit. Otherwise, will print help for [COMMAND].'],
