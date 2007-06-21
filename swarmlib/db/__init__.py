@@ -68,7 +68,7 @@ table_schema = [
         column('parents'),
         column('children'),
         column('related'),
-        ],
+    ],
 
     table('issue_custom')[
         column('id'),
@@ -89,9 +89,8 @@ table_schema = [
         column('type'),
         column('authentication'), # blob containing auth info
         column('transport'), # blob containing transport info
-        ],
-
-     ]
+    ],
+]
 
 database_backends = {
     'sqlite' : 'sqlite_backend',
