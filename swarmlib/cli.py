@@ -95,7 +95,6 @@ def cli_init(pre_options, pre_args, command, post_options):
     config.init(project_name)
     logger.unregister()
 
-
 class Command:
     def __init__(self, short_opts, long_opts, usage, summary, desc, callback):
         self.short_opts = short_opts
