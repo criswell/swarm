@@ -23,6 +23,7 @@ import os
 import getopt
 import swarmlib.config as Config
 import swarmlib.log as Log
+import swarmlib.db as SwarmDB
 
 log = Log.log()
 logger = log.get_logger("swarm_cli")
@@ -93,6 +94,8 @@ def cli_init(pre_options, pre_args, command, post_options):
 
     config = Config.config(working_dir, log, force)
     config.init(project_name)
+    db = SwarmDB(working_dir, config, log, force)
+    db.backend.init()
     logger.unregister()
 
 class Command:

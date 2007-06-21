@@ -24,12 +24,15 @@ import sqlite # Should do some more fanciness here, I'm sure
 
 from swarmlib import *
 from swarmlib.db import table_schema
+from swarmlib.
 
 class db:
-    def __init__(self, cwd, config, log):
+    def __init__(self, cwd, config, log. force):
         self._db_filename = "%s/%s" % (config.dot_swarm, config.get('main', 'dbfile', 'swarm'))
         self._project_root = cwd
         self._config = config
+        self._log = log
+        self._force = force
         self._logger = log.get_logger("sqlite_backend(db)")
         self._connect = None
         self._cursor = None
@@ -43,12 +46,14 @@ class db:
                 columns = columns + (" %s |" % column.name)
             print columns
 
-    def init(self, force=False):
+    def init(self):
+
+        force =
 
         self._logger.register("init")
 
         db_exists = os.path.isfile(self._db_filename)
-        if db_exists and force:
+        if db_exists and self._force:
             self._logger.entry("removing old database", 1)
             os.remove(self._db_filename)
             db_exists = False
