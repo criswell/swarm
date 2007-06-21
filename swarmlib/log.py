@@ -76,7 +76,7 @@ class log:
 
         def _logentry(self, output, function_name, entry):
             curtime = time.strftime("%Y %b %d %H:%M.%S", time.localtime(time.time()))
-            outpur.write("%s [%s.%s] : %s\n" % (curtime, self._module_name, function_name, entry))
+            output.write("%s [%s.%s] : %s\n" % (curtime, self._module_name, function_name, entry))
 
         def register(self, function_name=None):
             if function_name:

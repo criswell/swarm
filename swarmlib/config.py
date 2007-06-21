@@ -126,7 +126,7 @@ class config:
             fp = open(swarm_config, mode="w")
             self._config['swarm'].write(fp)
             fp.close()
-            selt._swarm_config_is_set = True
+            self._swarm_config_is_set = True
 
         self._logger.unregister()
 
