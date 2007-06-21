@@ -144,7 +144,35 @@ class config:
     def set(self, section, setting, value, config_region=None):
         if config_region in self._config['regions']:
             self._config[config_region].set(section, setting, value)
+        else:
+            # Default is to swarm
+            self._config[self._config['regions'][-1]].set(section, setting, value)
 
     def add_section(self, section, config_region=None):
-        #if config_region in self.
-        print "ERE I AM JH"
+        if config_region in self._config['regions']:
+            self._config[config_region].add_section(section)
+        else:
+            # Default is to last entry (swarm)
+            self._config[self._config['regions'][-1]]..add_section(section)
+
+    def save(self):
+        # This probably should be made more generally,
+        # however, right now I'm not convinced we should
+        # even be setting/saving none project swarmrc
+        # files. Then again, we allow it above...
+        # so who the fuck knows? Let's decide and fix it
+        # later....
+        # - Sam 2007-06-21
+        self._logger.register("save")
+        swarm_config = "%s/swarmrc" % self.dot_swarm
+
+        swarmrc_exists = os.path.isfile(swarm_config)
+        if not swarmrc_exists:
+            self._logger.entry("Attempting to create swarm rc '%s'" % swarm_config, 2)
+
+            fp = open(swarm_config, mode="w")
+            self._config['swarm'].write(fp)
+            fp.close()
+            self._swarm_config_is_set = True
+
+        self._logger.unregister()

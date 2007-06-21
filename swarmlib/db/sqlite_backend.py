@@ -20,8 +20,9 @@
 
 import os
 import sqlite # Should do some more fanciness here, I'm sure
+              # like, you know, try various versions and whatnot
 
-from swarm import *
+from swarmlib import *
 
 class db:
     def __init__(self, cwd, config, log):
@@ -32,13 +33,20 @@ class db:
         self._connect = None
         self._cursor = None
 
-    def _init_db(self, force=False):
+    def init(self, force=False):
 
-        self._logger.register("_init_db")
+        self._logger.register("init")
 
         db_exists = os.path.isfile(self._db_filename)
-        if not db_exists or force:
-            self._connect = sqlite.connect
+        if db_exists and force:
+            self._logger.entry("removing old database", 1)
+            os.remove(self._db_filename)
+            db_exists = False
+        if not db_exists:
+            self._logger.entry("connecting to database", 3)
+            self._connect = sqlite.connect(self._db_filename)
         else:
             self._logger.error("SQLite db '%s' file exists! (Use force to overwrite)" % self._db_filename)
             raise swarm_error("SQLite db '%s' file exists! (Use force to overwrite)" % self._db_filename)
+
+        self._logger.unregister("init")

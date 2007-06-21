@@ -23,3 +23,10 @@ class swarm_error(Exception):
         Exception.__init__(self, message)
         self.message = message
         self.show_traceback = show_traceback
+
+def import_at_runtime(module_name, suite_name):
+    try:
+        module = __import__(module_name, globals(), locals(), [suite_name])
+    except ImportError:
+        return None
+    return vars(module)[suite_name]

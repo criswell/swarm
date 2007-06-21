@@ -93,5 +93,25 @@ table_schema = [
 
      ]
 
+database_backends = {
+    'sqlite' : 'sqlite_backend',
+}
+
 class swarmdb:
-    def __init__(self, config):
+    def __init__(self, project_root, config, log, force=False):
+        self._config = config
+        self._log = log
+        self._logger = log.get_logger("swarmdb")
+        self._force = force
+        self._project_root = project_root
+        self.backend = None
+        self._backend_class = None
+        self.backend_type = self._config('main', 'dbtype')
+        self._load_backend()
+
+    def _load_backend(self):
+        self._logger.register("_load_backend")
+
+        self._logger.entry("Loading '%s' backend" % self.backend_type, 2)
+        self._backend_class = import_at_runtime("swarmlib.swarmdb", database_backend[self.backend_type])
+        self.backend = self._backend_class(self._project_root, self._config, self._log)
