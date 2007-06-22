@@ -19,7 +19,6 @@
 # Author: Sam Hart
 
 from swarmlib import *
-
 #
 # Database schema
 #
@@ -114,5 +113,5 @@ class swarmdb:
         self._logger.register("_load_backend")
 
         self._logger.entry("Loading '%s' backend" % self.backend_type, 2)
-        self._backend_class = import_at_runtime("swarmlib.swarmdb", database_backends[self.backend_type])
+        self._backend_class = import_at_runtime("swarmlib.db.%s" % database_backends[self.backend_type], "db")
         self.backend = self._backend_class(self._project_root, self._config, self._log, self._force)
