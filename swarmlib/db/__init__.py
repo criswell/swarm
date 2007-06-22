@@ -105,7 +105,7 @@ class swarmdb:
         self._project_root = project_root
         self.backend = None
         self._backend_class = None
-        self.backend_type = self._config('main', 'dbtype')
+        self.backend_type = self._config.get('main', 'dbtype')
         self._load_backend()
 
     def _load_backend(self):
