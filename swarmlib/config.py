@@ -135,7 +135,7 @@ class config:
         local_regions = self._config['regions']
         result = None
         if config_region and config_region in local_regions:
-            local_regions = config_region
+            local_regions = [config_region]
 
         for region in local_regions:
             if self._config[region].has_section(section):
