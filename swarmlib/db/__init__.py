@@ -62,7 +62,7 @@ table_schema = [
         column('status'),
         column('resolution'),
 
-        column('time', type='int'),
+        column('time', data_type='int'),
         column('root'),
 
         column('parents'),
