@@ -61,4 +61,4 @@ class db:
             self._logger.error("SQLite db '%s' file exists! (Use force to overwrite)" % self._db_filename)
             raise swarm_error("SQLite db '%s' file exists! (Use force to overwrite)" % self._db_filename)
 
-        self._logger.unregister("init")
+        self._logger.unregister()
