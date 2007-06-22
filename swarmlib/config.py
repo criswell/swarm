@@ -92,10 +92,13 @@ class config:
 
         swarm_config = "%s/swarmrc" % self.dot_swarm
         if self._swarm_config_is_set:
-            self._logger.error("swarm config is already set for project root '%s'" % self.project_root)
+            self._logger.error("swarm config is already set for project root '%s' (use force if you really want to overwrite)" % self.project_root)
             if not self._force:
                 sys.exit(2)
             self._logger.error("initializing anyway because of 'force' option")
+            os.remove(swarm_config)
+            for section in self._config['swarm'].sections():
+                self._config['swarm'].remove_section(section)
 
         project_root_exists = os.path.exists(self.project_root)
         if not project_root_exists:
