@@ -96,6 +96,7 @@ def cli_init(pre_options, pre_args, command, post_options):
     config.init(project_name)
     db = swarmdb(working_dir, config, log, force)
     db.backend.init()
+    db.backend.close()
     logger.unregister()
 
 class Command:

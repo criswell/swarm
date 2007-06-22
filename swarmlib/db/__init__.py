@@ -23,6 +23,8 @@ from swarmlib import *
 # Database schema
 #
 
+__db_version__ = 1
+
 class column:
     def __init__(self, name, auto_increment=False, primary_key=False, data_type='text', unique=False):
         self.name = name

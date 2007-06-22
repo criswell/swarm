@@ -168,13 +168,11 @@ class config:
         self._logger.register("save")
         swarm_config = "%s/swarmrc" % self.dot_swarm
 
-        swarmrc_exists = os.path.isfile(swarm_config)
-        if not swarmrc_exists:
-            self._logger.entry("Attempting to create swarm rc '%s'" % swarm_config, 2)
+        self._logger.entry("Attempting to create swarm rc '%s'" % swarm_config, 2)
 
-            fp = open(swarm_config, mode="w")
-            self._config['swarm'].write(fp)
-            fp.close()
-            self._swarm_config_is_set = True
+        fp = open(swarm_config, mode="w")
+        self._config['swarm'].write(fp)
+        fp.close()
+        self._swarm_config_is_set = True
 
         self._logger.unregister()
