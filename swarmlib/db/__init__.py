@@ -18,6 +18,8 @@
 #
 # Author: Sam Hart
 
+from swarmlib import *
+
 #
 # Database schema
 #

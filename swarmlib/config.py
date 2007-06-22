@@ -138,7 +138,8 @@ class config:
             local_regions = config_region
 
         for region in local_regions:
-            result = self._config[region].get(section, setting)
+            if self._config[region].has_section(section):
+                result = self._config[region].get(section, setting)
 
         return result
 
