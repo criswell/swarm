@@ -24,10 +24,9 @@ import sqlite # Should do some more fanciness here, I'm sure
 
 from swarmlib import *
 from swarmlib.db import table_schema
-from swarmlib.
 
 class db:
-    def __init__(self, cwd, config, log. force):
+    def __init__(self, cwd, config, log, force):
         self._db_filename = "%s/%s" % (config.dot_swarm, config.get('main', 'dbfile', 'swarm'))
         self._project_root = cwd
         self._config = config
@@ -47,9 +46,6 @@ class db:
             print columns
 
     def init(self):
-
-        force =
-
         self._logger.register("init")
 
         db_exists = os.path.isfile(self._db_filename)
