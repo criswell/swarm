@@ -19,6 +19,7 @@
 # Author: Sam Hart
 
 import os
+import sys
 import ConfigParser
 
 class config:
