@@ -38,11 +38,18 @@ class db:
 
     def _create_table(self):
         for table in table_schema:
-            print "Table '%s'" % table.name
-            print "-------------------------------------------"
-            columns = "|"
+            sql_code = "create table %s\n" % table.name
+            sql_code = sql_code + "(\n"
+            first = True
             for column in table.columns:
-                columns = columns + (" %s |" % column.name)
+                if not first:
+                    sql_code = sql_code + ",\n"
+                else:
+                    sql_code = sql_code + "\n"
+                sql_code = sql_code + column.name
+                if column.data_type: sql_code = sql_code + " %s" % column.data_type
+                if column.primary_key: sql_code = sql_code + " PRIMARY KEY"
+                # ERE I AM JH
             print columns
 
     def init(self):
