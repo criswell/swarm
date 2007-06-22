@@ -71,6 +71,8 @@ table_schema = [
         column('parents'),
         column('children'),
         column('related'),
+
+        column('attachments', data_type='blob'), #Should these be a seperate table?
     ],
 
     table('issue_custom')[
@@ -90,8 +92,60 @@ table_schema = [
         column('id'),
         column('uri'),
         column('type'),
-        column('authentication'), # blob containing auth info
-        column('transport'), # blob containing transport info
+        column('authentication', data_type='blob'), # blob containing auth info
+        column('transport', data_type='blob'), # blob containing transport info
+    ],
+
+    #taxonomy
+    table('component')[
+        column('id' unique=True),
+        column('name'),
+        column('details'),
+    ],
+
+    table('version')[
+        column('id' unique=True),
+        column('name'),
+        column('details'),
+    ],
+
+    table('milestone')[
+        column('id' unique=True),
+        column('name'),
+        column('details'),
+    ],
+
+    table('severity')[
+        column('id' unique=True),
+        column('name'),
+    ],
+
+    table('priority')[
+        column('id' unique=True),
+        column('name'),
+    ],
+
+    table('status')[
+        column('id' unique=True),
+        column('name'),
+    ],
+
+    table('resolution')[
+        column('id' unique=True),
+        column('name'),
+    ],
+]
+
+# The following tables will have some
+# useful defaults. They can be overwritten.
+table_defaults = [
+    "severity" : [
+    ],
+    "priority" : [
+    ],
+    "status" : [
+    ],
+    "resolution" : [
     ],
 ]
 
