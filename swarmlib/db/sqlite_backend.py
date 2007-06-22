@@ -27,7 +27,7 @@ from swarmlib.db import table_schema
 
 class db:
     def __init__(self, cwd, config, log, force):
-        self._db_filename = "%s/%s" % (config.dot_swarm, config.get('main', 'dbfile', 'swarm'))
+        self._db_filename = config.get('main', 'dbfile', 'swarm')
         self._project_root = cwd
         self._config = config
         self._log = log
