@@ -200,7 +200,7 @@ table_defaults = [
     "resolution" : [
         {'id' : 1,
         'name' : 'fixed',
-        'default' : 1},
+        'default' : 0},
         {'id' : 2,
         'name' : 'wontfix',
         'default' : 0},
@@ -213,6 +213,10 @@ table_defaults = [
         {'id' : 5,
         'name' : 'duplicate',
         'default' : 0},
+        {'id' : 4,
+        'name' : 'none',
+        'default' : 1},
+
     ],
 ]
 
