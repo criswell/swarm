@@ -40,6 +40,7 @@ class db:
 
     def _create_table(self):
         for table in table_schema:
+            sql_code = "drop table %s;\n" % table.name
             sql_code = "create table %s\n" % table.name
             sql_code = sql_code + "("
             first = True
