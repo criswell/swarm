@@ -98,41 +98,45 @@ table_schema = [
 
     #taxonomy
     table('component')[
-        column('id' unique=True),
+        column('id', unique=True),
         column('name'),
         column('details'),
     ],
 
     table('version')[
-        column('id' unique=True),
+        column('id', unique=True),
         column('name'),
         column('details'),
     ],
 
     table('milestone')[
-        column('id' unique=True),
+        column('id', unique=True),
         column('name'),
         column('details'),
     ],
 
     table('severity')[
-        column('id' unique=True),
+        column('id', unique=True),
         column('name'),
+        column('default', data_type='int'),
     ],
 
     table('priority')[
-        column('id' unique=True),
+        column('id', unique=True),
         column('name'),
+        column('default', data_type='int'),
     ],
 
     table('status')[
-        column('id' unique=True),
+        column('id', unique=True),
         column('name'),
+        column('default', data_type='int'),
     ],
 
     table('resolution')[
-        column('id' unique=True),
+        column('id', unique=True),
         column('name'),
+        column('value', data_type='int'),
     ],
 ]
 
@@ -140,12 +144,75 @@ table_schema = [
 # useful defaults. They can be overwritten.
 table_defaults = [
     "severity" : [
+        {'id' : 1,
+        'name' : 'blocker',
+        'default' : 0},
+        {'id' : 2,
+        'name' : 'critical',
+        'default' : 0},
+        {'id' : 3,
+        'name' : 'major',
+        'default' : 0},
+        {'id' : 4,
+        'name' : 'normal',
+        'default' : 1},
+        {'id' : 5,
+        'name' : 'minor',
+        'default' : 0},
+        {'id' : 6,
+        'name' : 'trivial',
+        'default' : 0},
+        {'id' : 7,
+        'name' : 'enhancement',
+        'default' : 0},
     ],
     "priority" : [
+        {'id' : 1,
+        'name' : 'highest',
+        'default' : 0},
+        {'id' : 2,
+        'name' : 'high',
+        'default' : 0},
+        {'id' : 3,
+        'name' : 'medium',
+        'default' : 1},
+        {'id' : 4,
+        'name' : 'low',
+        'default' : 0},
+        {'id' : 5,
+        'name' : 'lowest',
+        'default' : 0},
     ],
     "status" : [
+        {'id' : 1,
+        'name' : 'unassigned',
+        'default' : 0},
+        {'id' : 2,
+        'name' : 'assigned',
+        'default' : 0},
+        {'id' : 3,
+        'name' : 'closed',
+        'default' : 0},
+        {'id' : 4,
+        'name' : 'new',
+        'default' : 1},
     ],
     "resolution" : [
+        {'id' : 1,
+        'name' : 'fixed',
+        'default' : 1},
+        {'id' : 2,
+        'name' : 'wontfix',
+        'default' : 0},
+        {'id' : 3,
+        'name' : 'invalid',
+        'default' : 0},
+        {'id' : 4,
+        'name' : 'worksforme',
+        'default' : 0},
+        {'id' : 5,
+        'name' : 'duplicate',
+        'default' : 0},
     ],
 ]
 
