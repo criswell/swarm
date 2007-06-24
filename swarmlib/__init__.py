@@ -25,6 +25,9 @@ class swarm_error(Exception):
         self.show_traceback = show_traceback
 
 def import_at_runtime(module_name, suite_name):
+    """
+    Imports a python module determined at runtime.
+    """
     try:
         module = __import__(module_name, globals(), locals(), [suite_name])
     except ImportError:
