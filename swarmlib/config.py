@@ -1,17 +1,20 @@
 #!/usr/bin/env python
 
+# swarmlib.config - The config abstraction layer for swarmlib.
+# Use this module to interface with swarmrc and config files.
+#
 # Copyright 2007 Sam Hart
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-#
+
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-#
+
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -24,6 +27,13 @@ import ConfigParser
 
 class config:
     def __init__(self, cwd, log, force=False):
+        """
+        Main config class
+        cwd = The current working directory or project root
+        log = The log instance for the current running swarm program
+        force = Whether operations performed by the config class
+                should be forced
+        """
         self.project_root = cwd
         self.dot_swarm = "%s/.swarm" % self.project_root
         self._config = {}
@@ -41,8 +51,10 @@ class config:
         self._load_config()
 
     def _load_config(self):
-        # load the configuration
-
+        """
+        Internal load config method.
+        SHOULD NOT BE CALLED EXTERNALLY
+        """
         self._logger.register("_load_config")
 
         # Read the system-wide config file (if exists)
@@ -86,7 +98,18 @@ class config:
         self._logger.unregister()
 
     def init(self, project_name):
-        """ init project config file """
+        """
+        init project config file
+        Given the "project_name" will initialize the
+        project's swarmrc file.
+
+        This should be called when a new project is being
+        initialized.
+
+        If the force setting was set to true in the class
+        __init__ method, this method will overwrite the
+        project's swarmrc file even if it exists.
+        """
 
         self._logger.register("init")
 
@@ -135,6 +158,21 @@ class config:
         self._logger.unregister()
 
     def get(self, section, setting, config_region=None):
+        """
+        Get a given config's setting
+        section = The section title of the config file
+        setting = The setting we want the value for
+        config_region = The config region to look up
+
+        config_region can be one of 'system' (or system-
+        wide settings), 'user' (or user-specific settings),
+        or 'swarm' (project-specific settings).
+
+        If config_region is not specified, will cycle
+        through each config file taking the one from the
+        highest priority file, e.g.,
+            'system' < 'user' < 'swarm'
+        """
         local_regions = self._config['regions']
         result = None
         if config_region and config_region in local_regions:
@@ -147,6 +185,21 @@ class config:
         return result
 
     def set(self, section, setting, value, config_region=None):
+        """
+        Set a specific config's setting
+        section = The section title of the config file
+        setting = The setting we want the value for
+        value = The value to set setting to
+        config_region = The config region to look up
+
+        config_region can be one of 'system' (or system-
+        wide settings), 'user' (or user-specific settings),
+        or 'swarm' (project-specific settings).
+
+        If config_region is not specified, will default
+        to 'swarm', or the local project-specific config
+        file.
+        """
         if config_region in self._config['regions']:
             self._config[config_region].set(section, setting, value)
         else:
@@ -154,6 +207,19 @@ class config:
             self._config[self._config['regions'][-1]].set(section, setting, value)
 
     def add_section(self, section, config_region=None):
+        """
+        Add a new section to a config file
+        section = The section title to add
+        config_region = The config region to look up
+
+        config_region can be one of 'system' (or system-
+        wide settings), 'user' (or user-specific settings),
+        or 'swarm' (project-specific settings).
+
+        If config_region is not specified, will default
+        to 'swarm', or the local project-specific config
+        file.
+        """
         if config_region in self._config['regions']:
             self._config[config_region].add_section(section)
         else:
@@ -161,13 +227,20 @@ class config:
             self._config[self._config['regions'][-1]].add_section(section)
 
     def save(self):
-        # This probably should be made more generally,
-        # however, right now I'm not convinced we should
-        # even be setting/saving none project swarmrc
-        # files. Then again, we allow it above...
-        # so who the fuck knows? Let's decide and fix it
-        # later....
-        # - Sam 2007-06-21
+        """
+        Save the project's swarmrc file.
+
+        Will save the project-specific swarm config
+        file.
+
+        This probably should be made more generally,
+        however, right now I'm not convinced we should
+        even be setting/saving none project swarmrc
+        files. Then again, we allow it above...
+        so who the fuck knows? Let's decide and fix it
+        later....
+        - Sam 2007-06-21
+        """
         self._logger.register("save")
         swarm_config = "%s/swarmrc" % self.dot_swarm
 
