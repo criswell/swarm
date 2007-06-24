@@ -99,6 +99,33 @@ def cli_init(pre_options, pre_args, command, post_options):
     db.backend.close()
     logger.unregister()
 
+def cli_component(pre_options, pre_args, command, post_options):
+    verbose = 0
+    comp_command = None
+
+    for o, a in pre_options:
+        if o in ("-v", "--verbose"):
+            verbose = verbose + 1
+
+    if post_options:
+        comp_command = post_options[0]
+    else:
+        cli_help(None, None, 'help', ['component'])
+        sys.exit(2)
+
+    log.set_universal_loglevel(verbose)
+    logger.register("cli_component")
+
+    config = Config.config(working_dir, log, force)
+    db = swarmdb(working_dir, config, log, force)
+
+    if comp_command.lower() == 'list':
+        components = db.get_taxonomy('component')
+
+    db.backend.close()
+    logger.unregister()
+
+
 class Command:
     def __init__(self, short_opts, long_opts, usage, summary, desc, callback):
         self.short_opts = short_opts
@@ -130,6 +157,24 @@ option_dispatch = {
          '  -v|--verbose    Be verbose about actions',
          "  -f|--force      Force even if directory isn't empty"],
         cli_init),
+    'component' : Command(
+        ['v'],
+        ['verbose'],
+        'swarm [OPTIONS] component [COMP COMMAND]',
+        'Perform a "component" command',
+        ['   Components are sub-project classifications which issues',
+         '   can be filed against. The [COMP COMMAND]s are as follows',
+         '',
+         '   COMP COMMANDS:',
+         '   list           List the current components',
+         '   edit           Start up an editor and edit the component',
+         '                      list',
+         '   add [COMP]     Add a new component to the list',
+         '   delete [COMP]  Delete a component from the list',
+         '',
+         '   OPTIONS:',
+         '   -v|--verbose   Be verbose about actions',],
+        cli_component),
     'help' : Command(
         None,
         None,
@@ -138,7 +183,6 @@ option_dispatch = {
         ['   If called with no [COMMAND], will give general help',
          '   and exit. Otherwise, will print help for [COMMAND].'],
          cli_help),
-
     'copyright' : Command(
         None,
         None,

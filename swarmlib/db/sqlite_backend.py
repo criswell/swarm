@@ -24,6 +24,7 @@ import sqlite # Should do some more fanciness here, I'm sure
 
 from swarmlib import *
 from swarmlib.db import table_schema
+from swarmlib.db import table_defaults
 from swarmlib.db import __db_version__
 
 class db:
@@ -68,10 +69,40 @@ class db:
         self._cursor = self._connect.cursor()
         self._connected = True
 
+    def _prepopulate_tables(self):
+        self._logger.register("_prepopulate_tables")
+        for table in table_defaults.keys():
+            for entry in table_defaults[table]:
+                column_code = ""
+                value_code = ""
+                first_entry = True
+                for key in entry.keys():
+                    if first_entry:
+                        first_entry = False
+                    else:
+                        column_code = column_code + ", "
+                        value_code = value_code + ", "
+
+                    column_code = column_code + "%s" % key
+                    value_code = value_code + '"%s"' % entry[key]
+                sql_code = "INSERT INTO %s (%s) VALUES (%s);\n" % (table, column_code, value_code)
+                self._logger.entry("SQL code is:\n%s" % sql_code, 5)
+                if self._connected:
+                    self._cursor.execute(sql_code)
+                else:
+                    self._logger.error("Attempted to prepopulate table while not connected to the database. Could it be that the connection failed for some reason?")
+                    raise swarm_error("Attempted to prepopulate table while not connected to the database. Could it be that the connection failed for some reason?")
+        self._logger.unregister()
+
     def close(self):
         self._connect.commit()
         self._connect.close()
         self._connected = False
+
+    def get_taxonomy(self, term):
+        self._logger.register("get_taxonomy")
+
+        self._logger.unregister()
 
     def init(self):
         self._logger.register("init")
@@ -85,6 +116,7 @@ class db:
             self._logger.entry("connecting to database", 3)
             self._get_connection()
             self._create_table()
+            self._prepopulate_tables()
             self._config.add_section('sqlite', 'swarm')
             self._config.set('sqlite', 'db_version', __db_version__, 'swarm')
             self._config.save()
