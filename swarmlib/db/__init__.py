@@ -216,7 +216,11 @@ table_defaults = {
         {'id' : 6,
         'name' : 'none',
         'isdefault' : 1},
-
+    ],
+    "component" : [
+        {'id': 0,
+        'name': "None",
+        'details' : 'No component'},
     ],
 }
 
