@@ -110,6 +110,8 @@ def cli_component(pre_options, pre_args, command, post_options):
 
     if post_options:
         comp_command = post_options[0]
+        if len(post_options) == 2:
+            working_dir = post_options[1]
     else:
         cli_help(None, None, 'help', ['component'])
         sys.exit(2)
@@ -162,7 +164,7 @@ option_dispatch = {
     'component' : Command(
         ['v'],
         ['verbose'],
-        'swarm [OPTIONS] component [COMP COMMAND]',
+        'swarm [OPTIONS] component [COMP COMMAND] [DIR]',
         'Perform a "component" command',
         ['   Components are sub-project classifications which issues',
          '   can be filed against. The [COMP COMMAND]s are as follows',
@@ -171,8 +173,6 @@ option_dispatch = {
          '   list           List the current components',
          '   edit           Start up an editor and edit the component',
          '                      list',
-         '   add [COMP]     Add a new component to the list',
-         '   delete [COMP]  Delete a component from the list',
          '',
          '   OPTIONS:',
          '   -v|--verbose   Be verbose about actions',],
