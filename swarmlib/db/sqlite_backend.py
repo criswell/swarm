@@ -103,7 +103,34 @@ class db:
         self._logger.register("_convert_list")
         converted_list = []
 
-        return the_list
+        table_in_use = None
+        columns = []
+
+        # First, get the schema:
+        for table in table_schema:
+            if table.name == term:
+                table_in_use = table
+                break
+
+        if not table_in_use:
+            raise swarm_error("No table named '%s'" % term)
+
+        for column in table_in_use.columns:
+            columns.append(column.name)
+
+        # Now, let's convert the list using this schema
+        for entry in the_list:
+            if len(entry) != len(columns):
+                self._logger.error("Table column mismatch in sqlite results from taxonomy query on '%s', database may be corrupt. Skipping." % term)
+                continue
+
+            converted_entry = {}
+            for i in range(len(entry)):
+                converted_entry[columns[i]] = entry[i]
+
+            converted_list.append(converted_entry)
+
+        return converted_list
 
         self._logger.unregister()
 

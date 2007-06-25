@@ -125,6 +125,8 @@ def cli_component(pre_options, pre_args, command, post_options):
 
     if comp_command.lower() == 'list':
         components = db.backend.get_taxonomy('severity') #('component')
+        for entry in components:
+            print entry
 
     db.backend.close()
     logger.unregister()
