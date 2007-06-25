@@ -161,6 +161,35 @@ class db:
         self._connect.close()
         self._connected = False
 
+    def set_taxonomy(self, term, the_list):
+        """
+        Given a table name, will update its contents with the new
+        terms from 'the_list'
+        """
+        self._logger.register("set_taxonomy")
+
+        for entry in the_list:
+            column_names = ""
+            column_values = ""
+            first_entry = True
+            for key in entry.keys():
+                if first_entry:
+                    column_names = column_names + key
+                    column_values = '"%s"' % entry[key]
+                    first_entry = False
+                else:
+                    column_names = column_names + ", " + key
+                    column_values = '%s, "%s"' % (column_values, entry[key])
+            sql_code = "REPLACE INTO %s (%s) VALUES (%s);" % (term, column_names, column_values)
+            self._logger.entry("SQL code is:\n%s" % sql_code, 5)
+            if self._connected:
+                self._cursor.execute(sql_code)
+            else:
+                self._logger.error("Attempted to replace table entries while not connected to the database. Could it be that the connection failed for some reason?")
+                raise swarm_error("Attempted to replace table entries while not connected to the database. Could it be that the connection failed for some reason?")
+
+        self._logger.unregister()
+
     def get_taxonomy(self, term):
         """
         Given a table name, will return the list of the

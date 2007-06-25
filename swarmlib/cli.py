@@ -21,9 +21,17 @@
 import sys
 import os
 import getopt
+import md5
+import tempfile
+
 import swarmlib.config as Config
 import swarmlib.log as Log
 from swarmlib.db import swarmdb
+
+#import gettext
+#gettext.bindtextdomain('swarmlib')
+#gettext.textdomain('swarmlib')
+#_ = gettext.gettext
 
 log = Log.log()
 logger = log.get_logger("swarm_cli")
@@ -52,6 +60,64 @@ def cli_space_filler(command, size):
     if size > len(command):
         a = " " * (size - len(command))
     return a
+
+def cli_parse_datafile(name, column_list):
+    """
+    Given a datafile (name) and a format for the columns (column_list) will parse
+    the file and return a list of the data
+    """
+
+    parsed_list = []
+
+    fd = file(name, 'rb')
+    for line in fd.readlines():
+        temp_line = line.strip()
+        if len(temp_line):
+            if temp_line[0] != '#':
+                temp_split = temp_line.split('|')
+                if len(temp_split) == len(column_list):
+                    temp_parsed = {}
+                    for a in range(len(column_list)):
+                        temp_parsed[column_list[a]] = temp_split[a].strip()
+                    parsed_list.append(temp_parsed)
+                else:
+                    logger.error("Unable to parse line, skipping: '%s'" % temp_line)
+
+    return parsed_list
+
+def cli_launch_editor(name):
+    """
+    Launch an external editor
+    Returns:
+    (bhash, ahash, bsize, asize)
+    Where:
+    asize = filesize after
+    bsize = filesize before
+    ahash = filehash after
+    bhash = filehash before
+    """
+
+    bstat = os.stat(name)
+    bsize = bstat.st_size
+    fd = file(name, 'rb')
+    bhash = md5.new(fd.read()).digest()
+    fd.close()
+
+    # TODO: Right now, we just use $EDITOR from the system environement, but later on
+    # we will want to make this fancier
+    editor = os.environ.get("EDITOR", "nano")
+    cmd = "%s %s" % (editor, name)
+    status = os.system(cmd)
+
+    # TODO: Should do something with status
+
+    astat = os.stat(name)
+    asize = astat.st_size
+    fd = file(name, 'rb')
+    ahash = md5.new(fd.read()).digest()
+    fd.close()
+
+    return (bhash, ahash, bsize, asize)
 
 def cli_help(pre_options, pre_args, command, post_options):
     if post_options:
@@ -122,11 +188,33 @@ def cli_component(pre_options, pre_args, command, post_options):
     config = Config.config(working_dir, log)
     db = swarmdb(working_dir, config, log)
     db.backend.connect()
+    components = db.backend.get_taxonomy('component')
 
     if comp_command.lower() == 'list':
-        components = db.backend.get_taxonomy('component')
         for entry in components:
             print entry
+    if comp_command.lower() == 'edit':
+        (fp, name) = tempfile.mkstemp()
+        temp = os.write(fp,
+            "# Component entries\n" +
+            "# NOTE THAT CHANGING ENTRIES FOR A GIVEN\n" +
+            "# 'id' will overwrite that entry globally\n\n" +
+            "# FORMAT:\n" +
+            "# id | name | details\n")
+
+        for entry in components:
+            temp = os.write(fp, "%s | %s | %s\n" % (entry['id'], entry['name'], entry['details']))
+
+        os.close(fp)
+
+        (bhash, ahash, bsize, asize) = cli_launch_editor(name)
+        if bhash != ahash:
+            new_components = cli_parse_datafile(name, ['id', 'name', 'details'])
+            db.backend.set_taxonomy('component', new_components)
+        else:
+            logger.entry("Component list unchanged.", 0)
+
+        os.remove(name)
 
     db.backend.close()
     logger.unregister()
