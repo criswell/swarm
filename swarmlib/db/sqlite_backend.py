@@ -94,15 +94,63 @@ class db:
                     raise swarm_error("Attempted to prepopulate table while not connected to the database. Could it be that the connection failed for some reason?")
         self._logger.unregister()
 
+    def _convert_list(self, the_list, term):
+        """
+        Given an sqlite result and tablename will
+        generate a list of dictionaries with column
+        names and values
+        """
+        self._logger.register("_convert_list")
+        converted_list = []
+
+        return the_list
+
+        self._logger.unregister()
+
+    def connect(self):
+        """
+        Connect to the database
+        """
+        self._logger.register("connect")
+        if not self._connected:
+            db_exists = os.path.isfile(self._db_filename)
+            if db_exists:
+                self._get_connected()
+            else:
+                self._logger.error("Cannot connect to database, file not found. Workspace not initialized?")
+        else:
+            self._logger.erro("Connect was called after we were already connected.")
+            raise swarm_error("Connect was called after we were already connected.")
+
+        self._logger.unregister()
+
+
     def close(self):
+        """
+        Call this when you wish to close your connection to the db
+        """
         self._connect.commit()
         self._connect.close()
         self._connected = False
 
     def get_taxonomy(self, term):
+        """
+        Given a table name, will return the list of the
+        taxonomy that table describes
+        """
         self._logger.register("get_taxonomy")
+        the_list = None
 
+        sql_code = "SELECT * FROM %s order by id;" % term
+        self._logger.entry("Executing SQL code: '%s'" % sql_code, 5)
+        if self._connected:
+            self._cursor.execute(sql_code)
+            the_list = self._convert_list(self._cursor.fetchall(), term)
+        else:
+            self._logger.error("Attempted to get taxonomy while not connected to the database. Could it be that the connection failed for some reason?")
+            raise swarm_error("Attempted to get taxonomy while not connected to the database. Could it be that the connection failed for some reason?")
         self._logger.unregister()
+        return the_list
 
     def init(self):
         self._logger.register("init")

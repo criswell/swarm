@@ -102,6 +102,7 @@ def cli_init(pre_options, pre_args, command, post_options):
 def cli_component(pre_options, pre_args, command, post_options):
     verbose = 0
     comp_command = None
+    working_dir = os.getcwd()
 
     for o, a in pre_options:
         if o in ("-v", "--verbose"):
@@ -116,11 +117,12 @@ def cli_component(pre_options, pre_args, command, post_options):
     log.set_universal_loglevel(verbose)
     logger.register("cli_component")
 
-    config = Config.config(working_dir, log, force)
-    db = swarmdb(working_dir, config, log, force)
+    config = Config.config(working_dir, log)
+    db = swarmdb(working_dir, config, log)
+    db.backend.connect()
 
     if comp_command.lower() == 'list':
-        components = db.get_taxonomy('component')
+        components = db.backend.get_taxonomy('severity') #('component')
 
     db.backend.close()
     logger.unregister()
