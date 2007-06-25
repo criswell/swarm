@@ -124,7 +124,7 @@ def cli_component(pre_options, pre_args, command, post_options):
     db.backend.connect()
 
     if comp_command.lower() == 'list':
-        components = db.backend.get_taxonomy('severity') #('component')
+        components = db.backend.get_taxonomy('component')
         for entry in components:
             print entry
 
