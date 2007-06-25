@@ -29,7 +29,7 @@ from swarmlib.db import __db_version__
 
 class db:
     def __init__(self, cwd, config, log, force):
-        self._db_filename = config.get('main', 'dbfile', 'swarm')
+        self._db_filename = "%s/%s" % (config.dot_swarm, config.get('main', 'dbfile', 'swarm'))
         self._project_root = cwd
         self._config = config
         self._log = log
@@ -112,14 +112,15 @@ class db:
         Connect to the database
         """
         self._logger.register("connect")
+        self._logger.entry("Connecting to db file: %s" % self._db_filename, 5)
         if not self._connected:
             db_exists = os.path.isfile(self._db_filename)
             if db_exists:
-                self._get_connected()
+                self._get_connection()
             else:
                 self._logger.error("Cannot connect to database, file not found. Workspace not initialized?")
         else:
-            self._logger.erro("Connect was called after we were already connected.")
+            self._logger.error("Connect was called after we were already connected.")
             raise swarm_error("Connect was called after we were already connected.")
 
         self._logger.unregister()

@@ -144,10 +144,11 @@ class config:
         swarmrc_exists = os.path.isfile(swarm_config)
         if not swarmrc_exists:
             self._logger.entry("Attempting to create swarm rc '%s'" % swarm_config, 2)
-            dbfile = "%s/swarm.db" % self.dot_swarm
+            #dbfile = "%s/swarm.db" % self.dot_swarm
+            # This was, perhaps, not a good idea
             self._config['swarm'].add_section("main")
             self._config['swarm'].set("main", "project_name", project_name)
-            self._config['swarm'].set("main", "dbfile", dbfile)
+            self._config['swarm'].set("main", "dbfile", "swarm.db")
             self._config['swarm'].set("main", "dbtype", "sqlite")
 
             fp = open(swarm_config, mode="w")
