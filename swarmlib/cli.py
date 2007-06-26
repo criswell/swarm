@@ -27,6 +27,7 @@ import tempfile
 import swarmlib.config as Config
 import swarmlib.log as Log
 from swarmlib.db import swarmdb
+from swarmlib.db import taxonomy_terms
 
 #import gettext
 #gettext.bindtextdomain('swarmlib')
@@ -165,9 +166,10 @@ def cli_init(pre_options, pre_args, command, post_options):
     db.backend.close()
     logger.unregister()
 
-def cli_component(pre_options, pre_args, command, post_options):
+def cli_taxonomy(pre_options, pre_args, command, post_options):
     verbose = 0
-    comp_command = None
+    tax_command = None
+    tax_term = 'component'
     working_dir = os.getcwd()
 
     for o, a in pre_options:
@@ -175,28 +177,35 @@ def cli_component(pre_options, pre_args, command, post_options):
             verbose = verbose + 1
 
     if post_options:
-        comp_command = post_options[0]
-        if len(post_options) == 2:
-            working_dir = post_options[1]
+        tax_command = post_options[0]
+        if tax_command == 'listall':
+            logger.entry('Possible taxonomy terms:', 0)
+            for a in taxonomy_terms:
+                print "\t%s" % a
+            sys.exit()
+        if len(post_options) > 1:
+            tax_term = post_options[1].lower()
+        if len(post_options) == 3:
+            working_dir = post_options[2]
     else:
-        cli_help(None, None, 'help', ['component'])
+        cli_help(None, None, 'help', ['taxonomy'])
         sys.exit(2)
 
     log.set_universal_loglevel(verbose)
-    logger.register("cli_component")
+    logger.register("cli_taxonomy")
 
     config = Config.config(working_dir, log)
     db = swarmdb(working_dir, config, log)
     db.backend.connect()
-    components = db.backend.get_taxonomy('component')
+    components = db.backend.get_taxonomy(tax_term)
 
-    if comp_command.lower() == 'list':
+    if tax_command.lower() == 'list':
         for entry in components:
             print entry
-    if comp_command.lower() == 'edit':
+    if tax_command.lower() == 'edit':
         (fp, name) = tempfile.mkstemp()
         temp = os.write(fp,
-            "# Component entries\n" +
+            "# Entries\n" +
             "# NOTE THAT CHANGING ENTRIES FOR A GIVEN\n" +
             "# 'id' will overwrite that entry globally\n\n" +
             "# FORMAT:\n" +
@@ -210,9 +219,9 @@ def cli_component(pre_options, pre_args, command, post_options):
         (bhash, ahash, bsize, asize) = cli_launch_editor(name)
         if bhash != ahash:
             new_components = cli_parse_datafile(name, ['id', 'name', 'details'])
-            db.backend.set_taxonomy('component', new_components)
+            db.backend.set_taxonomy(tax_term, new_components)
         else:
-            logger.entry("Component list unchanged.", 0)
+            logger.entry("'%s' list unchanged." % tax_term, 0)
 
         os.remove(name)
 
@@ -251,22 +260,33 @@ option_dispatch = {
          '  -v|--verbose    Be verbose about actions',
          "  -f|--force      Force even if directory isn't empty"],
         cli_init),
-    'component' : Command(
+    'taxonomy' : Command(
         ['v'],
         ['verbose'],
-        'swarm [OPTIONS] component [COMP COMMAND] [DIR]',
-        'Perform a "component" command',
-        ['   Components are sub-project classifications which issues',
-         '   can be filed against. The [COMP COMMAND]s are as follows',
+        'swarm [OPTIONS] taxonomy [TAX COMMAND] [TAX TERM] [DIR]',
+        'Perform a taxonomy command',
+        ['   Swarm taxonomies define various classifications used to',
+         '   categorize issues. Taxonomies may include version,',
+         '   milestone, or sub-project information.',
          '',
-         '   COMP COMMANDS:',
-         '   list           List the current components',
-         '   edit           Start up an editor and edit the component',
-         '                      list',
+         '   If a [DIR] is not specified, the current directory is',
+         '   used.',
+         '',
+         '   Every [TAX COMMAND] except for "listall" takes an',
+         '   additional option, [TAX TERM], which specifies which',
+         '   taxonomy term to perform the operation on',
+         '',
+         '   The [TAX COMMAND]s are as follows',
+         '',
+         '   TAX COMMANDS:',
+         '   listall        List all the taxonomy terms available',
+         '   list           List the current entries in the taxonomy',
+         '   edit           Start up an editor and edit the entries',
+         '                    in the taxonomy list',
          '',
          '   OPTIONS:',
          '   -v|--verbose   Be verbose about actions',],
-        cli_component),
+        cli_taxonomy),
     'help' : Command(
         None,
         None,

@@ -228,6 +228,8 @@ database_backends = {
     'sqlite' : 'sqlite_backend',
 }
 
+taxonomy_terms = ['component', 'version', 'milestone']
+
 class swarmdb:
     def __init__(self, project_root, config, log, force=False):
         self._config = config
