@@ -96,6 +96,14 @@ table_schema = [
         column('transport', data_type='blob'), # blob containing transport info
     ],
 
+    #log
+    table('log')[
+        column('id', unique=True),
+        column('time', data_type='INTEGER'),
+        column('transaction'),
+        column('entry'),
+    ],
+
     #taxonomy
     table('component')[
         column('id', unique=True),

@@ -134,6 +134,23 @@ class db:
 
         self._logger.unregister()
 
+    def _log_transaction(self, message, xaction):
+        """
+        Internal function for logging the transaction into the
+        sqlite table 'log'
+        """
+        self._logger.register('_log_transaction')
+        if self._connected:
+            # BAH ERE I AM JH
+            # get unique hash for id
+            # get unique time in int utc
+            # figure out sql code
+            # enter it
+        else:
+            self._logger.error('Transaction log entry attempted when not connected to database. Skipping.')
+
+        self._logger.unregister()
+
     def connect(self):
         """
         Connect to the database
