@@ -100,7 +100,7 @@ table_schema = [
     table('log')[
         column('id', unique=True),
         column('time', data_type='INTEGER'),
-        column('transaction'),
+        column('transaction', data_type='blob'),
         column('entry'),
     ],
 
