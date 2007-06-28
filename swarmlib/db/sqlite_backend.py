@@ -19,6 +19,7 @@
 # Author: Sam Hart
 
 import os
+import time
 import sqlite # Should do some more fanciness here, I'm sure
               # like, you know, try various versions and whatnot
 
@@ -141,6 +142,9 @@ class db:
         """
         self._logger.register('_log_transaction')
         if self._connected:
+            # Determine what number we're on
+            # by looking at the 0th entry
+            print
             # BAH ERE I AM JH
             # get unique hash for id
             # get unique time in int utc

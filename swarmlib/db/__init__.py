@@ -97,9 +97,10 @@ table_schema = [
     ],
 
     #log
-    table('log')[
+    table('xlog')[
         column('id', unique=True),
-        column('time', data_type='INTEGER'),
+        column('user'),
+        column('time', data_type='float'),
         column('transaction', data_type='blob'),
         column('entry'),
     ],
@@ -229,6 +230,13 @@ table_defaults = {
         {'id': 0,
         'name': "None",
         'details' : 'No component'},
+    ],
+    "xlog" : [
+        {'id': 0,
+        'user': "None",
+        'time': 0,
+        'transaction': "0",
+        'entry': "0"},
     ],
 }
 
