@@ -44,7 +44,7 @@ class table:
 table_schema = [
     # Issue tracking blob
     table('issue')[
-        column('id', unique=True),
+        column('id', data_type='INTEGER', unique=True),
 
         column('component'),
         column('version'),
@@ -58,13 +58,16 @@ table_schema = [
         column('cc'),
         column('subscribers'),
 
-        column('summary'),
-        column('details'),
         column('keywords'),
 
         column('status'),
         column('resolution'),
 
+        column('time', data_type='INTEGER'),
+    ]
+
+    table('node')[
+        column('node_id', unique=True),
         column('time', data_type='INTEGER'),
         column('root'),
 
@@ -72,11 +75,15 @@ table_schema = [
         column('children'),
         column('related'),
 
+        column('summary'),
+        column('details'),
+        column('keywords'),
+
         column('attachments', data_type='blob'), #Should these be a seperate table?
     ],
 
     table('issue_custom')[
-        column('id'),
+        column('node_id'),
         column('name'),
         column('value'),
     ],
