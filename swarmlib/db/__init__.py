@@ -81,12 +81,6 @@ table_schema = [
         column('value'),
     ],
 
-    #root tracker
-    table('rootids')[
-        column('humanid'),
-        column('id'),
-    ],
-
     #upstream tracker
     table('upstream')[
         column('id'),
@@ -94,15 +88,6 @@ table_schema = [
         column('type'),
         column('authentication', data_type='blob'), # blob containing auth info
         column('transport', data_type='blob'), # blob containing transport info
-    ],
-
-    #log
-    table('xlog')[
-        column('id', unique=True),
-        column('user'),
-        column('time', data_type='float'),
-        column('transaction', data_type='blob'),
-        column('entry'),
     ],
 
     #taxonomy
@@ -230,13 +215,6 @@ table_defaults = {
         {'id': 0,
         'name': "None",
         'details' : 'No component'},
-    ],
-    "xlog" : [
-        {'id': 0,
-        'user': "None",
-        'time': 0,
-        'transaction': "0",
-        'entry': "0"},
     ],
 }
 
