@@ -33,7 +33,7 @@ class xlog:
         """
         self.issue_number = issue_number
         self._config = config
-        self._xlog_file = "%s/%s/%s.xlog" % (config.dot_swarm, config.get('main', 'xlog', 'directory'), str(issue_number))
+        self._xlog_file = "%s/%s/%s.xlog" % (config.dot_swarm, config.get('xlog', 'directory', 'swarm'), str(issue_number))
         self._log = log
         self._logger = log.get_logger("cPickle_backend(xlog)")
         self.xlog = []
@@ -46,15 +46,34 @@ class xlog:
         """
         self._logger.register("_init_xlog")
 
+        # If the directory doesn't exist and we are __MASTER_LOG__, then
+        # create it, otherwise toss an error
+        xlog_directory = "%s/%s" % (self._config.dot_swarm, self._config.get('xlog', 'directory', 'swarm'))
+        if not os.path.exists(xlog_directory):
+            if self.issue_number == __MASTER_LOG__:
+                logger.entry("Attempting to create xlog directory '%s'" % xlog_directory, 2)
+                try:
+                    os.mkdir(xlog_directory)
+                except:
+                    raise swarm_error("Could not create xlog directory '%s'. Does parent exist and do you have permissions to create this?" % xlog_directory)
+            else:
+                raise swarm_error("xlog directory '%s' does not exist, and we're not making the master log." % xlog_directory)
+
         if os.path.isfile(self._xlog_file):
             fp = open(self._xlog_file, "rb")
             self.xlog = cPickle.load(fp)
             fp.close()
         else:
             self.xlog = []
-            fp = open(self._xlog_file, "wb")
-            p = cPickle.Pickler(fp)
-            p.dump(self.xlog)
-            fp.close()
+            self.save()
 
         self._logger.unregister()
+
+    def save(self):
+        """
+        Save the current xlog array
+        """
+        fp = open(self._xlog_file, "wb")
+        p = cPickle.Pickler(fp)
+        p.dump(self.xlog)
+        fp.close()
