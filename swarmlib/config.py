@@ -148,8 +148,18 @@ class config:
             # This was, perhaps, not a good idea
             self._config['swarm'].add_section("main")
             self._config['swarm'].set("main", "project_name", project_name)
-            self._config['swarm'].set("main", "dbfile", "swarm.db")
-            self._config['swarm'].set("main", "dbtype", "sqlite")
+
+            # The following are defaults which we should
+            # eventually allow to be overwritten via
+            # system-wide or user settings, but for now,
+            # we don't
+            # FIXME
+            self._config['swarm'].add_section('db')
+            self._config['swarm'].set("db", "dbfile", "swarm.db")
+            self._config['swarm'].set("db", "type", "sqlite")
+            self._config['swarm'].add_section('xlog')
+            self._config['swarm'].set("xlog", "type", "cPickle")
+            self._config['swarm'].set("xlog", "directory", "xlogs")
 
             fp = open(swarm_config, mode="w")
             self._config['swarm'].write(fp)
