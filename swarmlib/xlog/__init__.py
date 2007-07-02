@@ -20,44 +20,54 @@
 #
 # Author: Sam Hart
 
+from swarmlib import *
+
 __xlog_version__ = 1
-
-class xlog:
-    def __init__(self, issue_number, config, log):
-        """
-        """
-        self.issue_number = issue_number
-        self._config = config
-        self._xlog_file = "%s/%s/%s.xlog" % (config.dot_swarm, config.get('main', 'xlog', 'directory'), str(issue_number))
-        self._log = log
-        self._logger = log.get_logger("xlog")
-        self.xlog = []
-        self._init_xlog()
-
-    def _init_xlog(self):
-        """
-        Internal command
-        Initalizes the xlog file
-        """
-        self._logger.register("_init_xlog")
-
-        if os.path.isfile(self._xlog_file):
-            fp = open(self._xlog_file, "rb")
-            self.xlog = cPickle.load(fp)
-            fp.close()
-        else:
-            self.xlog = []
-            self.
-            fp = open(self._xlog_file, "wb")
-            p = cPickle.Pickler(fp)
-            p.dump(self.xlog)
-            fp.close()
-
-        self._logger.unregister()
+__MASTER_LOG__ = 0
 
 xlog_backends = {
     'cPickle' : 'cPickle backend',
 }
+
+class xlog:
+    def __init__(self, config, log, force=False):
+        """
+        __init__(config, log, force=False)
+        """
+        self._config = config
+        self._log = log
+        self._logger = log.get_logger("xlog")
+        self._force = force
+        self._xlog = None
+        self._master = None
+        self.backend_type = self._config.get('xlog', 'type')
+        self._load_backend()
+        self._setup()
+
+    def _load_backend(self):
+        """
+        Internal backend loader
+        """
+        self._logger.register("_load_backend")
+
+        self._logger.entry("Loading '%s' backend" % self.backend_type, 2)
+        self._xlog = import_at_runtime("swarmlib.xlog.%s" % xlog_backends[self.backend_type], "xlog")
+
+        self._logger.unregister()
+
+    def _setup(self):
+        """
+        Internal. Called to setup the xlog master.
+        """
+        self._logger.register("_setup")
+
+        if self._xlog:
+            self._master = self._xlog(__MASTER_LOG__, self._config, self._log)
+        else:
+            self._logger.error("_setup called before backend loaded. Did _load_backend fail?")
+            raise swarm_error("_setup called before backend loaded. Did _load_backend fail?")
+
+        self._logger.unregister()
 
 def main_init(config, log):
     """
