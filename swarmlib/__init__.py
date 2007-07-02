@@ -20,6 +20,11 @@
 #
 # Author: Sam Hart
 
+import swarmlib.config as Config
+from swarmlib.xlog import xlog as Xlog
+from swarmlib.db import swarmdb
+from swarmlib.db import taxonomy_terms
+
 class swarm_error(Exception):
     def __init__(self, message, show_traceback=False):
         Exception.__init__(self, message)
@@ -35,3 +40,21 @@ def import_at_runtime(module_name, suite_name):
     except ImportError:
         return None
     return vars(module)[suite_name]
+
+def master_init(working_dir, log, force=False):
+    """
+    master_init(working_dir, log, force=False)
+    This is called when an issue repository is to be
+    initialized for the first time.
+    Use force=True to overwrite any existing issue
+    repository elements that may be found.
+    """
+    config = Config.config(working_dir, log, force)
+    config.init(project_name)
+    db = swarmdb(working_dir, config, log, force)
+    db.backend.init()
+    db.backend.close()
+    xlog = Xlog(config, log, force)
+
+class swarm:
+    def __init__(self,

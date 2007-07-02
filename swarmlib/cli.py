@@ -28,6 +28,8 @@ import swarmlib.config as Config
 import swarmlib.log as Log
 from swarmlib.db import swarmdb
 from swarmlib.db import taxonomy_terms
+from swarmlib import master_init
+from swarmlib import swarm as Swarm
 
 #import gettext
 #gettext.bindtextdomain('swarmlib')
@@ -159,11 +161,7 @@ def cli_init(pre_options, pre_args, command, post_options):
     logger.register("cli_init")
     logger.entry("Initializing directory '%s'" % working_dir, 0)
 
-    config = Config.config(working_dir, log, force)
-    config.init(project_name)
-    db = swarmdb(working_dir, config, log, force)
-    db.backend.init()
-    db.backend.close()
+    master_init(working_dir, log, force)
     logger.unregister()
 
 def cli_taxonomy(pre_options, pre_args, command, post_options):

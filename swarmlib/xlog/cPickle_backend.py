@@ -39,6 +39,15 @@ class xlog:
         self.xlog = []
         self._init_xlog()
 
+    def save(self):
+        """
+        Save the current xlog array
+        """
+        fp = open(self._xlog_file, "wb")
+        p = cPickle.Pickler(fp)
+        p.dump(self.xlog)
+        fp.close()
+
     def _init_xlog(self):
         """
         Internal command
@@ -64,16 +73,8 @@ class xlog:
             self.xlog = cPickle.load(fp)
             fp.close()
         else:
+            # File doesn't exist, make a new one
             self.xlog = []
             self.save()
 
         self._logger.unregister()
-
-    def save(self):
-        """
-        Save the current xlog array
-        """
-        fp = open(self._xlog_file, "wb")
-        p = cPickle.Pickler(fp)
-        p.dump(self.xlog)
-        fp.close()
