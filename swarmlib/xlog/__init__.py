@@ -68,24 +68,3 @@ class xlog:
             raise swarm_error("_setup called before backend loaded. Did _load_backend fail?")
 
         self._logger.unregister()
-
-def main_init(config, log):
-    """
-    main_init(config, log)
-    Called when the xlog directory needs to be initialized
-    """
-    logger = log.get_logger("xlog_helpers")
-    logger.register("main_init")
-    config.add_section('xlog', 'swarm')
-    config.set('xlog', 'directory', 'xlogs', 'swarm')
-    config.set('xlog', 'directory', 'cPickle', 'swarm')
-    config.save()
-    xlog_directory = "%s/%s" % (config.dot_swarm, config.get('main', 'xlog', 'directory'))
-    if not os.path.exists(xlog_directory)
-        logger.entry("Attempting to create xlog directory '%s'" % xlog_directory, 2)
-        try:
-            os.mkdir(xlog_directory)
-        except:
-            raise swarm_error("Could not create xlog directory '%s'. Does parent exist and do you have permissions to create this?" % xlog_directory)
-
-    logger.unregister()
