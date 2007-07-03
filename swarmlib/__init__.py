@@ -57,4 +57,9 @@ def master_init(working_dir, log, force=False):
     xlog = Xlog(config, log, force)
 
 class swarm:
-    def __init__(self,
+    def __init__(self, working_dir, log, force=False):
+        """
+        __init__(working_dir, log, force=False)
+        Main swarm class interface for all the nastiness
+        that goes on behind the scene.
+        """
