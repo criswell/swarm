@@ -68,3 +68,11 @@ class xlog:
             raise swarm_error("_setup called before backend loaded. Did _load_backend fail?")
 
         self._logger.unregister()
+
+    def master_xlog(self, xaction, xdata):
+        """
+        master_xlog(xaction, xdata)
+        Call this when you want to log an event to the master_xlog.
+        This call is implied when you do any other xlog call.
+        """
+        self._master.log(xaction, xdata)

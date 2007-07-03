@@ -78,3 +78,12 @@ class xlog:
             self.save()
 
         self._logger.unregister()
+
+    def log(self, xaction, xdata):
+        """
+        log(xaction, xdata)
+        Log a transaction (with transaction data) into
+        this xlog.
+        """
+        temp = {xaction: xdata}
+        self.xlog.append(temp)
