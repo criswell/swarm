@@ -192,10 +192,16 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
     log.set_universal_loglevel(verbose)
     logger.register("cli_taxonomy")
 
-    config = Config.config(working_dir, log)
-    db = swarmdb(working_dir, config, log)
-    db.backend.connect()
-    components = db.backend.get_taxonomy(tax_term)
+    sw = Swarm(working_dir, log)
+    components = sw.get_taxonomy(tax_term)
+
+    #FIXME: The following needs to be removed
+    # as it's legacy before we had the master swarm
+    # abstraction class
+    #config = Config.config(working_dir, log)
+    #db = swarmdb(working_dir, config, log)
+    #db.backend.connect()
+    #components = db.backend.get_taxonomy(tax_term)
 
     if tax_command.lower() == 'list':
         for entry in components:
@@ -217,13 +223,15 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
         (bhash, ahash, bsize, asize) = cli_launch_editor(name)
         if bhash != ahash:
             new_components = cli_parse_datafile(name, ['id', 'name', 'details'])
-            db.backend.set_taxonomy(tax_term, new_components)
+            # FIXME: This needs to be removed as well (see above)
+            #db.backend.set_taxonomy(tax_term, new_components)
+            sw.set_taxonomy(tax_term, new_components)
         else:
             logger.entry("'%s' list unchanged." % tax_term, 0)
 
         os.remove(name)
 
-    db.backend.close()
+    sw.close()
     logger.unregister()
 
 

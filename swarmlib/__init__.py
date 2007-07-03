@@ -63,3 +63,47 @@ class swarm:
         Main swarm class interface for all the nastiness
         that goes on behind the scene.
         """
+        self._working_dir = working_dir
+        self._log = log
+        self._force = force
+        self._logger = log.get_logger("swarm")
+        self.config = None
+        self.db = None
+        self.xlog = None
+
+        self._setup()
+
+    def _setup(self):
+        """
+        Internal setup function
+        """
+        self._logger.register("_setup")
+
+        self.config = Config.config(self._working_dir, self._log)
+        self.db = swarmdb(self._working_dir, self._config, self._log)
+        self.db.backend.connect()
+        self.xlog = Xlog(self._config, self._log, self._force)
+
+        self._logger.unregister()
+
+    def get_taxonomy(self, tax_term):
+        """
+        Given a table name, will return the list of the
+        taxonomy that table describes
+        """
+        return self.db.backend.get_taxonomy(tax_term)
+
+    def set_taxonomy(self, term, the_list):
+        """
+        Given a table name, will update its contents with the new
+        terms from 'the_list'
+        """
+        self.db.backend.set_taxonomy(term, the_list)
+
+    def close(self):
+        """
+        Closes the database (syncronizing data) as well as all
+        open xlog files.
+        """
+        self.db.backend.close()
+        # TODO: Need routine for closing xlogs
