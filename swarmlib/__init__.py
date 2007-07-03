@@ -95,12 +95,21 @@ class swarm:
         """
         return self.db.backend.get_taxonomy(tax_term)
 
+    def _set_taxonomy(self, term, the_list):
+        """
+        INTERNAL FUNCTION, DONT CALL
+        Given a table name, will update its contents with the new
+        terms from 'the_list'
+        """
+        self.db.backend.set_taxonomy(term, the_list)
+
     def set_taxonomy(self, term, the_list):
         """
         Given a table name, will update its contents with the new
         terms from 'the_list'
         """
-        self.db.backend.set_taxonomy(term, the_list)
+        # LOG TRANSACTION HERE TODO
+        self._set_taxonomy(term, the_list)
 
     def close(self):
         """
