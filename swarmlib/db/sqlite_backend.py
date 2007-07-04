@@ -20,8 +20,6 @@
 
 import os
 import time
-#import sqlite # Should do some more fanciness here, I'm sure
-              # like, you know, try various versions and whatnot
 
 from swarmlib import *
 from swarmlib.db import table_schema
