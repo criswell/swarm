@@ -19,9 +19,9 @@
 # Author: Sam Hart
 
 import os
-import time
 import sys
 
+import swarmlib.time
 from swarmlib import *
 from swarmlib.db import table_schema
 from swarmlib.db import table_defaults
@@ -154,7 +154,7 @@ class db:
 
         self._logger.unregister()
 
-    def _log_transaction(self, root, xaction, xdata, issue=None):
+    def _log_transaction(self, root, xaction, xdata, setid=None):
         """
         Internal function for logging the transaction into the
         sqlite table 'log'
@@ -168,9 +168,22 @@ class db:
                 sys.exit(2)
             else:
                 # Default is db_version 1
-                sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) "
+                timestamp = swarmlib.time.timestamp()
+                rowid = "Null"
+                if setid:
+                    # Let's make sure you have a requested id that's larger than the max
+                    self._cursor.execute("select max(id) from xlog;")
+                    maxid = self._cursor.fetchcall()
+                    if int(setid) > int(maxid):
+                        rowid = str(setid)
+                    else:
+                        self._logger.error("Requested id for xlog entry, '%s', was lower than the maxid, '%s'. Ignoring request." % (str(setid), str(maxid)))
+                    rowid = str(setid)
+                sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) VALUES (%s, '%s', '%s', '%s', '%s');" %
+                            (rowid, root, timestamp, xaction, xdata)
+                self._cursor.execute(sql_code)
         else:
-            self._logger.error('Transaction log entry attempted when not connected to database. Skipping.')
+            raise swarm_error('Transaction log entry attempted when not connected to database.')
 
         self._logger.unregister()
 
