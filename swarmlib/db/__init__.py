@@ -24,6 +24,7 @@ from swarmlib import *
 #
 
 __db_version__ = 1
+__MASTER_ISSUE__ = 0
 
 class column:
     def __init__(self, name, auto_increment=False, primary_key=False, data_type='text', unique=False):
@@ -44,7 +45,7 @@ class table:
 table_schema = [
     # Issue tracking blob
     table('issue')[
-        column('id', data_type='INTEGER', unique=True),
+        column('id', data_type='INTEGER', auto_increment=True, primary_key=True),
 
         column('component'),
         column('version'),
@@ -142,8 +143,9 @@ table_schema = [
 
     # Transaction log
     table('xlog')[
-        column('id', data_type='INTEGER',  primary_key = True),
+        column('id', data_type='INTEGER',  primary_key=True, auto_increment=True),
         column('root', data_type='INTEGER'),
+        column('time', data_type='INTEGER'),
         column('xaction'),
         column('xdata', data_type='BLOB'),
     ],

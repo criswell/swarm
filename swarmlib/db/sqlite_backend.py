@@ -135,7 +135,7 @@ class db:
 
         self._logger.unregister()
 
-    def _log_transaction(self, message, xaction):
+    def _log_transaction(self, root, xaction, xdata):
         """
         Internal function for logging the transaction into the
         sqlite table 'log'
