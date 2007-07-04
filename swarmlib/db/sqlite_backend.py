@@ -262,6 +262,8 @@ class db:
             self._prepopulate_tables()
             self._config.add_section('sqlite', 'swarm')
             self._config.set('sqlite', 'db_version', __db_version__, 'swarm')
+            self._config.set('sqlite', 'db_subversion', __db_subversion__, 'swarm')
+
             self._config.save()
         else:
             self._logger.error("SQLite db '%s' file exists! (Use force to overwrite)" % self._db_filename)
