@@ -145,7 +145,7 @@ table_schema = [
     table('xlog')[
         column('id', data_type='INTEGER',  primary_key=True, auto_increment=True),
         column('root', data_type='INTEGER'),
-        column('time', data_type='INTEGER'),
+        column('time', data_type='FLOAT'),
         column('xaction'),
         column('xdata', data_type='BLOB'),
     ],

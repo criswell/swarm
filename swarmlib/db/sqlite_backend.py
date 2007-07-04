@@ -20,6 +20,7 @@
 
 import os
 import time
+import sys
 
 from swarmlib import *
 from swarmlib.db import table_schema
@@ -153,21 +154,21 @@ class db:
 
         self._logger.unregister()
 
-    def _log_transaction(self, root, xaction, xdata):
+    def _log_transaction(self, root, xaction, xdata, issue=None):
         """
         Internal function for logging the transaction into the
         sqlite table 'log'
         """
         self._logger.register('_log_transaction')
         if self._connected:
-            # Determine what number we're on
-            # by looking at the 0th entry
-            print
-            # BAH ERE I AM JH
-            # get unique hash for id
-            # get unique time in int utc
-            # figure out sql code
-            # enter it
+            actual_db_version = self._config.get('sqlite', 'db_version', 'swarm')
+            if actual_db_version == 2:
+                # Stub to grow
+                print "What you trying to pull here, there is no swarmdb version 2!"
+                sys.exit(2)
+            else:
+                # Default is db_version 1
+                sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) "
         else:
             self._logger.error('Transaction log entry attempted when not connected to database. Skipping.')
 
