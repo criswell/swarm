@@ -145,7 +145,7 @@ table_schema = [
         column('id', data_type='INTEGER',  primary_key = True),
         column('root', data_type='INTEGER'),
         column('xaction'),
-        column('xdata'),
+        column('xdata', data_type='BLOB'),
     ],
 ]
 
