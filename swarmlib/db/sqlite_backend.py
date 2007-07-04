@@ -175,7 +175,7 @@ class db:
                     # Let's make sure you have a requested id that's larger than the max
                     self._cursor.execute("select max(id) from xlog;")
                     maxid = self._cursor.fetchcall()
-                    if int(setid) > int(maxid):
+                    if not maxid[0][0] or int(setid) > int(maxid[0][0]):
                         rowid = str(setid)
                     else:
                         self._logger.error("Requested id for xlog entry, '%s', was lower than the maxid, '%s'. Ignoring request." % (str(setid), str(maxid)))
