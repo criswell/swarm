@@ -139,13 +139,14 @@ table_schema = [
         column('name'),
         column('isdefault', data_type='INTEGER'),
     ],
-]
 
-xlog_schema = [
-    column('id', data_type='INTEGER',  primary_key = True),
-    column('root', data_type='INTEGER'),
-    column('xaction'),
-    column('xdata'),
+    # Transaction log
+    table('xlog')[
+        column('id', data_type='INTEGER',  primary_key = True),
+        column('root', data_type='INTEGER'),
+        column('xaction'),
+        column('xdata'),
+    ],
 ]
 
 # The following tables will have some
