@@ -141,6 +141,13 @@ table_schema = [
     ],
 ]
 
+xlog_schema = [
+    column('id', data_type='INTEGER',  primary_key = True),
+    column('root', data_type='INTEGER'),
+    column('xaction'),
+    column('xdata'),
+]
+
 # The following tables will have some
 # useful defaults. They can be overwritten.
 table_defaults = {
