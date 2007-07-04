@@ -111,7 +111,8 @@ class db:
                     raise swarm_error("Attempted to prepopulate table while not connected to the database. Could it be that the connection failed for some reason?")
 
         # Add the first entry to the xlog
-        sql_code = "INSERT INTO %s (%s) VALUES (Null, %" # ERE I AM JH
+        # The 0th entry will always be the date stamp of when the issue tracker repo started
+        self._log_transaction(__MASTER_ISSUE__, 'xlog_start', 'Null', 0)
         self._logger.unregister()
 
     def _convert_list(self, the_list, term):
@@ -179,8 +180,8 @@ class db:
                     else:
                         self._logger.error("Requested id for xlog entry, '%s', was lower than the maxid, '%s'. Ignoring request." % (str(setid), str(maxid)))
                     rowid = str(setid)
-                sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) VALUES (%s, '%s', '%s', '%s', '%s');" %
-                            (rowid, root, timestamp, xaction, xdata)
+                sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) VALUES (%s, %s, %s, '%s', '%s');" %
+                            (str(rowid), str(root), str(timestamp), xaction, xdata)
                 self._cursor.execute(sql_code)
         else:
             raise swarm_error('Transaction log entry attempted when not connected to database.')
