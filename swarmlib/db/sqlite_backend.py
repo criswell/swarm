@@ -108,6 +108,9 @@ class db:
                 else:
                     self._logger.error("Attempted to prepopulate table while not connected to the database. Could it be that the connection failed for some reason?")
                     raise swarm_error("Attempted to prepopulate table while not connected to the database. Could it be that the connection failed for some reason?")
+
+        # Add the first entry to the xlog
+        sql_code = "INSERT INTO %s (%s) VALUES (Null, %" # ERE I AM JH
         self._logger.unregister()
 
     def _convert_list(self, the_list, term):

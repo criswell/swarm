@@ -56,7 +56,9 @@ def master_init(working_dir, log, force=False):
     db.backend.close()
     xlog = Xlog(config, log, force)
 
-transactions = { ERE I AM JH }
+transactions = {
+    'xlog_start' : None,
+}
 
 class swarm:
     def __init__(self, working_dir, log, force=False):
