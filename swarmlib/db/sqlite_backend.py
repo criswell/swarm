@@ -20,13 +20,30 @@
 
 import os
 import time
-import sqlite # Should do some more fanciness here, I'm sure
+#import sqlite # Should do some more fanciness here, I'm sure
               # like, you know, try various versions and whatnot
 
 from swarmlib import *
 from swarmlib.db import table_schema
 from swarmlib.db import table_defaults
 from swarmlib.db import __db_version__
+from swarmlib.db import __MASTER_ISSUE__
+
+__db_subversion__ = None
+__sqlite_version__ = None
+
+try:
+    import sqlite3 as sqlite
+    __db_subversion__ = 2
+    __sqlite_version__ = 3
+except ImportError:
+    try:
+        import sqlite
+        __db_subversion__ = 1
+        __sqlite_version__ = 2
+    except ImportError:
+        __db_subversion__ = None
+        __sqlite_version__ = None
 
 class db:
     def __init__(self, cwd, config, log, force):
