@@ -234,6 +234,26 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
     sw.close()
     logger.unregister()
 
+def cli_log(pre_options, pre_args, command, post_options):
+    verbose = 0
+    issue = None
+    working_dir = os.getcwd()
+
+    for o, a in pre_options:
+        if o in ("-v", "--verbose"):
+            verbose = verbose + 1
+
+    if post_options:
+        issue = post_options[0]
+
+    log.set_universal_loglevel(verbose)
+    logger.register("cli_log")
+
+    sw = Swarm(working_dir, log)
+    log = sw.get_transaction_log(issue)
+
+    sw.close()
+    logger.unregister()
 
 class Command:
     def __init__(self, short_opts, long_opts, usage, summary, desc, callback):
@@ -293,6 +313,19 @@ option_dispatch = {
          '   OPTIONS:',
          '   -v|--verbose   Be verbose about actions',],
         cli_taxonomy),
+    'log' : Command(
+        ['v'],
+        ['verbose'],
+        'swarm [OPTIONS] log [ISSUE]',
+        'Displays the log (master log or for a given issue)',
+        ['  Will display the log. If [ISSUE] is empty (or 0), will',
+         '  display the master log for the DITS repository. If',
+         '  [ISSUE] is a legitimate issue, will only display the log',
+         '  pertaining to it.'
+         '',
+         '  OPTIONS:',
+         '  -v|--verbose    Be verbose about actions'],
+        cli_log),
     'help' : Command(
         None,
         None,

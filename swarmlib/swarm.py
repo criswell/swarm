@@ -23,6 +23,7 @@
 import swarmlib.config as Config
 from swarmlib.db import swarmdb
 from swarmlib.db import taxonomy_terms
+from swarmlib.db import __MASTER_ISSUE__
 
 def master_init(project_name, working_dir, log, force=False):
     """
@@ -86,8 +87,41 @@ class swarm:
         Given a table name, will update its contents with the new
         terms from 'the_list'
         """
-        # LOG TRANSACTION HERE TODO
+        # TODO, we should probably do some error checking here
         self._set_taxonomy(term, the_list)
+
+    def get_transaction_log(self, issue=None, lower_entry=None, upper_entry=None, lower_date=None, uppder_date=None, xaction=None):
+        """
+        get_transaction_log(...)
+        Get a transaction log slice. Accepts the following parameters:
+        issue : If you don't specify an issue, will default to None (e.g., all entries)
+        lower_entry : The lower log entry number to start at, will default to None (e.g., no lower limit)
+        upper_entry : The upper log entry number to end at, will default to None (e.g., no upper limit)
+        lower_date : The lower date to start at, will default to None (e.g., begining of time)
+        upper_date : The upper date to end at, will default to None (e.g., the end of days)
+        xaction : The transaction to filter by, will default to None
+
+        If called with no parameters will just return the entire transaction log.
+
+        The most common use for this will be to find changes to the repo or to individual
+        issues. For example, let's say there's an external repo that is wanting to sync
+        with us. The last time they synced was at log entry #871, and they are requesting
+        all the changes since then. This function would be called as:
+          get_transaction(lower_entry=871)
+
+        easy, no?
+
+        Okay, let's next suppose that we have an external repo that is tracking issue #45
+        on our repo. They haven't synced since log entry #4711, so they want all changes
+        since then for issue #45 only. The function would be called as:
+          get_transaction(issue=45, lower_entry=4711)
+
+        Anyway... there's more you can do with dates and things, but I wont go into that
+        here.
+        """
+        self._logger.register("get_transaction_log")
+
+        self._logger.unregister()
 
     def close(self):
         """
