@@ -21,7 +21,6 @@
 # Author: Sam Hart
 
 import swarmlib.config as Config
-from swarmlib.xlog import xlog as Xlog
 from swarmlib.db import swarmdb
 from swarmlib.db import taxonomy_terms
 
