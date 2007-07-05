@@ -223,7 +223,6 @@ class db:
 
         self._logger.unregister()
 
-
     def close(self):
         """
         Call this when you wish to close your connection to the db
