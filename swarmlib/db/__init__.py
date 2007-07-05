@@ -258,7 +258,9 @@ class swarmdb:
         self._logger.register("_load_backend")
 
         self._logger.entry("Loading '%s' backend" % self.backend_type, 2)
-        self._backend_class = import_at_runtime("swarmlib.db.%s" % database_backends[self.backend_type], "db")
+        mod_to_load = "swarmlib.db.%s" % database_backends[self.backend_type]
+        self._logger.entry("Loading '%s'" % mod_to_load, 5)
+        self._backend_class = import_at_runtime(mod_to_load, "db")
         self.backend = self._backend_class(self._project_root, self._config, self._log, self._force)
 
         self._logger.unregister()

@@ -22,8 +22,10 @@ import os
 import sys
 import cPickle
 
-import swarmlib.time
+import swarmlib.swarm_time
 from swarmlib import *
+#from swarmlib import import_at_runtime
+from swarmlib import swarm_error
 from swarmlib.db import table_schema
 from swarmlib.db import table_defaults
 from swarmlib.db import __db_version__
@@ -187,7 +189,7 @@ class db:
                 sys.exit(2)
             else:
                 # Default is db_version 1
-                timestamp = swarmlib.time.timestamp()
+                timestamp = swarmlib.swarm_time.timestamp()
                 rowid = "Null"
                 if setid:
                     # Let's make sure you have a requested id that's larger than the max
