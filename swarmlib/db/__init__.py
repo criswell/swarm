@@ -65,7 +65,7 @@ table_schema = [
         column('resolution'),
 
         column('time', data_type='INTEGER'),
-    ]
+    ],
 
     table('node')[
         column('node_id', unique=True),
