@@ -112,7 +112,7 @@ class db:
 
         # Add the first entry to the xlog
         # The 0th entry will always be the date stamp of when the issue tracker repo started
-        self._log_transaction(__MASTER_ISSUE__, 'xlog_start', 'Null', 0)
+        self.log_transaction(__MASTER_ISSUE__, 'xlog_start', 'Null', 0)
         self._logger.unregister()
 
     def _convert_list(self, the_list, term):
@@ -155,10 +155,27 @@ class db:
 
         self._logger.unregister()
 
-    def _log_transaction(self, root, xaction, xdata, setid=None):
+    def log_transaction(self, root, xaction, xdata, setid=None):
         """
-        Internal function for logging the transaction into the
-        sqlite table 'log'
+        log_transaction(root, xaction, xdata, setid=None)
+        Log a given transaction.
+        root = the root id of the issue this transaction corresponds to.
+               Use __MASTER_ISSUE__ (imported from swarmlib.db) if this
+               transaction is a change outside of any current issue.
+        xaction = The transaction code. Use one of the codes in the
+                  'transactions' dictionary imported from swarmlib.
+                  If you need a new code added to this dictionary, please
+                  discuss it before hand.
+        xdata = The transaction data needed to recreate the xaction.
+                Usually, it's best to pickle this to a string.
+        setid = If this isn't set (the default) then the next log id
+                will be used. This is the way you SHOULD use it.
+                Occassionally, there will be a need where people *might*
+                want to specify a specific log id. You can request one here,
+                but the request may be ignored if the id isn't valid.
+                Really... unless you're doing something wacky like creating
+                a new repo or a new root issue, just leave this setting
+                alone.
         """
         self._logger.register('_log_transaction')
         if self._connected:
