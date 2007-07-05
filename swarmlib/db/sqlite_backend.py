@@ -23,7 +23,7 @@ import sys
 import cPickle
 
 import swarmlib.swarm_time
-from swarmlib import *
+#from swarmlib import *
 #from swarmlib import import_at_runtime
 from swarmlib import swarm_error
 from swarmlib.db import table_schema
