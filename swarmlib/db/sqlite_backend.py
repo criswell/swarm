@@ -20,6 +20,7 @@
 
 import os
 import sys
+import cPickle
 
 import swarmlib.time
 from swarmlib import *
@@ -238,6 +239,8 @@ class db:
         """
         self._logger.register("set_taxonomy")
 
+        logged_code = []
+
         for entry in the_list:
             column_names = ""
             column_values = ""
@@ -254,9 +257,12 @@ class db:
             self._logger.entry("SQL code is:\n%s" % sql_code, 5)
             if self._connected:
                 self._cursor.execute(sql_code)
+                logged_code.append(sql_code)
             else:
                 self._logger.error("Attempted to replace table entries while not connected to the database. Could it be that the connection failed for some reason?")
                 raise swarm_error("Attempted to replace table entries while not connected to the database. Could it be that the connection failed for some reason?")
+
+        self.log_transaction(__MASTER_ISSUE__, 'set_taxonomy', cPickle.dumps(logged_code))
 
         self._logger.unregister()
 

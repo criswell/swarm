@@ -56,8 +56,10 @@ def master_init(working_dir, log, force=False):
     db.backend.close()
     xlog = Xlog(config, log, force)
 
+# FIXME : These 'None's should be set to callbacks when we get them
 transactions = {
     'xlog_start' : None,
+    'set_taxonomy' : None,
 }
 
 class swarm:
