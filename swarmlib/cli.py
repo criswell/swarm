@@ -161,7 +161,7 @@ def cli_init(pre_options, pre_args, command, post_options):
     logger.register("cli_init")
     logger.entry("Initializing directory '%s'" % working_dir, 0)
 
-    master_init(working_dir, log, force)
+    master_init(project_name, working_dir, log, force)
     logger.unregister()
 
 def cli_taxonomy(pre_options, pre_args, command, post_options):

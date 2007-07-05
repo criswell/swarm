@@ -40,7 +40,7 @@ def import_at_runtime(module_name, suite_name):
         return None
     return vars(module)[suite_name]
 
-def master_init(working_dir, log, force=False):
+def master_init(project_name, working_dir, log, force=False):
     """
     master_init(working_dir, log, force=False)
     This is called when an issue repository is to be
