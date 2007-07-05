@@ -28,8 +28,8 @@ import swarmlib.config as Config
 import swarmlib.log as Log
 from swarmlib.db import swarmdb
 from swarmlib.db import taxonomy_terms
-from swarmlib import master_init
-from swarmlib import swarm as Swarm
+from swarmlib.swarm import master_init
+from swarmlib.swarm import swarm as Swarm
 
 #import gettext
 #gettext.bindtextdomain('swarmlib')

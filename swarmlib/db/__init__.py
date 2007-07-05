@@ -18,7 +18,8 @@
 #
 # Author: Sam Hart
 
-from swarmlib import *
+from swarmlib import import_at_runtime
+from swarmlib import swarm_error
 #
 # Database schema
 #
