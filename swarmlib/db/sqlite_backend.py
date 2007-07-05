@@ -198,8 +198,7 @@ class db:
                     else:
                         self._logger.error("Requested id for xlog entry, '%s', was lower than the maxid, '%s'. Ignoring request." % (str(setid), str(maxid)))
                     rowid = str(setid)
-                sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) VALUES (%s, %s, %s, '%s', '%s');" %
-                            (str(rowid), str(root), str(timestamp), xaction, xdata)
+                sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) VALUES (%s, %s, %s, '%s', '%s');" % (str(rowid), str(root), str(timestamp), xaction, xdata)
                 self._cursor.execute(sql_code)
         else:
             raise swarm_error('Transaction log entry attempted when not connected to database.')
