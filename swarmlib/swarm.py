@@ -62,7 +62,7 @@ class swarm:
         self._logger.register("_setup")
 
         self.config = Config.config(self._working_dir, self._log)
-        self.db = swarmdb(self._working_dir, self._config, self._log)
+        self.db = swarmdb(self._working_dir, self.config, self._log)
         self.db.backend.connect()
 
         self._logger.unregister()
@@ -90,7 +90,7 @@ class swarm:
         # TODO, we should probably do some error checking here
         self._set_taxonomy(term, the_list)
 
-    def get_transaction_log(self, issue=None, lower_entry=None, upper_entry=None, lower_date=None, uppder_date=None, xaction=None):
+    def get_transaction_log(self, issue=None, lower_entry=None, upper_entry=None, lower_date=None, upper_date=None, xaction=None):
         """
         get_transaction_log(...)
         Get a transaction log slice. Accepts the following parameters:
@@ -119,9 +119,7 @@ class swarm:
         Anyway... there's more you can do with dates and things, but I wont go into that
         here.
         """
-        self._logger.register("get_transaction_log")
-
-        self._logger.unregister()
+        return self.db.backend.search_transaction_log(issue, lower_entry, upper_entry, lower_date, upper_date, xaction)
 
     def close(self):
         """

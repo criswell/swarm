@@ -207,6 +207,23 @@ class db:
 
         self._logger.unregister()
 
+    def search_transaction_log(issue=None, lower_entry=None, upper_entry=None, lower_date=None, upper_date=None, xaction=None):
+        """
+        search_transaction_log(...)
+        Get a transaction log slice. Accepts the following parameters:
+        issue : If you don't specify an issue, will default to None (e.g., all entries)
+        lower_entry : The lower log entry number to start at, will default to None (e.g., no lower limit)
+        upper_entry : The upper log entry number to end at, will default to None (e.g., no upper limit)
+        lower_date : The lower date to start at, will default to None (e.g., begining of time)
+        upper_date : The upper date to end at, will default to None (e.g., the end of days)
+        xaction : The transaction to filter by, will default to None
+
+        If called with no parameters will just return the entire transaction log.
+        """
+        self._logger.register('search_transaction_log')
+
+        self._logger.unregister()
+
     def connect(self):
         """
         Connect to the database
