@@ -206,7 +206,7 @@ class db:
 
         self._logger.unregister()
 
-    def search_transaction_log(issue=None, lower_entry=None, upper_entry=None, lower_date=None, upper_date=None, xaction=None):
+    def search_transaction_log(self, issue=None, lower_entry=None, upper_entry=None, lower_date=None, upper_date=None, xaction=None):
         """
         search_transaction_log(...)
         Get a transaction log slice. Accepts the following parameters:
@@ -220,8 +220,25 @@ class db:
         If called with no parameters will just return the entire transaction log.
         """
         self._logger.register('search_transaction_log')
+        args = [ issue, lower_entry, upper_entry, lower_date, upper_date, xaction]
+        limit_text = [ 
+            "root = %s"
+            , "id > %s"
+            , "id < %s"
+            , "time > %s"
+            , "time < %s"
+            , "xaction = '%s'"
+            ]
+        clauses = [ clause % arg for clause,arg in zip(limit_text,args) if arg is not None ]
+        query = "SELECT * FROM xlog"
+        if clauses:
+            query = query + " WHERE " + " AND ".join(clauses)
 
+        self._logger.entry("SQL code is:\n%s" % query, 5)
+        self._cursor.execute(query)
+        result =  self._cursor.fetchall()
         self._logger.unregister()
+        return result
 
     def connect(self):
         """
@@ -262,7 +279,6 @@ class db:
             column_values = []
             sql_code = ""
             sql_columns = ""
-            sql_column_values = ""
             for key in entry.keys():
                 column_names.append(key)
                 column_values.append(entry[key])
