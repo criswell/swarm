@@ -20,11 +20,9 @@
 
 import os
 import sys
-import cPickle
+import marshal
 
 import swarmlib.swarm_time
-#from swarmlib import *
-#from swarmlib import import_at_runtime
 from swarmlib import swarm_error
 from swarmlib.db import table_schema
 from swarmlib.db import table_defaults
@@ -200,8 +198,9 @@ class db:
                     else:
                         self._logger.error("Requested id for xlog entry, '%s', was lower than the maxid, '%s'. Ignoring request." % (str(setid), str(maxid)))
                     rowid = str(setid)
-                sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) VALUES (%s, %s, %s, '%s', '%s');" % (str(rowid), str(root), str(timestamp), xaction, xdata)
-                self._cursor.execute(sql_code)
+                sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) VALUES (%s, %s, %s, '%s', '%s');"
+                self._logger.entry("SQL code is:\n%s" % (sql_code % (str(rowid), str(root), str(timestamp), xaction, xdata)), 5)
+                self._cursor.execute(sql_code, (str(rowid), str(root), str(timestamp), xaction, xdata))
         else:
             raise swarm_error('Transaction log entry attempted when not connected to database.')
 
@@ -257,30 +256,35 @@ class db:
         """
         self._logger.register("set_taxonomy")
 
-        logged_code = []
-
         for entry in the_list:
-            column_names = ""
-            column_values = ""
-            first_entry = True
+            final_entries = [term]
+            column_names = []
+            column_values = []
+            sql_code = ""
+            sql_columns = ""
             for key in entry.keys():
+                column_names.append(key)
+                column_values.append(entry[key])
+
+            first_entry = True
+            for name in column_names:
+                final_entries.append(name)
                 if first_entry:
-                    column_names = column_names + key
-                    column_values = '"%s"' % entry[key]
+                    sql_columns = sql_columns + "%s"
                     first_entry = False
                 else:
-                    column_names = column_names + ", " + key
-                    column_values = '%s, "%s"' % (column_values, entry[key])
-            sql_code = "REPLACE INTO %s (%s) VALUES (%s);" % (term, column_names, column_values)
-            self._logger.entry("SQL code is:\n%s" % sql_code, 5)
-            if self._connected:
-                self._cursor.execute(sql_code)
-                logged_code.append(sql_code)
-            else:
-                self._logger.error("Attempted to replace table entries while not connected to the database. Could it be that the connection failed for some reason?")
-                raise swarm_error("Attempted to replace table entries while not connected to the database. Could it be that the connection failed for some reason?")
+                    sql_columns = sql_columns + ", %s"
 
-        self.log_transaction(__MASTER_ISSUE__, 'set_taxonomy', cPickle.dumps(logged_code))
+            for value in column_values:
+                final_entries.append(value)
+
+            # We've removed the error checker here, we need to put it back in
+            # We no longer check to see if connected. FIXME
+            sql_code = "REPLACE INTO %s (" + sql_columns + ") VALUES (" + sql_columns + ");"
+            self._logger.entry("SQL code is:\n%s" % (sql_code % tuple(final_entries)), 5)
+            self._cursor.execute(sql_code, tuple(final_entries))
+
+        self.log_transaction(__MASTER_ISSUE__, 'set_taxonomy', marshal.dumps(the_list))
 
         self._logger.unregister()
 
