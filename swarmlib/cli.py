@@ -271,12 +271,12 @@ def cli_new(pre_options, pre_args, command, post_options):
     logger.register("cli_new")
 
     sw = Swarm(working_dir, log)
-    log = sw.get_transaction_log(issue)
 
-    schema = sw.get_schema('issue')
+    schema_issue = sw.get_schema('issue')
+    schema_node = sw.get_schema('node')
     (fp, name) = tempfile.mkstemp()
     timestamp = swarm_time.timestamp()
-    reporter = Swarm.get_user()
+    reporter = sw.get_user()
     temp = os.write(fp,
         "# Create new ticket\n" +
         "#--------------------\n" +
@@ -284,17 +284,34 @@ def cli_new(pre_options, pre_args, command, post_options):
         "# In the header section, blank lines will be ignored\n" +
         "# Lines starting with '@' indicate a section divider.\n\n" +
         "@ HEADER SECTION\n\n")
-    if schema.has_key('time'):
+    if schema_issue.has_key('time'):
         temp = os.write(fp, "# timestamp: %s\n" % timestamp)
         temp = os.write(fp, "# %s\n" % swarm_time.human_readable_from_stamp(timestamp))
+    if schema_issue.has_key('reporter'):
+        temp = os.write(fp, "# reporter: %s\n" % reporter)
 
     meta_data = ['component', 'version', 'milestone', 'severity' 'priority' 'owner', 'keywords']
     for element in meta_data:
-        if schema.has_key(element):
+        if schema_issue.has_key(element):
             temp = os.write(fp, "%s:\n" % element)
 
-    if schema.has_key('reporter'):
-        print
+    temp = os.write(fp, "\n@ NODE SECTION\n")
+    meta_data = ['related', 'summary']
+    for element in meta_data:
+        if schema_node.has_key(element):
+            temp = os.write(fp, "%s:\n" % element)
+
+    temp = os.write(fp, "\n# Everything after details (including lines begining with '#' or '@') will\n# be considered part of the details section\n@ DETAILS\n\n")
+
+    os.close(fp)
+
+    (bhash, ahash, bsize, asize) = cli_launch_editor(name)
+    if bhash != ahash:
+        print "Changed, we should do something with it"
+    else:
+        logger.entry("Ticket creation cancelled.", 0)
+
+    os.remove(name)
 
     sw.close()
     logger.unregister()

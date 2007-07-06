@@ -20,10 +20,14 @@
 #
 # Author: Sam Hart
 
+import socket
+import os
+
 import swarmlib.config as Config
 from swarmlib.db import swarmdb
 from swarmlib.db import taxonomy_terms
 from swarmlib.db import __MASTER_ISSUE__
+from swarmlib.db import table_schema
 
 def master_init(project_name, working_dir, log, force=False):
     """
@@ -96,8 +100,34 @@ class swarm:
         Will search in the following order for it:
         environ variable "SWARMUSER"
         configs (system, user, repo)
+        figure it out from os.env and fqdn
         """
-        print
+        # FIXME!
+        # This is a stub
+        return '%s@%s' % (os.environ.get('USER'), socket.getfqdn())
+
+    def get_schema(self, name):
+        """
+        get_schema(name)
+        Given a name of a table, get the schema for that table
+        """
+        schema = {}
+        table_in_use = None
+
+        # First, get the schema:
+        for table in table_schema:
+            if table.name == name:
+                table_in_use = table
+                break
+
+        if not table_in_use:
+            raise swarm_error("No table named '%s'" % name)
+
+        for column in table_in_use.columns:
+            schema[column.name] = column.data_type
+
+        return schema
+
 
     def get_transaction_log(self, issue=None, lower_entry=None, upper_entry=None, lower_date=None, upper_date=None, xaction=None):
         """

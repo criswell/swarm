@@ -79,7 +79,6 @@ table_schema = [
 
         column('summary'),
         column('details'),
-        column('keywords'),
 
         column('attachments', data_type='blob'), #Should these be a seperate table?
     ],
