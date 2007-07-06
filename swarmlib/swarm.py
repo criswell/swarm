@@ -90,6 +90,15 @@ class swarm:
         # TODO, we should probably do some error checking here
         self._set_taxonomy(term, the_list)
 
+    def get_user(self):
+        """
+        Returns the user information.
+        Will search in the following order for it:
+        environ variable "SWARMUSER"
+        configs (system, user, repo)
+        """
+        print
+
     def get_transaction_log(self, issue=None, lower_entry=None, upper_entry=None, lower_date=None, upper_date=None, xaction=None):
         """
         get_transaction_log(...)

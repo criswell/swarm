@@ -26,6 +26,7 @@ import tempfile
 
 import swarmlib.config as Config
 import swarmlib.log as Log
+import swarmlib.swarm_time as swarm_time
 from swarmlib.db import swarmdb
 from swarmlib.db import taxonomy_terms
 from swarmlib.swarm import master_init
@@ -236,7 +237,6 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
 
 def cli_log(pre_options, pre_args, command, post_options):
     verbose = 0
-    issue = None
     working_dir = os.getcwd()
 
     for o, a in pre_options:
@@ -244,13 +244,57 @@ def cli_log(pre_options, pre_args, command, post_options):
             verbose = verbose + 1
 
     if post_options:
-        issue = post_options[0]
+        working_dir = post_options[0]
 
     log.set_universal_loglevel(verbose)
     logger.register("cli_log")
 
     sw = Swarm(working_dir, log)
+    xlog = sw.get_transaction_log()
+    print xlog
+
+    sw.close()
+    logger.unregister()
+
+def cli_new(pre_options, pre_args, command, post_options):
+    verbose = 0
+    working_dir = os.getcwd()
+
+    for o, a in pre_options:
+        if o in ("-v", "--verbose"):
+            verbose = verbose + 1
+
+    if post_options:
+        working_dir = post_options[0]
+
+    log.set_universal_loglevel(verbose)
+    logger.register("cli_new")
+
+    sw = Swarm(working_dir, log)
     log = sw.get_transaction_log(issue)
+
+    schema = sw.get_schema('issue')
+    (fp, name) = tempfile.mkstemp()
+    timestamp = swarm_time.timestamp()
+    reporter = Swarm.get_user()
+    temp = os.write(fp,
+        "# Create new ticket\n" +
+        "#--------------------\n" +
+        "# Lines begining with a '#' will be treated as a comment.\n" +
+        "# In the header section, blank lines will be ignored\n" +
+        "# Lines starting with '@' indicate a section divider.\n\n" +
+        "@ HEADER SECTION\n\n")
+    if schema.has_key('time'):
+        temp = os.write(fp, "# timestamp: %s\n" % timestamp)
+        temp = os.write(fp, "# %s\n" % swarm_time.human_readable_from_stamp(timestamp))
+
+    meta_data = ['component', 'version', 'milestone', 'severity' 'priority' 'owner', 'keywords']
+    for element in meta_data:
+        if schema.has_key(element):
+            temp = os.write(fp, "%s:\n" % element)
+
+    if schema.has_key('reporter'):
+        print
 
     sw.close()
     logger.unregister()
@@ -316,7 +360,7 @@ option_dispatch = {
     'log' : Command(
         ['v'],
         ['verbose'],
-        'swarm [OPTIONS] log [ISSUE]',
+        'swarm [OPTIONS] log [ISSUE] [DIR]',
         'Displays the log (master log or for a given issue)',
         ['  Will display the log. If [ISSUE] is empty (or 0), will',
          '  display the master log for the DITS repository. If',
@@ -326,6 +370,19 @@ option_dispatch = {
          '  OPTIONS:',
          '  -v|--verbose    Be verbose about actions'],
         cli_log),
+    'new' : Command(
+        ['v'],
+        ['verbose'],
+        'swarm [OPTIONS] new [DIR]',
+        'Creates a new ticket.',
+        ['   Giving a project workspace (either in current working',
+         '   directory or in [DIR]), will create a new ticket. Will',
+         '   invoke your editor with the new ticket data and allow',
+         '   you to create it.',
+         '',
+         '  OPTIONS:',
+         '  -v|--verbose    Be verbose about actions'],
+        cli_new),
     'help' : Command(
         None,
         None,

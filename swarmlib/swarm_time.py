@@ -34,3 +34,15 @@ def timestamp(time_tuple=None):
         return time.mktime(time_tuple)
     else:
         return time.time()
+
+def human_readable_from_stamp(stamp=None):
+    """
+    human_readable_from_stamp(stamp=None)
+    Returns a human readable string for a given timestamp.
+    If stamp=None, then will use current time.
+    """
+
+    if stamp:
+        return time.ctime(stamp)
+    else:
+        return time.ctime(time.time())
