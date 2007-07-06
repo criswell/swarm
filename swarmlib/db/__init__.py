@@ -148,7 +148,7 @@ table_schema = [
         column('root', data_type='INTEGER'),
         column('time', data_type='FLOAT'),
         column('xaction'),
-        column('xdata', data_type='BLOB'),
+        column('xdata'),
     ],
 ]
 

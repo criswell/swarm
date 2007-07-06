@@ -20,10 +20,10 @@
 
 import os
 import sys
-import marshal
 
 import swarmlib.swarm_time
 from swarmlib import swarm_error
+import swarmlib.data_tools as data_tools
 from swarmlib.db import table_schema
 from swarmlib.db import table_defaults
 from swarmlib.db import __db_version__
@@ -198,9 +198,9 @@ class db:
                     else:
                         self._logger.error("Requested id for xlog entry, '%s', was lower than the maxid, '%s'. Ignoring request." % (str(setid), str(maxid)))
                     rowid = str(setid)
-                sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) VALUES (%s, %s, %s, '%s', '%s');"
-                self._logger.entry("SQL code is:\n%s" % (sql_code % (str(rowid), str(root), str(timestamp), xaction, xdata)), 5)
-                self._cursor.execute(sql_code, (str(rowid), str(root), str(timestamp), xaction, xdata))
+                sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) VALUES (" + str(rowid) + ", " + str(root) + ", %f, %s, %s);"
+                self._logger.entry("SQL code is:\n%s" % (sql_code % (float(timestamp), xaction, xdata)), 5)
+                self._cursor.execute(sql_code, (float(timestamp), xaction, xdata))
         else:
             raise swarm_error('Transaction log entry attempted when not connected to database.')
 
@@ -262,6 +262,7 @@ class db:
             column_values = []
             sql_code = ""
             sql_columns = ""
+            sql_column_values = ""
             for key in entry.keys():
                 column_names.append(key)
                 column_values.append(entry[key])
@@ -284,7 +285,7 @@ class db:
             self._logger.entry("SQL code is:\n%s" % (sql_code % tuple(final_entries)), 5)
             self._cursor.execute(sql_code, tuple(final_entries))
 
-        self.log_transaction(__MASTER_ISSUE__, 'set_taxonomy', marshal.dumps(the_list))
+        self.log_transaction(__MASTER_ISSUE__, 'set_taxonomy', data_tools.encode_content(the_list))
 
         self._logger.unregister()
 
