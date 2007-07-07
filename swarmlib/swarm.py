@@ -191,8 +191,10 @@ class swarm:
         issue_data['issue']['id'] = issue_id
         issue_data['node']['root'] = issue_id
 
-        print issue_data
-        #self.db.backend.add_issue(issue_data)
+        #for element in issue_data.keys():
+        #    print element
+        #    print issue_data[element]
+        self.db.backend.add_entries(issue_data)
 
     def close(self):
         """

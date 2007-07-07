@@ -346,6 +346,15 @@ class db:
         else:
             return None
 
+    def add_entries(self, table_data):
+        """
+        FIXME DOCUMENTATION
+        """
+        self._logger.register("get_taxonomy_default")
+        for key_name in table_data.keys():
+            # ERE I AM JH
+        self._logger.unregister()
+
     def get_next_free_id(self, table_name, id_string):
         """
         Given a table name and id string, will return the next free id
