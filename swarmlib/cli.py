@@ -87,7 +87,56 @@ def cli_parse_datafile(name, column_list):
                 else:
                     logger.error("Unable to parse line, skipping: '%s'" % temp_line)
 
+    close(fd)
     return parsed_list
+
+def cli_parse_issuefile(name, schema_issue, schema_node):
+    """
+    cli_parse_issuefile(name, schema_issue, schema_node)
+    Given a issue file(name) and the schemas for issues and nodes,
+    will parse the issuefile and return a hash containing the parsed
+    issue data.
+    returned_data = {'issue': {parsed data}, 'node': {parsed data}}
+    """
+    parsed_data = {'issue': {}, 'node': {}}
+    for column in schema_issue:
+        parsed_data['issue'][column] = None
+
+    for column in schema_node:
+        parsed_data['node'][column] = None
+
+    parsed_data['node']['details'] = ""
+
+    current_section = None
+
+    fd = file(name, 'rb')
+    for line in fd.readlines():
+        temp_line = line.strip()
+        if current_section == 'details':
+            parsed_data['node']['details'] = parsed_data['node']['details'] + temp_line.strip() + "\n"
+        elif len(temp_line):
+            if temp_line[0] != '#':
+                if temp_line[0] == "@":
+                    current_section = temp_line[1:].strip()
+                    current_section = current_section.lower()
+                else:
+                    temp_split = temp_line.split(':')
+                    if len(temp_split) > 1:
+                        setting = temp_split[0].strip()
+                        value = ""
+                        value = value.join(temp_split[1:])
+                        value = value.strip()
+                        if len(value) < 1:
+                            value = None
+                        if current_section == 'header':
+                            parsed_data['issue'][setting] = value
+                        elif current_section == 'node':
+                            parsed_data['node'][setting] = value
+                        # If we have something outside of the three
+                        # known sections, we kind of have to ignore it
+                        # after all, where would it go?
+    fd.close()
+    return parsed_data
 
 def cli_launch_editor(name):
     """
@@ -283,19 +332,19 @@ def cli_new(pre_options, pre_args, command, post_options):
         "# Lines begining with a '#' will be treated as a comment.\n" +
         "# In the header section, blank lines will be ignored\n" +
         "# Lines starting with '@' indicate a section divider.\n\n" +
-        "@ HEADER SECTION\n\n")
+        "@ HEADER\n\n")
     if schema_issue.has_key('time'):
         temp = os.write(fp, "# timestamp: %s\n" % timestamp)
         temp = os.write(fp, "# %s\n" % swarm_time.human_readable_from_stamp(timestamp))
     if schema_issue.has_key('reporter'):
         temp = os.write(fp, "# reporter: %s\n" % reporter)
 
-    meta_data = ['component', 'version', 'milestone', 'severity' 'priority' 'owner', 'keywords']
+    meta_data = ['component', 'version', 'milestone', 'severity', 'priority', 'owner', 'keywords']
     for element in meta_data:
         if schema_issue.has_key(element):
             temp = os.write(fp, "%s:\n" % element)
 
-    temp = os.write(fp, "\n@ NODE SECTION\n")
+    temp = os.write(fp, "\n@ NODE\n")
     meta_data = ['related', 'summary']
     for element in meta_data:
         if schema_node.has_key(element):
@@ -307,7 +356,7 @@ def cli_new(pre_options, pre_args, command, post_options):
 
     (bhash, ahash, bsize, asize) = cli_launch_editor(name)
     if bhash != ahash:
-        print "Changed, we should do something with it"
+        sw.new_issue(cli_parse_issuefile(name, schema_issue, schema_node))
     else:
         logger.entry("Ticket creation cancelled.", 0)
 

@@ -160,6 +160,12 @@ class swarm:
         """
         return self.db.backend.search_transaction_log(issue, lower_entry, upper_entry, lower_date, upper_date, xaction)
 
+    def new_issue(self, issue_data):
+        """
+        new_issue(issue_data)
+        """
+        print issue_data
+
     def close(self):
         """
         Closes the database (syncronizing data) as well as all
