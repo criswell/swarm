@@ -221,7 +221,7 @@ class db:
         """
         self._logger.register('search_transaction_log')
         args = [ issue, lower_entry, upper_entry, lower_date, upper_date, xaction]
-        limit_text = [ 
+        limit_text = [
             "root = %s"
             , "id > %s"
             , "id < %s"
@@ -323,6 +323,51 @@ class db:
             raise swarm_error("Attempted to get taxonomy while not connected to the database. Could it be that the connection failed for some reason?")
         self._logger.unregister()
         return the_list
+
+    def get_taxonomy_default(self, term):
+        """
+        Given a taxonomy name, will return the default
+        value
+        """
+        self._logger.register("get_taxonomy_default")
+        the_list = None
+
+        sql_code = "SELECT * FROM %s WHERE isdefault=1;" % term
+        self._logger.entry("Executing SQL code: '%s'" % sql_code, 5)
+        if self._connected:
+            self._cursor.execute(sql_code)
+            the_list = self._convert_list(self._cursor.fetchall(), term)
+        else:
+            self._logger.error("Attempted to get taxonomy while not connected to the database. Could it be that the connection failed for some reason?")
+            raise swarm_error("Attempted to get taxonomy while not connected to the database. Could it be that the connection failed for some reason?")
+        self._logger.unregister()
+        if len(the_list) == 1:
+            return the_list[0]
+        else:
+            return None
+
+    def get_next_free_id(self, table_name, id_string):
+        """
+        Given a table name and id string, will return the next free id
+        available in that table. In SQL DBs this means max(id_string)
+        """
+        next_id = None
+        self._logger.register("get_next_free_id")
+        sql_code = "SELECT max(%s) FROM %s;" % (id_string, table_name)
+        self._logger.entry("Executing SQL code: '%s'" % sql_code, 5)
+        if self._connected:
+            self._cursor.execute(sql_code)
+            temp = self._cursor.fetchall()
+            if temp[0][0]:
+                next_id = temp[0][0]
+            else:
+                next_id = 1
+        else:
+            self._logger.error("Attempted to get taxonomy while not connected to the database. Could it be that the connection failed for some reason?")
+            raise swarm_error("Attempted to get taxonomy while not connected to the database. Could it be that the connection failed for some reason?")
+
+        self._logger.unregister()
+        return next_id
 
     def init(self):
         self._logger.register("init")

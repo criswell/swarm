@@ -24,6 +24,8 @@ import socket
 import os
 
 import swarmlib.config as Config
+import swarmlib.data_tools as data_tools
+import swarmlib.swarm_time as swarm_time
 from swarmlib.db import swarmdb
 from swarmlib.db import taxonomy_terms
 from swarmlib.db import __MASTER_ISSUE__
@@ -164,7 +166,33 @@ class swarm:
         """
         new_issue(issue_data)
         """
+
+        # Get a node_id
+        # (should we verify this isn't in the db?)
+        node_id = data_tools.get_unique_hash(swarm_time.human_readable_from_stamp(issue_data['issue']['time']), str(issue_data['issue']['time']), issue_data['issue']['reporter'])
+
+        # Set the root_node to that node_id
+        issue_data['issue']['root_node'] = node_id
+        issue_data['node']['node_id'] = node_id
+
+        # Set to the default status
+        default_status = self.db.backend.get_taxonomy_default('status')
+        if default_status:
+            issue_data['issue']['status'] = default_status['id']
+        else:
+            raise swarm_error("Couldn't find the default status. The database may be corrupt.")
+
+        # Get the next available issue id
+        issue_id = self.db.backend.get_next_free_id('issue', 'id')
+        # FIXME: You know, if we are dealing with something else like
+        # MySQL we probably want to lock this table here to ensure
+        # that someone else doesn't sneak in and snatch this id before
+        # we're ready. In fact, it's probably a good idea generally.
+        issue_data['issue']['id'] = issue_id
+        issue_data['node']['root'] = issue_id
+
         print issue_data
+        #self.db.backend.add_issue(issue_data)
 
     def close(self):
         """

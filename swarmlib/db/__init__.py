@@ -65,14 +65,16 @@ table_schema = [
         column('status'),
         column('resolution'),
 
-        column('time', data_type='INTEGER'),
+        column('time', data_type='FLOAT'),
         column('root_node'),
     ],
 
     table('node')[
         column('node_id', unique=True),
-        column('time', data_type='INTEGER'),
+        column('time', data_type='FLOAT'),
         column('root'),
+
+        column('poster'),
 
         column('parents'),
         column('children'),

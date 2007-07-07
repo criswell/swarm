@@ -22,6 +22,7 @@
 
 import marshal
 import binascii
+import sha
 
 def encode_content(content_obj):
     """
@@ -30,3 +31,13 @@ def encode_content(content_obj):
     encode it into a transportable format
     """
     return binascii.hexlify(marshal.dumps(content_obj))
+
+def get_unique_hash(str1, str2, str3):
+    """
+    get_unique_hash(str1, str2, str3):
+    Given three strings, will return a unique hex hash
+    """
+    h = sha.new(str1)
+    h.update(str2)
+    h.update(str3)
+    return h.hexdigest()

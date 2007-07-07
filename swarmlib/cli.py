@@ -356,7 +356,12 @@ def cli_new(pre_options, pre_args, command, post_options):
 
     (bhash, ahash, bsize, asize) = cli_launch_editor(name)
     if bhash != ahash:
-        sw.new_issue(cli_parse_issuefile(name, schema_issue, schema_node))
+        parsed_data = cli_parse_issuefile(name, schema_issue, schema_node)
+        parsed_data['issue']['time'] = timestamp
+        parsed_data['issue']['reporter'] = reporter
+        parsed_data['node']['time'] = timestamp
+        parsed_data['node']['poster'] = reporter
+        sw.new_issue(parsed_data)
     else:
         logger.entry("Ticket creation cancelled.", 0)
 
