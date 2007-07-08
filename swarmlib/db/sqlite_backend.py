@@ -353,6 +353,7 @@ class db:
         self._logger.register("get_taxonomy_default")
         for key_name in table_data.keys():
             # ERE I AM JH
+            print
         self._logger.unregister()
 
     def get_next_free_id(self, table_name, id_string):

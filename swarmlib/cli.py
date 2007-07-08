@@ -87,7 +87,8 @@ def cli_parse_datafile(name, column_list):
                 else:
                     logger.error("Unable to parse line, skipping: '%s'" % temp_line)
 
-    close(fd)
+    #close(fd)
+    fd.close()
     return parsed_list
 
 def cli_parse_issuefile(name, schema_issue, schema_node):
@@ -224,6 +225,9 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
         if o in ("-v", "--verbose"):
             verbose = verbose + 1
 
+    log.set_universal_loglevel(verbose)
+    logger.register("cli_taxonomy")
+
     if post_options:
         tax_command = post_options[0]
         if tax_command == 'listall':
@@ -238,9 +242,6 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
     else:
         cli_help(None, None, 'help', ['taxonomy'])
         sys.exit(2)
-
-    log.set_universal_loglevel(verbose)
-    logger.register("cli_taxonomy")
 
     sw = Swarm(working_dir, log)
     components = sw.get_taxonomy(tax_term)
