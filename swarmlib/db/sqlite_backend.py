@@ -346,20 +346,107 @@ class db:
         else:
             return None
 
-    def add_entries(self, table_data):
+    def _add_entry(self, table_name, table_data):
         """
-        FIXME DOCUMENTATION
+        Internal add_entry function
         """
-        self._logger.register("get_taxonomy_default")
+        self._logger.register("_add_entry")
+        column_names = []
+        column_values = []
+        final_entries = []
+        sql_code = ""
+        sql_columns = ""
+        sql_datatypes = ""
+
+        table_in_use = None
+
+        # First, get the schema:
+        for table in table_schema:
+            if table.name == table_name:
+                table_in_use = table
+                break
+
+        first_entry = True
         for key_name in table_data.keys():
-            # ERE I AM JH
-            print
+            column_names.append(key_name)
+            local_type = '%s'
+            #if key_name == 'id':
+            #    column_values.append(None)
+            if table_data[key_name]:
+                (local_type, converted) = table_in_use.convert(key_name, table_data[key_name])
+                column_values.append(converted)
+            else:
+                column_values.append(None)
+            if first_entry:
+                sql_datatypes = sql_datatypes + local_type
+                first_entry = False
+            else:
+                sql_datatypes = sql_datatypes + ", %s" % local_type
+
+        first_entry = True
+        for name in column_names:
+            final_entries.append(name)
+            if first_entry:
+                sql_columns = sql_columns + "%s"
+                first_entry = False
+            else:
+                sql_columns = sql_columns + ", %s"
+
+        for value in column_values:
+            final_entries.append(value)
+
+        # FIXME : We're not checking if we're connected here
+        sql_code = "INSERT INTO " + table_name +" (" + sql_columns + ") VALUES (" + sql_datatypes + ");"
+        self._logger.entry("SQL code is:\n%s" % (sql_code % tuple(final_entries)), 5)
+        self._cursor.execute(sql_code, tuple(final_entries))
+
         self._logger.unregister()
+
+    def new_node(self, node_data):
+        """
+        new_node(node_data):
+        Given node_data, add to node table
+        """
+        self._add_entry('node', node_data)
+
+    def new_issue(self, issue_data):
+        """
+        new_issue(issue_data)
+        Given issue_data, add to issue table.
+        Returns new issue id
+        """
+        issue_id = None
+        self._logger.register("new_issue")
+
+        # The ID needs to be None
+        issue_data['id'] = None
+
+        self._add_entry('issue', issue_data)
+
+        sql_code = 'SELECT id FROM issue WHERE root_node="%s";' % issue_data['root_node']
+        self._logger.entry("SQL code is:\n%s" % sql_code, 5)
+        self._cursor.execute(sql_code)
+        temp = self._cursor.fetchall()
+        if temp[0][0]:
+            issue_id = temp[0][0]
+
+        if issue_id:
+            self.log_transaction(issue_id, 'new_issue', issue_id)
+        else:
+            print "PROBLEM!"
+            # FIXME: We should try to rollback I guess
+
+        self._logger.entry("Created new issue #%s" % str(issue_id), 3)
+
+        self._logger.unregister()
+        return issue_id
 
     def get_next_free_id(self, table_name, id_string):
         """
         Given a table name and id string, will return the next free id
         available in that table. In SQL DBs this means max(id_string)
+        FIXME - WE DON'T NEED THIS FUNCTION ANY MORE
+        DELME DELME DELME
         """
         next_id = None
         self._logger.register("get_next_free_id")

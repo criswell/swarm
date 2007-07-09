@@ -182,19 +182,13 @@ class swarm:
         else:
             raise swarm_error("Couldn't find the default status. The database may be corrupt.")
 
-        # Get the next available issue id
-        issue_id = self.db.backend.get_next_free_id('issue', 'id')
-        # FIXME: You know, if we are dealing with something else like
-        # MySQL we probably want to lock this table here to ensure
-        # that someone else doesn't sneak in and snatch this id before
-        # we're ready. In fact, it's probably a good idea generally.
-        issue_data['issue']['id'] = issue_id
+        # Add the issue, obtaining the issue id
+        issue_id = self.db.backend.new_issue(issue_data['issue'])
+        # Add the new node, linking to the issue
         issue_data['node']['root'] = issue_id
+        self.db.backend.new_node(issue_data['node'])
 
-        #for element in issue_data.keys():
-        #    print element
-        #    print issue_data[element]
-        self.db.backend.add_entries(issue_data)
+        return issue_id
 
     def close(self):
         """

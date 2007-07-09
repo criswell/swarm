@@ -362,7 +362,8 @@ def cli_new(pre_options, pre_args, command, post_options):
         parsed_data['issue']['reporter'] = reporter
         parsed_data['node']['time'] = timestamp
         parsed_data['node']['poster'] = reporter
-        sw.new_issue(parsed_data)
+        new_id = sw.new_issue(parsed_data)
+        logger.entry("Ticket #%s has been created." % str(new_id), 0)
     else:
         logger.entry("Ticket creation cancelled.", 0)
 

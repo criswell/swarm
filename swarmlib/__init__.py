@@ -40,4 +40,5 @@ def import_at_runtime(module_name, suite_name):
 transactions = {
     'xlog_start' : None,
     'set_taxonomy' : None,
+    'new_issue' : None,
 }

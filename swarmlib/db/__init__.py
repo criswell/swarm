@@ -42,18 +42,40 @@ class table:
     def __getitem__(self, objects):
         self.columns = [ob for ob in objects if isinstance(ob, column)]
         return self
+    def convert(self, column_name, value):
+        """
+        Given a column_name and value, will return a
+        converted value to the appropriate datatype
+        """
+        # First, find the column:
+        #print column_name
+        #print value
+        col_in_use = None
+        for col in self.columns:
+            if col.name == column_name:
+                col_in_use = col
+                break
+
+        if col_in_use:
+            dtype = col_in_use.data_type.lower()
+            if dtype == 'integer':
+                return ("%i", int(value))
+            elif dtype == 'float':
+                return ("%f", float(value))
+        return ("%s", str(value))
+
 
 table_schema = [
     # Issue tracking blob
     table('issue')[
         column('id', data_type='INTEGER', auto_increment=True, primary_key=True),
 
-        column('component'),
-        column('version'),
-        column('milestone'),
+        column('component', data_type='INTEGER'),
+        column('version', data_type='INTEGER'),
+        column('milestone', data_type='INTEGER'),
 
-        column('severity'),
-        column('priority'),
+        column('severity', data_type='INTEGER'),
+        column('priority', data_type='INTEGER'),
 
         column('owner'),
         column('reporter'),
@@ -62,8 +84,8 @@ table_schema = [
 
         column('keywords'),
 
-        column('status'),
-        column('resolution'),
+        column('status', data_type='INTEGER'),
+        column('resolution', data_type='INTEGER'),
 
         column('time', data_type='FLOAT'),
         column('root_node'),
