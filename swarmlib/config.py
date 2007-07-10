@@ -237,6 +237,15 @@ class config:
             # Default is to last entry (swarm)
             self._config[self._config['regions'][-1]].add_section(section)
 
+    def has_section(self, section, config_region=None):
+        """
+        Returns true if a section exists
+        """
+        if config_region in self._config['regions']:
+            return self._config[config_region].has_section(section)
+        else:
+            return self._config[self._config['regions'][-1]].has_section(section)
+
     def save(self):
         """
         Save the project's swarmrc file.

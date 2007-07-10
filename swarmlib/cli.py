@@ -301,7 +301,34 @@ def cli_log(pre_options, pre_args, command, post_options):
 
     sw = Swarm(working_dir, log)
     xlog = sw.get_transaction_log()
+    # FIXME
+    # This is ugly, was just an early hack that
+    # is still around
     print xlog
+
+    sw.close()
+    logger.unregister()
+
+def cli_last(pre_options, pre_args, command, post_options):
+    verbose = 0
+    working_dir = os.getcwd()
+
+    for o, a in pre_options:
+        if o in ("-v", "--verbose"):
+            verbose = verbose + 1
+
+    if post_options:
+        working_dir = post_options[0]
+
+    log.set_universal_loglevel(verbose)
+    logger.register("cli_last")
+
+    sw = Swarm(working_dir, log)
+    if sw.config.has_section('cli'):
+        last_id = sw.config.get('cli', 'last_issue')
+        logger.entry("The last issue was #%s." % last_id, 0)
+    else:
+        logger.enrty("There is no last issue set.", 0)
 
     sw.close()
     logger.unregister()
@@ -364,6 +391,10 @@ def cli_new(pre_options, pre_args, command, post_options):
         parsed_data['node']['poster'] = reporter
         new_id = sw.new_issue(parsed_data)
         logger.entry("Ticket #%s has been created." % str(new_id), 0)
+        if not sw.config.has_section('cli'):
+            sw.config.add_section('cli')
+        sw.config.set('cli', 'last_issue', new_id)
+        sw.config.save()
     else:
         logger.entry("Ticket creation cancelled.", 0)
 
@@ -443,6 +474,17 @@ option_dispatch = {
          '  OPTIONS:',
          '  -v|--verbose    Be verbose about actions'],
         cli_log),
+    'last' : Command(
+        ['v'],
+        ['verbose'],
+        'swarm [OPTIONS] last [DIR]',
+        'Displays the last ticket modified.',
+        ['  Will display the last ticket modified (the current assumed',
+         '  ticket if none is specified)',
+         '',
+         '  OPTIONS:',
+         '  -v|--verbose    Be verbose about actions'],
+        cli_last),
     'new' : Command(
         ['v'],
         ['verbose'],
