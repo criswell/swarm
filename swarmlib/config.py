@@ -97,10 +97,10 @@ class config:
 
         self._logger.unregister()
 
-    def init(self, project_name):
+    def init(self, project_name, project_hash):
         """
         init project config file
-        Given the "project_name" will initialize the
+        Given the "project_name" and "project_hash will initialize the
         project's swarmrc file.
 
         This should be called when a new project is being
@@ -148,6 +148,7 @@ class config:
             # This was, perhaps, not a good idea
             self._config['swarm'].add_section("main")
             self._config['swarm'].set("main", "project_name", project_name)
+            self._config['swarm'].set("main", "project_hash", project_hash)
 
             # The following are defaults which we should
             # eventually allow to be overwritten via
@@ -158,8 +159,6 @@ class config:
             self._config['swarm'].set("db", "dbfile", "swarm.db")
             self._config['swarm'].set("db", "type", "sqlite")
             self._config['swarm'].add_section('xlog')
-            self._config['swarm'].set("xlog", "type", "cPickle")
-            self._config['swarm'].set("xlog", "directory", "xlogs")
 
             fp = open(swarm_config, mode="w")
             self._config['swarm'].write(fp)

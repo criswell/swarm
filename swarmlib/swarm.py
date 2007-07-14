@@ -40,7 +40,8 @@ def master_init(project_name, working_dir, log, force=False):
     repository elements that may be found.
     """
     config = Config.config(working_dir, log, force)
-    config.init(project_name)
+    project_hash = data_tools.get_hash(project_name, swarm_time.human_readable_from_stamp(), socket.getfqdn())
+    config.init(project_name, project_hash)
     db = swarmdb(working_dir, config, log, force)
     db.backend.init()
     db.backend.close()
