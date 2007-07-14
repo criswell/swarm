@@ -158,7 +158,6 @@ class config:
             self._config['swarm'].add_section('db')
             self._config['swarm'].set("db", "dbfile", "swarm.db")
             self._config['swarm'].set("db", "type", "sqlite")
-            self._config['swarm'].add_section('xlog')
 
             fp = open(swarm_config, mode="w")
             self._config['swarm'].write(fp)
