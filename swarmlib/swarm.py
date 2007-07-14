@@ -163,6 +163,15 @@ class swarm:
         """
         return self.db.backend.search_transaction_log(issue, lower_entry, upper_entry, lower_date, upper_date, xaction)
 
+    def get_last_hash(self, table_name):
+        """
+        get_last_hash(table_name)
+        Given a table name, get the hash for the last ticket added.
+        Returns (full_hash, part_hash)
+        """
+        data = self.db.backend.get_last_record(table_name, 'time') #ERE I AM JH
+        return (data['hash_id'], data['short_hash_id'])
+
     def new_issue(self, issue_data):
         """
         new_issue(issue_data)
@@ -183,10 +192,15 @@ class swarm:
         else:
             raise swarm_error("Couldn't find the default status. The database may be corrupt.")
 
+        # Generate the next issue hash
+        (fh, ph) = self.get_last_hash('issue')
+        issue_id = data_tools.get_hash(fh, ph str(issue_data['issue']['time']))
+        (issue_data['issue']['hash'], issue_data['issue']['shash']) = self.get_unique(issue_id)
+
         # Add the issue, obtaining the issue id
-        issue_id = self.db.backend.new_issue(issue_data['issue'])
+        issue_rowid = self.db.backend.new_issue(issue_data['issue'])
         # Add the new node, linking to the issue
-        issue_data['node']['root'] = issue_id
+        issue_data['node']['root'] = issue_rowid
         self.db.backend.new_node(issue_data['node'])
 
         return issue_id
