@@ -69,6 +69,8 @@ table_schema = [
     # Issue tracking blob
     table('issue')[
         column('id', data_type='INTEGER', auto_increment=True, primary_key=True),
+        column('shash',  unique=True),
+        column('hash', unique=True),
 
         column('component', data_type='INTEGER'),
         column('version', data_type='INTEGER'),

@@ -32,7 +32,7 @@ def encode_content(content_obj):
     """
     return binascii.hexlify(marshal.dumps(content_obj))
 
-def get_unique_hash(str1, str2, str3):
+def get_hash(str1, str2, str3):
     """
     get_unique_hash(str1, str2, str3):
     Given three strings, will return a unique hex hash

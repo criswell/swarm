@@ -169,7 +169,7 @@ class swarm:
 
         # Get a node_id
         # (should we verify this isn't in the db?)
-        node_id = data_tools.get_unique_hash(swarm_time.human_readable_from_stamp(issue_data['issue']['time']), str(issue_data['issue']['time']), issue_data['issue']['reporter'])
+        node_id = data_tools.get_hash(swarm_time.human_readable_from_stamp(issue_data['issue']['time']), str(issue_data['issue']['time']), issue_data['issue']['reporter'])
 
         # Set the root_node to that node_id
         issue_data['issue']['root_node'] = node_id
