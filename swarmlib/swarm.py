@@ -214,7 +214,7 @@ class swarm:
 
         # Generate the next issue hash
         (fh, ph) = self.get_last_hash('issue')
-        issue_id = data_tools.get_hash(fh, ph str(issue_data['issue']['time']))
+        issue_id = data_tools.get_hash(fh, ph, issue_data['issue']['time'])
         (issue_data['issue']['hash'], issue_data['issue']['shash']) = (self.get_unique(issue_id), issue_id)
 
         # Add the issue, obtaining the issue id
