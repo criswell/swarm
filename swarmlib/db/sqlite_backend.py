@@ -279,7 +279,7 @@ class db:
         if self._connected:
             sql_code = "SELECT * FROM %s ORDER BY %s DESC LIMIT 1;"
             params = (table_name, order_by)
-            self._logger.register("SQL code is :'%s'" % (sql_code % params), 5)
+            self._logger.entry("SQL code is :'%s'" % (sql_code % params), 5)
             self._cursor.execute(sql_code, params)
             the_record = self._convert_list(self._cursor.fetchone(), table_name)
         else:
