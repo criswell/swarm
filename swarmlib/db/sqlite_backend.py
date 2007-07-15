@@ -277,7 +277,7 @@ class db:
 
         self._logger.register("get_last_record")
         if self._connected:
-            sql_code = "SELECT * FROM %s ORDER BY %S DESC LIMIT 1;"
+            sql_code = "SELECT * FROM %s ORDER BY %s DESC LIMIT 1;"
             params = (table_name, order_by)
             self._logger.register("SQL code is :'%s'" % (sql_code % params), 5)
             self._cursor.execute(sql_code, params)
