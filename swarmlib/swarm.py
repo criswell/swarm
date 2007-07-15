@@ -183,7 +183,7 @@ class swarm:
         """
         length = 4 # The starting, default length of the hash id
         hash_id = issue_id[:length]
-        while self.db.backend.fetch('issue', {'short_hash_id': hash_id})
+        while self.db.backend.fetch('issue', {'short_hash_id': hash_id}):
             length += 1
             if length < len(issue_id):
                 hash_id = issue_id[:length]
