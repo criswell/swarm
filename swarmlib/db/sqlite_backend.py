@@ -266,6 +266,28 @@ class db:
         self._connect.close()
         self._connected = False
 
+    def get_last_record(self, table_name, order_by):
+        """
+        get_last_record(table_name, order_by)
+        Given a table name and an column to order by, will return the
+        last record in the table as ordered by 'order_by'
+        """
+
+        the_record = None
+
+        self._logger.register("get_last_record")
+        if self._connected:
+            sql_code = "SELECT * FROM %s ORDER BY %S DESC LIMIT 1;"
+            params = (table_name, order_by)
+            self._logger.register("SQL code is :'%s'" % (sql_code % params), 5)
+            self._cursor.execute(sql_code, params)
+            the_record = self._convert_list(self._cursor.fetchone(), table_name)
+        else:
+            self._logger.error("Last record requested, but not connected to sqlite database file.")
+
+        self._logger.unregister()
+        return the_record
+
     def set_taxonomy(self, term, the_list):
         """
         Given a table name, will update its contents with the new

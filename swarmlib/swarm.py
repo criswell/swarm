@@ -169,7 +169,7 @@ class swarm:
         Given a table name, get the hash for the last ticket added.
         Returns (full_hash, part_hash)
         """
-        data = self.db.backend.get_last_record(table_name, 'time') #ERE I AM JH
+        data = self.db.backend.get_last_record(table_name, 'time')
         return (data['hash_id'], data['short_hash_id'])
 
     def new_issue(self, issue_data):
@@ -195,7 +195,7 @@ class swarm:
         # Generate the next issue hash
         (fh, ph) = self.get_last_hash('issue')
         issue_id = data_tools.get_hash(fh, ph str(issue_data['issue']['time']))
-        (issue_data['issue']['hash'], issue_data['issue']['shash']) = self.get_unique(issue_id)
+        (issue_data['issue']['hash'], issue_data['issue']['shash']) = (self.get_unique(issue_id), issue_id)
 
         # Add the issue, obtaining the issue id
         issue_rowid = self.db.backend.new_issue(issue_data['issue'])
