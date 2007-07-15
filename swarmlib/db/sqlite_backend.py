@@ -288,6 +288,32 @@ class db:
         self._logger.unregister()
         return the_record
 
+    def fetch(self, table_name, search_criteria):
+        """
+        data = fetch(table_name, search_criteria)
+        Given a table name, and search criteria (in the form of a dictionary,
+        e.g., {'column': 'value', etc.}), will return the entry or entries
+        based on the search criteria.
+        """
+
+        self._logger.register("fetch")
+        the_record = None
+        clauses = []
+
+        if self._connected:
+            sql_code = "SELECT * FROM %s WHERE " % table_name
+            for key in search_criteria:
+                clauses.append("%s=%s" % (key, search_criteria[key]))
+            sql_code = sql_code + " AND ".join(clauses) + ";"
+            self._logger.entry("SQL code is:'%s'" % sql_code, 5)
+            self._cursor.execute(sql_code)
+            the_record = self._convert_list(self._cursor.fetchall(), table_name)
+        else:
+            self._logger.error("Fetch requested, but not connected to sqlite database file.")
+
+        self._logger.unregister()
+        return the_record
+
     def set_taxonomy(self, term, the_list):
         """
         Given a table name, will update its contents with the new

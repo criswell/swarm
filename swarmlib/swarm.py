@@ -165,12 +165,32 @@ class swarm:
 
     def get_last_hash(self, table_name):
         """
-        get_last_hash(table_name)
+        (short_hash, full_hash) = get_last_hash(table_name)
         Given a table name, get the hash for the last ticket added.
         Returns (full_hash, part_hash)
         """
         data = self.db.backend.get_last_record(table_name, 'time')
-        return (data['hash_id'], data['short_hash_id'])
+        if data:
+            return (data['hash_id'], data['short_hash_id'])
+        else:
+            return ("", "")
+
+    def get_unique(self, issue_id):
+        """
+        hash = get_unique(issue_id)
+        Given an issue id, determine a unique "human readable" (e.g., short)
+        sub-section hash of it
+        """
+        length = 4 # The starting, default length of the hash id
+        hash_id = issue_id[:length]
+        while self.db.backend.fetch('issue', {'short_hash_id': hash_id})
+            length += 1
+            if length < len(issue_id):
+                hash_id = issue_id[:length]
+            else:
+                return None
+
+        return hash_id
 
     def new_issue(self, issue_data):
         """
