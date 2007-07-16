@@ -141,16 +141,19 @@ class db:
             columns.append(column.name)
 
         # Now, let's convert the list using this schema
-        for entry in the_list:
-            if len(entry) != len(columns):
-                self._logger.error("Table column mismatch in sqlite results from taxonomy query on '%s', database may be corrupt. Skipping." % term)
-                continue
+        if the_list:
+            for entry in the_list:
+                if len(entry) != len(columns):
+                    self._logger.error("Table column mismatch in sqlite results from taxonomy query on '%s', database may be corrupt. Skipping." % term)
+                    continue
 
-            converted_entry = {}
-            for i in range(len(entry)):
-                converted_entry[columns[i]] = entry[i]
+                converted_entry = {}
+                for i in range(len(entry)):
+                    converted_entry[columns[i]] = entry[i]
 
-            converted_list.append(converted_entry)
+                converted_list.append(converted_entry)
+        else:
+            converted_list = None
 
         return converted_list
 
@@ -277,10 +280,10 @@ class db:
 
         self._logger.register("get_last_record")
         if self._connected:
-            sql_code = "SELECT * FROM %s ORDER BY %s DESC LIMIT 1;"
-            params = (table_name, order_by)
-            self._logger.entry("SQL code is :'%s'" % (sql_code % params), 5)
-            self._cursor.execute(sql_code, params)
+            sql_code = "SELECT * FROM %s ORDER BY %s DESC LIMIT 1;" % (table_name, order_by)
+            #params = (table_name, order_by)
+            self._logger.entry("SQL code is :'%s'" % sql_code, 5)
+            self._cursor.execute(sql_code) #, params)
             the_record = self._convert_list(self._cursor.fetchone(), table_name)
         else:
             self._logger.error("Last record requested, but not connected to sqlite database file.")
@@ -303,7 +306,7 @@ class db:
         if self._connected:
             sql_code = "SELECT * FROM %s WHERE " % table_name
             for key in search_criteria:
-                clauses.append("%s=%s" % (key, search_criteria[key]))
+                clauses.append("%s = '%s'" % (key, search_criteria[key]))
             sql_code = sql_code + " AND ".join(clauses) + ";"
             self._logger.entry("SQL code is:'%s'" % sql_code, 5)
             self._cursor.execute(sql_code)

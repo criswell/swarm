@@ -94,8 +94,7 @@ table_schema = [
     ],
 
     table('node')[
-        column('short_hash_id', unique=True),
-        column('hash_id', unique=True),
+        column('node_id', unique=True),
 
         column('time', data_type='FLOAT'),
         column('root'),
