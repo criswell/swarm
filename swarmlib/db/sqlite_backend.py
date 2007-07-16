@@ -281,9 +281,8 @@ class db:
         self._logger.register("get_last_record")
         if self._connected:
             sql_code = "SELECT * FROM %s ORDER BY %s DESC LIMIT 1;" % (table_name, order_by)
-            #params = (table_name, order_by)
             self._logger.entry("SQL code is :'%s'" % sql_code, 5)
-            self._cursor.execute(sql_code) #, params)
+            self._cursor.execute(sql_code)
             the_record = self._convert_list(self._cursor.fetchone(), table_name)
         else:
             self._logger.error("Last record requested, but not connected to sqlite database file.")
