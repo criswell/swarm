@@ -215,7 +215,7 @@ class swarm:
         # Generate the next issue hash
         (fh, ph) = self.get_last_hash('issue')
         issue_id = data_tools.get_hash(fh, ph, str(issue_data['issue']['time']))
-        (issue_data['issue']['hash_id'], issue_data['issue']['short_hash_id']) = (self.get_unique(issue_id), issue_id)
+        (issue_data['issue']['hash_id'], issue_data['issue']['short_hash_id']) = (issue_id, self.get_unique(issue_id))
 
         # Add the issue, obtaining the issue id
         issue_rowid = self.db.backend.new_issue(issue_data['issue'])
@@ -223,7 +223,7 @@ class swarm:
         issue_data['node']['root'] = issue_rowid
         self.db.backend.new_node(issue_data['node'])
 
-        return issue_id
+        return issue_data['issue']['short_hash_id']
 
     def close(self):
         """

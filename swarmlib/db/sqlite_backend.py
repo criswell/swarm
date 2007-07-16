@@ -116,19 +116,19 @@ class db:
         self.log_transaction(__MASTER_ISSUE__, 'xlog_start', 'Null', 0)
         self._logger.unregister()
 
-    def _convert_list(self, the_list, term):
+    def _convert_entry(self, entry, columns):
         """
-        Given an sqlite result and tablename will
-        generate a list of dictionaries with column
-        names and values
+        Given an entry and column definition, return a converted entry
         """
-        self._logger.register("_convert_list")
-        converted_list = []
+        converted_entry = {}
+        for i in range(len(entry)):
+            converted_entry[columns[i]] = entry[i]
+        return converted_entry
 
-        table_in_use = None
+    def _get_schema(self, term):
+        """
+        """
         columns = []
-
-        # First, get the schema:
         for table in table_schema:
             if table.name == term:
                 table_in_use = table
@@ -140,6 +140,22 @@ class db:
         for column in table_in_use.columns:
             columns.append(column.name)
 
+        return columns
+
+    def _convert_list(self, the_list, term):
+        """
+        Given an sqlite result and tablename will
+        generate a list of dictionaries with column
+        names and values
+        """
+        self._logger.register("_convert_list")
+        converted_list = []
+
+        table_in_use = None
+
+        # First, get the schema:
+        columns = self._get_schema(term)
+
         # Now, let's convert the list using this schema
         if the_list:
             for entry in the_list:
@@ -147,11 +163,7 @@ class db:
                     self._logger.error("Table column mismatch in sqlite results from taxonomy query on '%s', database may be corrupt. Skipping." % term)
                     continue
 
-                converted_entry = {}
-                for i in range(len(entry)):
-                    converted_entry[columns[i]] = entry[i]
-
-                converted_list.append(converted_entry)
+                converted_list.append(self._convert_entry(entry, columns))
         else:
             converted_list = None
 
@@ -283,7 +295,7 @@ class db:
             sql_code = "SELECT * FROM %s ORDER BY %s DESC LIMIT 1;" % (table_name, order_by)
             self._logger.entry("SQL code is :'%s'" % sql_code, 5)
             self._cursor.execute(sql_code)
-            the_record = self._convert_list(self._cursor.fetchone(), table_name)
+            the_record = self._convert_entry(self._cursor.fetchone(), self._get_schema(table_name))
         else:
             self._logger.error("Last record requested, but not connected to sqlite database file.")
 
