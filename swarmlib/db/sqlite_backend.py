@@ -121,8 +121,11 @@ class db:
         Given an entry and column definition, return a converted entry
         """
         converted_entry = {}
-        for i in range(len(entry)):
-            converted_entry[columns[i]] = entry[i]
+        try:
+            for i in range(len(entry)):
+                converted_entry[columns[i]] = entry[i]
+        except:
+                converted_entry = None
         return converted_entry
 
     def _get_schema(self, term):
