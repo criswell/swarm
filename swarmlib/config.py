@@ -45,7 +45,7 @@ class config:
         self._config['system'] = ConfigParser.ConfigParser()
         self._config['user'] = ConfigParser.ConfigParser()
         self._config['swarm'] = ConfigParser.ConfigParser()
-        self._swarm_config_is_set = False
+        self.config_set = False
         self._force = force
         self._logger = log.get_logger("config")
         self._load_config()
@@ -90,10 +90,10 @@ class config:
 
         if os.path.isfile(swarm_config):
             self._config['swarm'].read(swarm_config)
-            self._swarm_config_is_set = True
+            self.config_set = True
         else:
             self._logger.entry("swarm config does not exist.", 2)
-            self._swarm_config_is_set = False
+            self.config_set = False
 
         self._logger.unregister()
 
@@ -114,7 +114,7 @@ class config:
         self._logger.register("init")
 
         swarm_config = "%s/swarmrc" % self.dot_swarm
-        if self._swarm_config_is_set:
+        if self.config_set:
             self._logger.error("swarm config is already set for project root '%s' (use force if you really want to overwrite)" % self.project_root)
             if not self._force:
                 sys.exit(2)
@@ -162,7 +162,7 @@ class config:
             fp = open(swarm_config, mode="w")
             self._config['swarm'].write(fp)
             fp.close()
-            self._swarm_config_is_set = True
+            self.config_set = True
 
         self._logger.unregister()
 
@@ -267,6 +267,6 @@ class config:
         fp = open(swarm_config, mode="w")
         self._config['swarm'].write(fp)
         fp.close()
-        self._swarm_config_is_set = True
+        self.config_set = True
 
         self._logger.unregister()

@@ -179,6 +179,38 @@ table_schema = [
     ],
 ]
 
+# When displaying the contents of the above tables,
+# the following is the order
+table_orders = {
+    'issue' : {
+        'short' : [
+            'short_hash_id',
+            'time',
+            'reporter',
+            'owner',
+            'cc',
+            'subscribers',
+            'component',
+            'version',
+            'milestone',
+            'severity',
+            'priority',
+            'status',
+            'resolution'],
+        'long' : [
+            'keywords']
+    },
+    'node' : {
+        'short' : [
+            'time',
+            'poster',
+            'related'],
+        'long' : [
+            'summary',
+            'details']
+    }
+}
+
 # The following tables will have some
 # useful defaults. They can be overwritten.
 table_defaults = {
@@ -279,7 +311,8 @@ class swarmdb:
         self.backend = None
         self._backend_class = None
         self.backend_type = self._config.get('db', 'type')
-        self._load_backend()
+        if self.backend_type:
+            self._load_backend()
 
     def _load_backend(self):
         self._logger.register("_load_backend")

@@ -139,6 +139,38 @@ def cli_parse_issuefile(name, schema_issue, schema_node):
     fd.close()
     return parsed_data
 
+def cli_printnode(fp, issue, node, issue_order, node_order):
+    """
+    cli_printnode(fp, issue, node, schema_issue, schema_node)
+    Given issue and node details, will print
+    the current node to the file object fp
+    """
+    # Start out with the issue metadata
+    data = "TICKET NUMBER : %s\n" % issue['short_hash_id']
+    for i in issue_order['short']:
+        if i != 'short_hash_id':
+            if i == 'time':
+                data = data + "Time: %s\n" % swarm_time.human_readable_from_stamp(issue['time'])
+            else:
+                data = data + "%s : %s\n" % (i, issue[i])
+    data = data + "\n"
+    for i in issue_order['long']:
+        data = data + "%s : %s\n" % (i, issue[i])
+
+    data = data + "\n---------------------------\n\n"
+
+    # Now do the node data
+    for i in node_order['short']:
+        if i == 'time':
+            data = data + "Post time: %s\n" % swarm_time.human_readable_from_stamp(node['time'])
+        else:
+            data = data + "%s : %s\n" % (i, node[i])
+
+    for i in node_order['long']:
+        data = data + "\n%s:\n%s\n" % (i, node[i])
+
+    temp = os.write(fp, data)
+
 def cli_launch_editor(name):
     """
     Launch an external editor
@@ -172,6 +204,18 @@ def cli_launch_editor(name):
     fd.close()
 
     return (bhash, ahash, bsize, asize)
+
+def cli_pager(name):
+    """
+    Given a filename, view it in some external pager
+    """
+
+    # TODO: This needs to be fixed, we ought to try various pagers
+    # right now we just kind of assume less is available...
+    # which is dumb :-P
+
+    cmd = "less %s" % (name)
+    status = os.system(cmd)
 
 def cli_help(pre_options, pre_args, command, post_options):
     if post_options:
@@ -333,6 +377,69 @@ def cli_last(pre_options, pre_args, command, post_options):
     sw.close()
     logger.unregister()
 
+def cli_thread(pre_options, pre_args, command, post_options):
+    verbose = 0
+    working_dir = os.getcwd()
+    ticket_number = None
+    sw = None
+
+    for o, a in pre_options:
+        if o in ("-v", "--verbose"):
+            verbose = verbose + 1
+
+    log.set_universal_loglevel(verbose)
+    logger.register("cli_last")
+
+    if len(post_options) == 2:
+        # swarm thread ##### directory
+        working_dir = post_options[1]
+        ticket_number = post_options[0]
+        sw = Swarm(working_dir, log)
+    elif len(post_options) == 1:
+        # 1) swarm thread #####
+        # OR
+        # 2) swarm thread directory
+        ticket_number = post_options[0]
+        sw = Swarm(working_dir, log)
+        if not sw.loaded:
+            # Try #2
+            sw.close()
+            ticket_number = None
+            working_dir = post_options[0]
+            sw = Swarm(working_dir, log)
+    else:
+        # Default is to use the last issue
+        sw = Swarm(working_dir, log)
+
+    if sw:
+        if sw.loaded:
+            if not ticket_number:
+                if sw.config.has_section('cli'):
+                    ticket_number = sw.config.get('cli', 'last_issue')
+
+            if ticket_number:
+                issue = sw.get_issue(ticket_number)
+                schema_issue = sw.get_schema('issue')
+                schema_node = sw.get_schema('node')
+                if len(issue) == 1:
+                    cur_node_id = issue[0]['root_node']
+                    node = sw.get_node(cur_node_id)
+                    if len(node):
+                        (fp, name) = tempfile.mkstemp()
+                        cli_printnode(fp, issue[0], node[0], sw.get_table_order('issue'), sw.get_table_order('node'))
+                        cli_pager(name)
+                        os.close(fp)
+                        os.remove(name)
+                else:
+                    logger.error("The ticket provided seems to have duplicates.\n Sorry, you're on your own until we provide some means to repair conflicts like this.\n Hey, you know, you could help out with swarm and fix this rather serious problem :-)")
+            else:
+                logger.error("No ticket found.")
+        else:
+            logger.error("No swarm repository found.")
+
+        sw.close()
+    logger.unregister()
+
 def cli_new(pre_options, pre_args, command, post_options):
     verbose = 0
     working_dir = os.getcwd()
@@ -485,6 +592,17 @@ option_dispatch = {
          '  OPTIONS:',
          '  -v|--verbose    Be verbose about actions'],
         cli_last),
+    'thread' : Command(
+        ['v'],
+        ['verbose'],
+        'swarm [OPTIONS] thread [TICKET_NUMBER] [DIR]',
+        'Views the traffic for a given ticket.',
+        ['   Will display the ticket traffic for a given ticket',
+         '   in threaded format and allow you to add new comments.',
+         '',
+         '  OPTIONS:',
+         '  -v|--verbose    Be verbose about actions'],
+        cli_thread),
     'new' : Command(
         ['v'],
         ['verbose'],

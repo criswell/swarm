@@ -30,6 +30,7 @@ from swarmlib.db import swarmdb
 from swarmlib.db import taxonomy_terms
 from swarmlib.db import __MASTER_ISSUE__
 from swarmlib.db import table_schema
+from swarmlib.db import table_orders
 
 def master_init(project_name, working_dir, log, force=False):
     """
@@ -59,6 +60,7 @@ class swarm:
         self._logger = log.get_logger("swarm")
         self.config = None
         self.db = None
+        self.loaded = False
 
         self._setup()
 
@@ -70,9 +72,47 @@ class swarm:
 
         self.config = Config.config(self._working_dir, self._log)
         self.db = swarmdb(self._working_dir, self.config, self._log)
-        self.db.backend.connect()
+        if self.db.backend:
+            self.loaded = True
+            self.db.backend.connect()
+        else:
+            self._logger.error("Database backend not loaded")
 
         self._logger.unregister()
+
+    def get_issue(self, ticket_number):
+        """
+        Given a ticket_number, get the issue
+        """
+
+        self._logger.register("get_issue")
+        search_criteria = {}
+
+        issue = None
+        if ticket_number and self.loaded:
+            search_criteria['short_hash_id'] = ticket_number
+            self._logger.entry("Fetching for ticket '%s'." % ticket_number, 1)
+            issue = self.db.backend.fetch('issue', search_criteria)
+
+        self._logger.unregister()
+        return issue
+
+    def get_node(self, node_id):
+        """
+        Given a node_id, get the issue
+        """
+
+        self._logger.register("get_node")
+        search_criteria = {}
+
+        node = None
+        if node_id and self.loaded:
+            search_criteria['node_id'] = node_id
+            self._logger.entry("Fetching for node '%s'." % node_id, 1)
+            issue = self.db.backend.fetch('node', search_criteria)
+
+        self._logger.unregister()
+        return issue
 
     def get_taxonomy(self, tax_term):
         """
@@ -131,6 +171,17 @@ class swarm:
 
         return schema
 
+    def get_table_order(self, name):
+        """
+        get_table_order(name)
+        Given a name of a table, get the table print order for that table
+        """
+        order = None
+
+        if table_orders[name]:
+            order = table_orders[name]
+
+        return order
 
     def get_transaction_log(self, issue=None, lower_entry=None, upper_entry=None, lower_date=None, upper_date=None, xaction=None):
         """
@@ -231,4 +282,5 @@ class swarm:
         Closes the database (syncronizing data) as well as all
         open xlog files.
         """
-        self.db.backend.close()
+        if self.loaded:
+            self.db.backend.close()
