@@ -424,12 +424,18 @@ def cli_thread(pre_options, pre_args, command, post_options):
                 if len(issue) == 1:
                     cur_node_id = issue[0]['root_node']
                     node = sw.get_node(cur_node_id)
-                    if len(node):
-                        (fp, name) = tempfile.mkstemp()
-                        cli_printnode(fp, issue[0], node[0], sw.get_table_order('issue'), sw.get_table_order('node'))
-                        cli_pager(name)
-                        os.close(fp)
-                        os.remove(name)
+                    more_nodes = True
+                    while more_nodes:
+                        if len(node):
+                            (fp, name) = tempfile.mkstemp()
+                            cli_printnode(fp, issue[0], node[0], sw.get_table_order('issue'), sw.get_table_order('node'))
+                            cli_pager(name)
+                            os.close(fp)
+                            os.remove(name)
+                            if node[0]['children']:
+                                print "BAH"
+                            else:
+                                more_nodes = False
                 else:
                     logger.error("The ticket provided seems to have duplicates.\n Sorry, you're on your own until we provide some means to repair conflicts like this.\n Hey, you know, you could help out with swarm and fix this rather serious problem :-)")
             else:
