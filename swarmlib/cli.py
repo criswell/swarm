@@ -87,7 +87,6 @@ def cli_parse_datafile(name, column_list):
                 else:
                     logger.error("Unable to parse line, skipping: '%s'" % temp_line)
 
-    #close(fd)
     fd.close()
     return parsed_list
 
@@ -432,8 +431,9 @@ def cli_thread(pre_options, pre_args, command, post_options):
                             cli_pager(name)
                             os.close(fp)
                             os.remove(name)
+                            children = None
                             if node[0]['children']:
-                                print "BAH"
+                                children = [ x.strip() for x in node[0]['children'].split(',')]
                             else:
                                 more_nodes = False
                 else:

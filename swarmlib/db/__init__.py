@@ -90,25 +90,31 @@ table_schema = [
         column('resolution', data_type='INTEGER'),
 
         column('time', data_type='FLOAT'),
-        column('root_node'),
     ],
 
     table('node')[
         column('node_id', unique=True),
 
         column('time', data_type='FLOAT'),
-        column('root'),
 
         column('poster'),
 
-        column('parents'),
-        column('children'),
         column('related'),
 
         column('summary'),
         column('details'),
 
         column('attachments', data_type='blob'), #Should these be a seperate table?
+    ],
+
+    table('issue_to_node')[
+        column('issue_id'),
+        column('node_id'),
+    ],
+
+    table('lineage')[
+        column('parent_id'),
+        column('child_id'),
     ],
 
     table('issue_custom')[
