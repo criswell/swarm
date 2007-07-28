@@ -292,9 +292,11 @@ class swarm:
 
         # Add the issue, obtaining the issue id
         issue_rowid = self.db.backend.new_issue(issue_data['issue'])
-        # Add the new node, linking to the issue
-        issue_data['node']['root'] = issue_rowid
+        # Add the new node
+        #issue_data['node']['root'] = issue_rowid
         self.db.backend.new_node(issue_data['node'])
+        # Add lineage
+        # ERE I AM JH
 
         return issue_data['issue']['short_hash_id']
 

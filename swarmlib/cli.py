@@ -431,18 +431,87 @@ def cli_thread(pre_options, pre_args, command, post_options):
                             cli_pager(name)
                             os.close(fp)
                             os.remove(name)
-                            lineage = sw.get_lineage(parent_id=cur_node_id)
-                            if lineage:
-                                children = []
-                                for child in lineage:
-                                    children.append(child)
+                            children = sw.get_lineage(parent_id=cur_node_id)
+                            parents = sw.get_lineage(child_id=cur_node_id)
+                            parent_entry = {}
+                            child_entry = {}
+                            parent_keys = None
+                            child_keys = None
+                            for p in parents:
+                                [temp_node] = sw.get_node(p['parent_id'])
+                                parent_entry[temp_node['time']] = [temp_node['poster'], temp_node['summary'], temp_node['node_id']]
+                            for c in children:
+                                [temp_node] = sw.get_node(c['child_id'])
+                                child_entry[temp_node['time']] = [temp_node['poster'], temp_node['summary'], temp_node['node_id']]
 
-                                child_choices = ", ".join(["[%i] %s" % (num, name) for num, name in zip(range(len(children)), children)
-                                choice = raw_input("%s or [q] to quit: ")
-                                # BAH I just made the above too complicated, didn't I?
-                                # ERE I AM JH
+                            output_text = ""
+
+                            if parent_entry:
+                                parent_keys = parent_entry.keys()
+                                parent_keys.sort()
+                                output_text = output_text + "Parent nodes:\n"
+                                for i in range(len(parent_keys)):
+                                    output_text = output_text + "\t[P%i] '%s' by '%s'\n" % (i, parent_entry[parent_keys[i]][1], parent_entry[parent_keys[i]][0])
+                                output_text = output_text + "\n"
+                            if child_entry:
+                                child_keys = child_entry.keys()
+                                child_keys.sort()
+                                output_text = output_text + "Child nodes:\n"
+                                for i in range(len(child_keys)):
+                                    output_text = output_text + "\t[C%i] '%s' by '%s'\n" % (i, child_entry[child_keys[i]][1], child_entry[child_keys[i]][0])
+                                output_text = output_text + "\n"
+
+                            if child_entry or parent_entry:
+                                output_text = output_text + "Select a node to navigate to or"
                             else:
+                                output_text = output_text + "Press"
                                 more_nodes = False
+
+                            output_text = output_text + "\n\t[R] Reply to the node just viewed\n\t[B] View the previous node again\n\t[Q] Quit viewing the thread\n? "
+
+                            valid_choice = False
+                            while not valid_choice:
+                                choice = raw_input(output_text)
+                                choice = choice.lower()
+                                if choice[0] == 'p':
+                                    # User requested a parent_id
+                                    if choice[1:].isdigit():
+                                        num = int(choice[1:])
+                                        if num in range(len(parent_keys)):
+                                            node = sw.get_node(parent_entry[num][2])
+                                            more_nodes = True
+                                            valid_choice = True
+                                        else:
+                                            print "\n'%i' is not a valid parent node!\n" % num
+                                            valid_choice = False
+                                    else:
+                                        valid_choice = False
+                                elif choice[0] == 'c':
+                                    # user requested a child_id
+                                    if choice[1:].isdigit():
+                                        num = int(choice[1:])
+                                        if num in range(len(child_keys)):
+                                            node = sw.get_node(child_entry[num][2])
+                                            more_nodes = True
+                                            valid_choice = True
+                                        else:
+                                            print "\n'%i' is not a valid child node!\n" % num
+                                            valid_choice = False
+                                    else:
+                                        valid_choice = False
+                                elif choice == 'b':
+                                    valid_choice = True
+                                    more_nodes = True
+                                elif choice == 'q':
+                                    valid_choice = True
+                                    more_nodes = False
+                                elif choice == 'r':
+                                    valid_choice = True
+                                    new_id = cli_new_comment(node[0]['node_id'])
+                                    more_nodes = True
+                                else:
+                                    valid_choice = False
+                                    print "\n'%s' choice is not a valid option\n" % choice
                 else:
                     logger.error("The ticket provided seems to have duplicates.\n Sorry, you're on your own until we provide some means to repair conflicts like this.\n Hey, you know, you could help out with swarm and fix this rather serious problem :-)")
             else:
@@ -452,6 +521,9 @@ def cli_thread(pre_options, pre_args, command, post_options):
 
         sw.close()
     logger.unregister()
+
+def cli_new_comment(node_id):
+    print "Comment on node '%s'" % node_id
 
 def cli_new(pre_options, pre_args, command, post_options):
     verbose = 0
