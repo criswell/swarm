@@ -417,23 +417,30 @@ def cli_thread(pre_options, pre_args, command, post_options):
                     ticket_number = sw.config.get('cli', 'last_issue')
 
             if ticket_number:
-                issue = sw.get_issue(ticket_number)
+                [issue] = sw.get_issue(ticket_number)
                 schema_issue = sw.get_schema('issue')
                 schema_node = sw.get_schema('node')
                 if len(issue) == 1:
-                    cur_node_id = issue[0]['root_node']
+                    cur_node_id = issue['root_node']
                     node = sw.get_node(cur_node_id)
                     more_nodes = True
                     while more_nodes:
                         if len(node):
                             (fp, name) = tempfile.mkstemp()
-                            cli_printnode(fp, issue[0], node[0], sw.get_table_order('issue'), sw.get_table_order('node'))
+                            cli_printnode(fp, issue, node[0], sw.get_table_order('issue'), sw.get_table_order('node'))
                             cli_pager(name)
                             os.close(fp)
                             os.remove(name)
-                            children = None
-                            if node[0]['children']:
-                                children = [ x.strip() for x in node[0]['children'].split(',')]
+                            lineage = sw.get_lineage(parent_id=cur_node_id)
+                            if lineage:
+                                children = []
+                                for child in lineage:
+                                    children.append(child)
+
+                                child_choices = ", ".join(["[%i] %s" % (num, name) for num, name in zip(range(len(children)), children)
+                                choice = raw_input("%s or [q] to quit: ")
+                                # BAH I just made the above too complicated, didn't I?
+                                # ERE I AM JH
                             else:
                                 more_nodes = False
                 else:

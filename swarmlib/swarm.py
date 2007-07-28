@@ -114,6 +114,27 @@ class swarm:
         self._logger.unregister()
         return issue
 
+    def get_lineage(parent_id=None, child_id=None):
+        """
+        Given parent or child ids, return the lineage
+        """
+
+        self._logger.register("get_lineage")
+        lineage = None
+        search_criteria = {}
+
+        if not child_id and parent_id:
+            search_criteria['parent_id'] = parent_id
+            self._logger.entry("Fetching children of parent_id '%s'." % parent_id, 1)
+        elif not parent_id and child_id:
+            search_criteria['child_id'] = child_id
+            self._logger.entry("Fetching parent(s) of child_id '%s'." % child_id, 1)
+
+        if search_criteria: lineage = self.db.backend.fetch('lineage', search_criteria)
+
+        self._logger.unregister()
+        return lineage
+
     def get_taxonomy(self, tax_term):
         """
         Given a table name, will return the list of the

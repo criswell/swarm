@@ -90,6 +90,8 @@ table_schema = [
         column('resolution', data_type='INTEGER'),
 
         column('time', data_type='FLOAT'),
+
+        column('root_node', unique=True),
     ],
 
     table('node')[
