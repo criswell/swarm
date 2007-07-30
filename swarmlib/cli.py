@@ -387,7 +387,7 @@ def cli_thread(pre_options, pre_args, command, post_options):
             verbose = verbose + 1
 
     log.set_universal_loglevel(verbose)
-    logger.register("cli_last")
+    logger.register("cli_thread")
 
     if len(post_options) == 2:
         # swarm thread ##### directory
@@ -420,7 +420,7 @@ def cli_thread(pre_options, pre_args, command, post_options):
                 [issue] = sw.get_issue(ticket_number)
                 schema_issue = sw.get_schema('issue')
                 schema_node = sw.get_schema('node')
-                if len(issue) == 1:
+                if len(issue):
                     cur_node_id = issue['root_node']
                     node = sw.get_node(cur_node_id)
                     more_nodes = True
@@ -437,12 +437,14 @@ def cli_thread(pre_options, pre_args, command, post_options):
                             child_entry = {}
                             parent_keys = None
                             child_keys = None
-                            for p in parents:
-                                [temp_node] = sw.get_node(p['parent_id'])
-                                parent_entry[temp_node['time']] = [temp_node['poster'], temp_node['summary'], temp_node['node_id']]
-                            for c in children:
-                                [temp_node] = sw.get_node(c['child_id'])
-                                child_entry[temp_node['time']] = [temp_node['poster'], temp_node['summary'], temp_node['node_id']]
+                            if parents:
+                                for p in parents:
+                                    [temp_node] = sw.get_node(p['parent_id'])
+                                    parent_entry[temp_node['time']] = [temp_node['poster'], temp_node['summary'], temp_node['node_id']]
+                            if children:
+                                for c in children:
+                                    [temp_node] = sw.get_node(c['child_id'])
+                                    child_entry[temp_node['time']] = [temp_node['poster'], temp_node['summary'], temp_node['node_id']]
 
                             output_text = ""
 
@@ -513,7 +515,7 @@ def cli_thread(pre_options, pre_args, command, post_options):
                                     valid_choice = False
                                     print "\n'%s' choice is not a valid option\n" % choice
                 else:
-                    logger.error("The ticket provided seems to have duplicates.\n Sorry, you're on your own until we provide some means to repair conflicts like this.\n Hey, you know, you could help out with swarm and fix this rather serious problem :-)")
+                    logger.error("Something wrong with the ticket.")
             else:
                 logger.error("No ticket found.")
         else:

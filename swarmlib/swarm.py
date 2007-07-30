@@ -114,7 +114,7 @@ class swarm:
         self._logger.unregister()
         return issue
 
-    def get_lineage(parent_id=None, child_id=None):
+    def get_lineage(self, parent_id=None, child_id=None):
         """
         Given parent or child ids, return the lineage
         """
@@ -291,12 +291,13 @@ class swarm:
         (issue_data['issue']['hash_id'], issue_data['issue']['short_hash_id']) = (issue_id, self.get_unique(issue_id))
 
         # Add the issue, obtaining the issue id
-        issue_rowid = self.db.backend.new_issue(issue_data['issue'])
+        self.db.backend.new_issue(issue_data['issue'])
         # Add the new node
         #issue_data['node']['root'] = issue_rowid
         self.db.backend.new_node(issue_data['node'])
-        # Add lineage
-        # ERE I AM JH
+        # Add issue_to_node
+        issue_to_node = {'issue_id': issue_id, 'node_id': node_id}
+        self.db.backend.link_issue_to_node(issue_to_node)
 
         return issue_data['issue']['short_hash_id']
 

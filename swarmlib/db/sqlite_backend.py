@@ -467,6 +467,13 @@ class db:
 
         self._logger.unregister()
 
+    def link_issue_to_node(self, issue_to_node_data):
+        """
+        link_issue_to_node(self, issue_to_node_data):
+        link issue to node data
+        """
+        self._add_entry('issue_to_node', issue_to_node_data)
+
     def new_node(self, node_data):
         """
         new_node(node_data):
@@ -480,7 +487,6 @@ class db:
         Given issue_data, add to issue table.
         Returns new issue id
         """
-        issue_id = None
         self._logger.register("new_issue")
 
         # The ID needs to be None
@@ -488,48 +494,23 @@ class db:
 
         self._add_entry('issue', issue_data)
 
-        sql_code = 'SELECT id FROM issue WHERE root_node="%s";' % issue_data['root_node']
-        self._logger.entry("SQL code is:\n%s" % sql_code, 5)
-        self._cursor.execute(sql_code)
-        temp = self._cursor.fetchall()
-        if temp[0][0]:
-            issue_id = temp[0][0]
+        #sql_code = 'SELECT id FROM issue WHERE root_node="%s";' % issue_data['root_node']
+        #self._logger.entry("SQL code is:\n%s" % sql_code, 5)
+        #self._cursor.execute(sql_code)
+        #temp = self._cursor.fetchall()
+        #if temp[0][0]:
+        #    issue_id = temp[0][0]
 
-        if issue_id:
-            self.log_transaction(issue_id, 'new_issue', issue_id)
-        else:
-            print "PROBLEM!"
-            # FIXME: We should try to rollback I guess
+        #if issue_id:
+        #    self.log_transaction(issue_id, 'new_issue', issue_id)
+        #else:
+        #    print "PROBLEM!"
+        #    # FIXME: We should try to rollback I guess
 
-        self._logger.entry("Created new issue #%s" % str(issue_id), 3)
-
-        self._logger.unregister()
-        return issue_id
-
-    def get_next_free_id(self, table_name, id_string):
-        """
-        Given a table name and id string, will return the next free id
-        available in that table. In SQL DBs this means max(id_string)
-        FIXME - WE DON'T NEED THIS FUNCTION ANY MORE
-        DELME DELME DELME
-        """
-        next_id = None
-        self._logger.register("get_next_free_id")
-        sql_code = "SELECT max(%s) FROM %s;" % (id_string, table_name)
-        self._logger.entry("Executing SQL code: '%s'" % sql_code, 5)
-        if self._connected:
-            self._cursor.execute(sql_code)
-            temp = self._cursor.fetchall()
-            if temp[0][0]:
-                next_id = temp[0][0]
-            else:
-                next_id = 1
-        else:
-            self._logger.error("Attempted to get taxonomy while not connected to the database. Could it be that the connection failed for some reason?")
-            raise swarm_error("Attempted to get taxonomy while not connected to the database. Could it be that the connection failed for some reason?")
+        #self._logger.entry("Created new issue #%s" % str(issue_id), 3)
 
         self._logger.unregister()
-        return next_id
+        #return issue_id
 
     def init(self):
         self._logger.register("init")
