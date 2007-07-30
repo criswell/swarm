@@ -509,7 +509,7 @@ def cli_thread(pre_options, pre_args, command, post_options):
                                     more_nodes = False
                                 elif choice == 'r':
                                     valid_choice = True
-                                    new_id = cli_new_comment(node[0]['node_id'])
+                                    (issue, node) = cli_new_comment(sw, issue, node[0])
                                     more_nodes = True
                                 else:
                                     valid_choice = False
@@ -524,8 +524,69 @@ def cli_thread(pre_options, pre_args, command, post_options):
         sw.close()
     logger.unregister()
 
-def cli_new_comment(node_id):
-    print "Comment on node '%s'" % node_id
+def cli_new_comment(sw, issue, node):
+    logger.register('cli_new_comment')
+    logger.entry("Comment on node '%s'" % node['node_id'], 2)
+
+    schema_issue = sw.get_schema('issue')
+    schema_node = sw.get_schema('node')
+    (fp, name) = tempfile.mkstemp()
+    timestamp = swarm_time.timestamp()
+    reporter = sw.get_user()
+    temp = os.write(fp,
+        "# Adding new comment to ticket\n" +
+        "#--------------------\n" +
+        "# Lines begining with a '#' will be treated as a comment.\n" +
+        "# In the header section, blank lines will be ignored\n" +
+        "# Lines starting with '@' indicate a section divider.\n\n" +
+        "@ HEADER\n\n")
+    if schema_issue.has_key('time'):
+        temp = os.write(fp, "# timestamp: %s\n" % timestamp)
+        temp = os.write(fp, "# %s\n" % swarm_time.human_readable_from_stamp(timestamp))
+    if schema_issue.has_key('reporter'):
+        temp = os.write(fp, "# poster: %s\n" % reporter)
+
+    meta_data = ['component', 'version', 'milestone', 'severity', 'priority', 'owner', 'keywords']
+    for element in meta_data:
+        if schema_issue.has_key(element):
+            if issue[element]:
+                temp = os.write(fp, "%s:%s\n" % (element, issue[element]))
+            else:
+                temp = os.write(fp, "%s:\n" % element)
+
+    temp = os.write(fp, "\n@ NODE\n")
+    meta_data = ['related', 'summary']
+    for element in meta_data:
+        if schema_node.has_key(element):
+            if node[element]:
+                temp = os.write(fp, "%s:%s\n" % (element, node[element]))
+            else:
+                temp = os.write(fp, "%s:\n" % element)
+
+    temp = os.write(fp, "\n# Everything after details (including lines begining with '#' or '@') will\n# be considered part of the details section\n@ DETAILS\n\n")
+
+    os.close(fp)
+
+    (bhash, ahash, bsize, asize) = cli_launch_editor(name)
+    if bhash != ahash:
+        parsed_data = cli_parse_issuefile(name, schema_issue, schema_node)
+        parsed_data['node']['time'] = timestamp
+        parsed_data['node']['poster'] = reporter
+        print parsed_data['node']
+        print parsed_data['issue']
+#        new_id = sw.new_issue(parsed_data)
+#        logger.entry("Ticket #%s has been created." % str(new_id), 0)
+#        if not sw.config.has_section('cli'):
+#            sw.config.add_section('cli')
+#        sw.config.set('cli', 'last_issue', new_id)
+#        sw.config.save()
+    else:
+        logger.entry("Ticket reply cancelled.", 0)
+
+    os.remove(name)
+
+    logger.unregister()
+    return (issue, node)
 
 def cli_new(pre_options, pre_args, command, post_options):
     verbose = 0
