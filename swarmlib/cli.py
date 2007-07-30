@@ -371,7 +371,7 @@ def cli_last(pre_options, pre_args, command, post_options):
         last_id = sw.config.get('cli', 'last_issue')
         logger.entry("The last issue was #%s." % last_id, 0)
     else:
-        logger.enrty("There is no last issue set.", 0)
+        logger.entry("There is no last issue set.", 0)
 
     sw.close()
     logger.unregister()
