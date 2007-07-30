@@ -509,7 +509,7 @@ def cli_thread(pre_options, pre_args, command, post_options):
                                     more_nodes = False
                                 elif choice == 'r':
                                     valid_choice = True
-                                    (issue, node) = cli_new_comment(sw, issue, node[0])
+                                    (issue, node[0]) = cli_new_comment(sw, issue, node[0])
                                     more_nodes = True
                                 else:
                                     valid_choice = False
