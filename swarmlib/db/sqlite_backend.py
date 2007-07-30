@@ -487,30 +487,10 @@ class db:
         Given issue_data, add to issue table.
         Returns new issue id
         """
-        self._logger.register("new_issue")
-
         # The ID needs to be None
         issue_data['id'] = None
 
         self._add_entry('issue', issue_data)
-
-        #sql_code = 'SELECT id FROM issue WHERE root_node="%s";' % issue_data['root_node']
-        #self._logger.entry("SQL code is:\n%s" % sql_code, 5)
-        #self._cursor.execute(sql_code)
-        #temp = self._cursor.fetchall()
-        #if temp[0][0]:
-        #    issue_id = temp[0][0]
-
-        #if issue_id:
-        #    self.log_transaction(issue_id, 'new_issue', issue_id)
-        #else:
-        #    print "PROBLEM!"
-        #    # FIXME: We should try to rollback I guess
-
-        #self._logger.entry("Created new issue #%s" % str(issue_id), 3)
-
-        self._logger.unregister()
-        #return issue_id
 
     def init(self):
         self._logger.register("init")
