@@ -546,7 +546,7 @@ def cli_new_comment(sw, issue, node):
     if schema_issue.has_key('reporter'):
         temp = os.write(fp, "# poster: %s\n" % reporter)
 
-    meta_data = ['component', 'version', 'milestone', 'severity', 'priority', 'owner', 'keywords']
+    meta_data = ['component', 'version', 'milestone', 'severity', 'priority', 'owner', 'keywords', 'status']
     for element in meta_data:
         if schema_issue.has_key(element):
             if issue[element]:
@@ -574,6 +574,9 @@ def cli_new_comment(sw, issue, node):
         parsed_data['node']['poster'] = reporter
         print parsed_data['node']
         print parsed_data['issue']
+        print issue
+        if parsed_data['issue'] == issue:
+            print "Didn't change"
 #        new_id = sw.new_issue(parsed_data)
 #        logger.entry("Ticket #%s has been created." % str(new_id), 0)
 #        if not sw.config.has_section('cli'):
