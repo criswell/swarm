@@ -473,20 +473,37 @@ class db:
         link issue to node data
         """
         self._add_entry('issue_to_node', issue_to_node_data)
+        self.log_transaction(issue_to_node_data['issue_id'], 'link_issue_to_node', data_tools.encode_content(issue_to_node_data))
 
-    def add_lineage(self, node_lineage):
+    def add_lineage(self, node_lineage, issue_id=None):
         """
-        add_lineage(self, node_lineage):
+        add_lineage(self, node_lineage, issue_id=None):
         link parents and children in lineage
+        If issue_id is not provided, it will try to determine it from the issue_to_node table.
+        This means that, unless you provide issue_id, the entry in the issue_to_node table MUST
+        exist.
         """
         self._add_entry('lineage', node_lineage)
+        if not issue_id:
+            search_criteria['node_id'] = node_lineage['parent_id']
+            issue = self.fetch('issue_to_node', search_criteria)
+            issue_id = issue['issue_id']
+        self.log_transaction(issue_id, 'add_lineage', data_tools.encode_content(node_lineage))
 
-    def new_node(self, node_data):
+    def new_node(self, node_data, issue_id=None):
         """
-        new_node(node_data):
+        new_node(node_data, issue_id=None):
         Given node_data, add to node table
+        If issue_id is not provided, it will try to determine it from the issue_to_node table.
+        This means that, unless you provide issue_id, the entry in the issue_to_node table MUST
+        exist.
         """
         self._add_entry('node', node_data)
+        if not issue_id:
+            search_criteria['node_id'] = node_data['node_id']
+            issue = self.fetch('issue_to_node', search_criteria)
+            issue_id = issue['issue_id']
+        self.log_transaction(issue_id, 'new_node', node_data['node_id'])
 
     def new_issue(self, issue_data):
         """
@@ -498,6 +515,7 @@ class db:
         issue_data['id'] = None
 
         self._add_entry('issue', issue_data)
+        self.log_transaction(__MASTER_ISSUE__, 'new_issue', issue_data['hash_id'])
 
     def init(self):
         self._logger.register("init")

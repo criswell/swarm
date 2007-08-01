@@ -41,4 +41,8 @@ transactions = {
     'xlog_start' : None,
     'set_taxonomy' : None,
     'new_issue' : None,
+    'link_issue_to_node' : None,
+    'add_lineage' : None,
+    'new_node': None,
+    'new_issue': None,
 }
