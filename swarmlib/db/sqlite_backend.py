@@ -508,8 +508,10 @@ class db:
         """
         self._add_entry('node', node_data)
         if not issue_id:
+            search_criteria = {}
             search_criteria['node_id'] = node_data['node_id']
             issue = self.fetch('issue_to_node', search_criteria)
+            print issue
             issue_id = issue['issue_id']
         self.log_transaction(issue_id, 'new_node', node_data['node_id'])
 

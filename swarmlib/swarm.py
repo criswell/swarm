@@ -311,13 +311,13 @@ class swarm:
 
         node_id = data_tools.get_hash(issue_data['issue']['hash_id'], str(issue_data['node']['time']), issue_data['node']['poster'])
         issue_data['node']['node_id'] = node_id
-        self.db.backend.new_node(issue_data['node'])
+        self.db.backend.new_node(issue_data['node'], issue_data['issue']['hash_id'])
         # Add issue_to_node
         issue_to_node = {'issue_id': issue_data['issue']['hash_id'], 'node_id': node_id}
         self.db.backend.link_issue_to_node(issue_to_node)
         # Update lineage
         node_lineage = {'parent_id': parent_node['node_id'] , 'child_id': node_id}
-        self.db.backend.add_lineage(node_lineage, issue_data['hash_id'])
+        self.db.backend.add_lineage(node_lineage, issue_data['issue']['hash_id'])
 
         self._logger.unregister()
 

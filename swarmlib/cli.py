@@ -504,7 +504,8 @@ def cli_thread(pre_options, pre_args, command, post_options):
                                     if choice[1:].isdigit():
                                         num = int(choice[1:])
                                         if num in range(len(child_keys)):
-                                            node = sw.get_node(child_entry[num][2])
+                                            #print child_entry
+                                            node = sw.get_node(child_entry[child_keys[num]][2])
                                             more_nodes = True
                                             valid_choice = True
                                         else:
