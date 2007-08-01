@@ -206,7 +206,7 @@ class db:
             else:
                 # Default is db_version 1
                 timestamp = swarmlib.swarm_time.timestamp()
-                rowid = "Null"
+                rowid = None
                 if setid:
                     # Let's make sure you have a requested id that's larger than the max
                     self._cursor.execute("select max(id) from xlog;")
@@ -216,9 +216,17 @@ class db:
                     else:
                         self._logger.error("Requested id for xlog entry, '%s', was lower than the maxid, '%s'. Ignoring request." % (str(setid), str(maxid)))
                     rowid = str(setid)
-                sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) VALUES (" + str(rowid) + ", " + str(root) + ", %f, %s, %s);"
-                self._logger.entry("SQL code is:\n%s" % (sql_code % (float(timestamp), xaction, xdata)), 5)
-                self._cursor.execute(sql_code, (float(timestamp), xaction, xdata))
+                #sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) VALUES ('" + str(rowid) + "', '" + str(root) + "', %f, '%s', '%s');"
+                data = {}
+                if rowid:
+                    data['id'] = rowid
+                data['root'] = str(root)
+                data['time'] = float(timestamp)
+                data['xaction'] = xaction
+                data['xdata'] = xdata
+                self._add_entry('xlog', data)
+                #self._logger.entry("SQL code is:\n%s" % (sql_code % (float(timestamp), xaction, xdata)), 5)
+                #self._cursor.execute(sql_code, (float(timestamp), xaction, xdata))
         else:
             raise swarm_error('Transaction log entry attempted when not connected to database.')
 

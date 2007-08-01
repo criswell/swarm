@@ -294,7 +294,7 @@ class swarm:
         self.db.backend.new_issue(issue_data['issue'])
         # Add the new node
         #issue_data['node']['root'] = issue_rowid
-        self.db.backend.new_node(issue_data['node'], issue_data['hash_id'])
+        self.db.backend.new_node(issue_data['node'], issue_data['issue']['hash_id'])
         # Add issue_to_node
         issue_to_node = {'issue_id': issue_id, 'node_id': node_id}
         self.db.backend.link_issue_to_node(issue_to_node)
