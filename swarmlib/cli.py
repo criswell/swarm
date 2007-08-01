@@ -129,9 +129,19 @@ def cli_parse_issuefile(name, schema_issue, schema_node):
                         if len(value) < 1:
                             value = None
                         if current_section == 'header':
-                            parsed_data['issue'][setting] = value
+                            if schema_issue[setting].lower() == "integer" and value:
+                                parsed_data['issue'][setting] = int(value)
+                            elif schema_issue[setting].lower() == "float" and value:
+                                parsed_data['issue'][setting] = float(value)
+                            else:
+                                parsed_data['issue'][setting] = value
                         elif current_section == 'node':
-                            parsed_data['node'][setting] = value
+                            if schema_node[setting].lower() == "integer" and value:
+                                parsed_data['node'][setting] = int(value)
+                            elif schema_node[setting].lower() == "float" and value:
+                                parsed_data['node'][setting] = float(value)
+                            else:
+                                parsed_data['node'][setting] = value
                         # If we have something outside of the three
                         # known sections, we kind of have to ignore it
                         # after all, where would it go?
@@ -572,11 +582,24 @@ def cli_new_comment(sw, issue, node):
         parsed_data = cli_parse_issuefile(name, schema_issue, schema_node)
         parsed_data['node']['time'] = timestamp
         parsed_data['node']['poster'] = reporter
+        # Ensure specific items are kept in sync
+        parsed_data['issue']['root_node'] = issue['root_node']
+        parsed_data['issue']['reporter'] = issue['reporter']
+        parsed_data['issue']['short_hash_id'] = issue['short_hash_id']
+        parsed_data['issue']['time'] = issue['time']
+        parsed_data['issue']['hash_id'] = issue['hash_id']
+        parsed_data['issue']['id'] = issue['id']
+        #print len(parsed_data['node']['details'].strip())
         print parsed_data['node']
-        print parsed_data['issue']
-        print issue
-        if parsed_data['issue'] == issue:
-            print "Didn't change"
+        #print
+        #print parsed_data['issue']
+        #print
+        #print issue
+        #print
+        if parsed_data['issue'] != issue:
+            sw.update_issue(parsed_data['issue'])
+
+        sw.add_node(parsed_data, node)
 #        new_id = sw.new_issue(parsed_data)
 #        logger.entry("Ticket #%s has been created." % str(new_id), 0)
 #        if not sw.config.has_section('cli'):

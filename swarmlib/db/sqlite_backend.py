@@ -474,6 +474,13 @@ class db:
         """
         self._add_entry('issue_to_node', issue_to_node_data)
 
+    def add_lineage(self, node_lineage):
+        """
+        add_lineage(self, node_lineage):
+        link parents and children in lineage
+        """
+        self._add_entry('lineage', node_lineage)
+
     def new_node(self, node_data):
         """
         new_node(node_data):

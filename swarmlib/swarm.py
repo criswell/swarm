@@ -301,6 +301,26 @@ class swarm:
 
         return issue_data['issue']['short_hash_id']
 
+    def add_node(issue_data, parent_node):
+        """
+        add_node(issue_data)
+        Add a new node to the DB
+        """
+
+        self._logger.register('add_node')
+
+        node_id = data_tools.get_hash(issue_data['issue']['hash_id'], str(issue_data['node']['time']), issue_data['node']['poster'])
+        issue_data['node']['node_id'] = node_id
+        self.db.backend.new_node(issue_data['node'])
+        # Add issue_to_node
+        issue_to_node = {'issue_id': issue_data['issue']['hash_id'], 'node_id': node_id}
+        self.db.backend.link_issue_to_node(issue_to_node)
+        # Update lineage
+        node_lineage = {'parent_id': parent_node['node_id'] , 'child_id': node_id}
+        self.db.backend.add_lineage(node_lineage)
+
+        self._logger.unregister()
+
     def close(self):
         """
         Closes the database (syncronizing data) as well as all
