@@ -357,7 +357,8 @@ def cli_log(pre_options, pre_args, command, post_options):
     # FIXME
     # This is ugly, was just an early hack that
     # is still around
-    print xlog
+    for entry in xlog:
+        print "[%i] %s - %s" % (entry[0], swarm_time.human_readable_from_stamp(entry[2]), entry[3])
 
     sw.close()
     logger.unregister()
