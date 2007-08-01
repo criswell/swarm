@@ -301,7 +301,7 @@ class swarm:
 
         return issue_data['issue']['short_hash_id']
 
-    def add_node(issue_data, parent_node):
+    def add_node(self, issue_data, parent_node):
         """
         add_node(issue_data)
         Add a new node to the DB
