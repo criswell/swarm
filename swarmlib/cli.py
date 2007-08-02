@@ -428,6 +428,7 @@ def cli_thread(pre_options, pre_args, command, post_options):
                     ticket_number = sw.config.get('cli', 'last_issue')
 
             if ticket_number:
+                cli_thread.run(sw, ticket_number)
                 [issue] = sw.get_issue(ticket_number)
                 schema_issue = sw.get_schema('issue')
                 schema_node = sw.get_schema('node')
@@ -444,6 +445,9 @@ def cli_thread(pre_options, pre_args, command, post_options):
                             os.remove(name)
                             children = sw.get_lineage(parent_id=cur_node_id)
                             parents = sw.get_lineage(child_id=cur_node_id)
+                            print parents
+                            print
+                            print children
                             parent_entry = {}
                             child_entry = {}
                             parent_keys = None
