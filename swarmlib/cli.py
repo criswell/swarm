@@ -258,7 +258,7 @@ def cli_thread_run(pre_options, pre_args, command, post_options):
         # Default is to use the last issue
         sw = Swarm(working_dir, log)
 
-    util = cli_util(sw, log)
+    util = cli_util.util(sw, log)
 
     if sw:
         if sw.loaded:
