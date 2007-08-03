@@ -34,7 +34,7 @@ class thread:
 
     def run(self):
         self.logger.register('run')
-        [issue] = self.sw.get_issue(ticket_number)
+        [issue] = self.sw.get_issue(self.ticket_number)
         schema_issue = self.sw.get_schema('issue')
         schema_node = self.sw.get_schema('node')
         if len(issue):
