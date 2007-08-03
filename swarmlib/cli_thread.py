@@ -44,8 +44,8 @@ class thread:
             while more_nodes:
                 if len(node):
                     (fp, name) = tempfile.mkstemp()
-                    self.util.cli_printnode(fp, issue, node[0], self.sw.get_table_order('issue'), self.sw.get_table_order('node'))
-                    self.util.cli_pager(name)
+                    self.util.print_node(fp, issue, node[0], self.sw.get_table_order('issue'), self.sw.get_table_order('node'))
+                    self.util.pager(name)
                     os.close(fp)
                     os.remove(name)
                     children = self.sw.get_lineage(parent_id=cur_node_id)
