@@ -257,6 +257,7 @@ def cli_thread_run(pre_options, pre_args, command, post_options):
     else:
         # Default is to use the last issue
         sw = Swarm(working_dir, log)
+        util = cli_util(sw, log)
 
     if sw:
         if sw.loaded:
@@ -265,7 +266,7 @@ def cli_thread_run(pre_options, pre_args, command, post_options):
                     ticket_number = sw.config.get('cli', 'last_issue')
 
             if ticket_number:
-                cli_thread.run(sw, log, ticket_number)
+                cli_thread.run(sw, util, swarm_time, log, ticket_number)
             else:
                 logger.error("No ticket found.")
         else:

@@ -24,7 +24,7 @@ import tempfile
 import os
 
 class thread:
-    def __init__(self, sw, log,, util, st, ticket_number):
+    def __init__(self, sw, log, util, st, ticket_number):
         self.sw = sw
         self.util = util
         self.ticket_number = ticket_number
