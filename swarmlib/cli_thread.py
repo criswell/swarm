@@ -22,14 +22,15 @@
 
 import tempfile
 import os
+import swarmlib.swarm_time as swarm_time
+
 
 class thread:
-    def __init__(self, sw, log, util, st, ticket_number):
+    def __init__(self, sw, log, util, ticket_number):
         self.sw = sw
         self.util = util
         self.ticket_number = ticket_number
         self.log = log
-        self.swarm_time = st
         self.logger = self.log.get_logger("cli_thread")
 
     def run(self):
@@ -147,7 +148,7 @@ class thread:
         schema_issue = self.sw.get_schema('issue')
         schema_node = self.sw.get_schema('node')
         (fp, name) = tempfile.mkstemp()
-        timestamp = self.swarm_time.timestamp()
+        timestamp = swarm_time.timestamp()
         reporter = self.sw.get_user()
         temp = os.write(fp,
             "# Adding new comment to ticket\n" +
@@ -158,7 +159,7 @@ class thread:
             "@ HEADER\n\n")
         if schema_issue.has_key('time'):
             temp = os.write(fp, "# timestamp: %s\n" % timestamp)
-            temp = os.write(fp, "# %s\n" % self.swarm_time.human_readable_from_stamp(timestamp))
+            temp = os.write(fp, "# %s\n" % swarm_time.human_readable_from_stamp(timestamp))
         if schema_issue.has_key('reporter'):
             temp = os.write(fp, "# poster: %s\n" % reporter)
 
@@ -220,12 +221,12 @@ class thread:
         self.logger.unregister()
         return (issue, node)
 
-def run(sw, log, util, st, ticket_number):
+def run(sw, log, util, ticket_number):
     """
     sw = swarm instance
     log = log instance
     util = cli_util instance
     ticket_number = ticket_number(duh)
     """
-    t = thread(sw, log, util, st, ticket_number)
+    t = thread(sw, log, util, ticket_number)
     t.run()
