@@ -21,7 +21,7 @@
 import sys
 import os
 import getopt
-import md5
+#import md5 # Do we need this anymore?
 import tempfile
 
 import swarmlib.config as Config

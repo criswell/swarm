@@ -20,127 +20,135 @@
 #
 # Author: Sam Hart
 
+import tempfile
+import os
+
 class thread:
-    def __init__(self, sw, log,, util, ticket_number):
+    def __init__(self, sw, log,, util, st, ticket_number):
         self.sw = sw
         self.util = util
         self.ticket_number = ticket_number
         self.log = log
+        self.swarm_time = st
         self.logger = self.log.get_logger("cli_thread")
 
-                [issue] = sw.get_issue(ticket_number)
-                schema_issue = sw.get_schema('issue')
-                schema_node = sw.get_schema('node')
-                if len(issue):
-                    cur_node_id = issue['root_node']
-                    node = sw.get_node(cur_node_id)
-                    more_nodes = True
-                    while more_nodes:
-                        if len(node):
-                            (fp, name) = tempfile.mkstemp()
-                            cli_printnode(fp, issue, node[0], sw.get_table_order('issue'), sw.get_table_order('node'))
-                            cli_pager(name)
-                            os.close(fp)
-                            os.remove(name)
-                            children = sw.get_lineage(parent_id=cur_node_id)
-                            parents = sw.get_lineage(child_id=cur_node_id)
-                            print parents
-                            print
-                            print children
-                            parent_entry = {}
-                            child_entry = {}
-                            parent_keys = None
-                            child_keys = None
-                            if parents:
-                                for p in parents:
-                                    [temp_node] = sw.get_node(p['parent_id'])
-                                    parent_entry[temp_node['time']] = [temp_node['poster'], temp_node['summary'], temp_node['node_id']]
-                            if children:
-                                for c in children:
-                                    [temp_node] = sw.get_node(c['child_id'])
-                                    child_entry[temp_node['time']] = [temp_node['poster'], temp_node['summary'], temp_node['node_id']]
+    def run(self):
+        self.logger.register('run')
+        [issue] = self.sw.get_issue(ticket_number)
+        schema_issue = self.sw.get_schema('issue')
+        schema_node = self.sw.get_schema('node')
+        if len(issue):
+            cur_node_id = issue['root_node']
+            node = self.sw.get_node(cur_node_id)
+            more_nodes = True
+            while more_nodes:
+                if len(node):
+                    (fp, name) = tempfile.mkstemp()
+                    self.util.cli_printnode(fp, issue, node[0], self.sw.get_table_order('issue'), self.sw.get_table_order('node'))
+                    self.util.cli_pager(name)
+                    os.close(fp)
+                    os.remove(name)
+                    children = self.sw.get_lineage(parent_id=cur_node_id)
+                    parents = self.sw.get_lineage(child_id=cur_node_id)
+                    print parents
+                    print
+                    print children
+                    parent_entry = {}
+                    child_entry = {}
+                    parent_keys = None
+                    child_keys = None
+                    if parents:
+                        for p in parents:
+                            [temp_node] = self.sw.get_node(p['parent_id'])
+                            parent_entry[temp_node['time']] = [temp_node['poster'], temp_node['summary'], temp_node['node_id']]
+                    if children:
+                        for c in children:
+                            [temp_node] = self.sw.get_node(c['child_id'])
+                            child_entry[temp_node['time']] = [temp_node['poster'], temp_node['summary'], temp_node['node_id']]
 
-                            output_text = ""
+                    output_text = ""
 
-                            if parent_entry:
-                                parent_keys = parent_entry.keys()
-                                parent_keys.sort()
-                                output_text = output_text + "Parent nodes:\n"
-                                for i in range(len(parent_keys)):
-                                    output_text = output_text + "\t[P%i] '%s' by '%s'\n" % (i, parent_entry[parent_keys[i]][1], parent_entry[parent_keys[i]][0])
-                                output_text = output_text + "\n"
-                            if child_entry:
-                                child_keys = child_entry.keys()
-                                child_keys.sort()
-                                output_text = output_text + "Child nodes:\n"
-                                for i in range(len(child_keys)):
-                                    output_text = output_text + "\t[C%i] '%s' by '%s'\n" % (i, child_entry[child_keys[i]][1], child_entry[child_keys[i]][0])
-                                output_text = output_text + "\n"
+                    if parent_entry:
+                        parent_keys = parent_entry.keys()
+                        parent_keys.sort()
+                        output_text = output_text + "Parent nodes:\n"
+                        for i in range(len(parent_keys)):
+                            output_text = output_text + "\t[P%i] '%s' by '%s'\n" % (i, parent_entry[parent_keys[i]][1], parent_entry[parent_keys[i]][0])
+                        output_text = output_text + "\n"
+                    if child_entry:
+                        child_keys = child_entry.keys()
+                        child_keys.sort()
+                        output_text = output_text + "Child nodes:\n"
+                        for i in range(len(child_keys)):
+                            output_text = output_text + "\t[C%i] '%s' by '%s'\n" % (i, child_entry[child_keys[i]][1], child_entry[child_keys[i]][0])
+                        output_text = output_text + "\n"
 
-                            if child_entry or parent_entry:
-                                output_text = output_text + "Select a node to navigate to or"
-                            else:
-                                output_text = output_text + "Press"
-                                more_nodes = False
+                    if child_entry or parent_entry:
+                        output_text = output_text + "Select a node to navigate to or"
+                    else:
+                        output_text = output_text + "Press"
+                        more_nodes = False
 
-                            output_text = output_text + "\n\t[R] Reply to the node just viewed\n\t[B] View the previous node again\n\t[Q] Quit viewing the thread\n? "
+                    output_text = output_text + "\n\t[R] Reply to the node just viewed\n\t[B] View the previous node again\n\t[Q] Quit viewing the thread\n? "
 
-                            valid_choice = False
-                            while not valid_choice:
-                                choice = raw_input(output_text)
-                                choice = choice.lower()
-                                if choice[0] == 'p':
-                                    # User requested a parent_id
-                                    if choice[1:].isdigit():
-                                        num = int(choice[1:])
-                                        if num in range(len(parent_keys)):
-                                            node = sw.get_node(parent_entry[num][2])
-                                            more_nodes = True
-                                            valid_choice = True
-                                        else:
-                                            print "\n'%i' is not a valid parent node!\n" % num
-                                            valid_choice = False
-                                    else:
-                                        valid_choice = False
-                                elif choice[0] == 'c':
-                                    # user requested a child_id
-                                    if choice[1:].isdigit():
-                                        num = int(choice[1:])
-                                        if num in range(len(child_keys)):
-                                            #print child_entry
-                                            node = sw.get_node(child_entry[child_keys[num]][2])
-                                            more_nodes = True
-                                            valid_choice = True
-                                        else:
-                                            print "\n'%i' is not a valid child node!\n" % num
-                                            valid_choice = False
-                                    else:
-                                        valid_choice = False
-                                elif choice == 'b':
-                                    valid_choice = True
+                    valid_choice = False
+                    while not valid_choice:
+                        choice = raw_input(output_text)
+                        choice = choice.lower()
+                        if choice[0] == 'p':
+                            # User requested a parent_id
+                            if choice[1:].isdigit():
+                                num = int(choice[1:])
+                                if num in range(len(parent_keys)):
+                                    node = self.sw.get_node(parent_entry[num][2])
                                     more_nodes = True
-                                elif choice == 'q':
                                     valid_choice = True
-                                    more_nodes = False
-                                elif choice == 'r':
-                                    valid_choice = True
-                                    (issue, node[0]) = cli_new_comment(sw, issue, node[0])
-                                    more_nodes = True
                                 else:
+                                    print "\n'%i' is not a valid parent node!\n" % num
                                     valid_choice = False
-                                    print "\n'%s' choice is not a valid option\n" % choice
-                else:
-                    logger.error("Something wrong with the ticket.")
+                            else:
+                                valid_choice = False
+                        elif choice[0] == 'c':
+                            # user requested a child_id
+                            if choice[1:].isdigit():
+                                num = int(choice[1:])
+                                if num in range(len(child_keys)):
+                                    #print child_entry
+                                    node = self.sw.get_node(child_entry[child_keys[num]][2])
+                                    more_nodes = True
+                                    valid_choice = True
+                                else:
+                                    print "\n'%i' is not a valid child node!\n" % num
+                                    valid_choice = False
+                            else:
+                                valid_choice = False
+                        elif choice == 'b':
+                            valid_choice = True
+                            more_nodes = True
+                        elif choice == 'q':
+                            valid_choice = True
+                            more_nodes = False
+                        elif choice == 'r':
+                            valid_choice = True
+                            (issue, node[0]) = self.new_comment(sw, issue, node[0])
+                            more_nodes = True
+                        else:
+                            valid_choice = False
+                            print "\n'%s' choice is not a valid option\n" % choice
+        else:
+            self.logger.error("Something wrong with the ticket.")
 
-    def cli_new_comment(sw, issue, node):
-        logger.register('cli_new_comment')
-        logger.entry("Comment on node '%s'" % node['node_id'], 2)
+        self.logger.unregister()
 
-        schema_issue = sw.get_schema('issue')
-        schema_node = sw.get_schema('node')
+    def new_comment(self, issue, node):
+        self.logger.register('cli_new_comment')
+        self.logger.entry("Comment on node '%s'" % node['node_id'], 2)
+
+        schema_issue = self.sw.get_schema('issue')
+        schema_node = self.sw.get_schema('node')
         (fp, name) = tempfile.mkstemp()
-        timestamp = swarm_time.timestamp()
-        reporter = sw.get_user()
+        timestamp = self.swarm_time.timestamp()
+        reporter = self.sw.get_user()
         temp = os.write(fp,
             "# Adding new comment to ticket\n" +
             "#--------------------\n" +
@@ -150,7 +158,7 @@ class thread:
             "@ HEADER\n\n")
         if schema_issue.has_key('time'):
             temp = os.write(fp, "# timestamp: %s\n" % timestamp)
-            temp = os.write(fp, "# %s\n" % swarm_time.human_readable_from_stamp(timestamp))
+            temp = os.write(fp, "# %s\n" % self.swarm_time.human_readable_from_stamp(timestamp))
         if schema_issue.has_key('reporter'):
             temp = os.write(fp, "# poster: %s\n" % reporter)
 
@@ -175,9 +183,9 @@ class thread:
 
         os.close(fp)
 
-        (bhash, ahash, bsize, asize) = util.launch_editor(name)
+        (bhash, ahash, bsize, asize) = self.util.launch_editor(name)
         if bhash != ahash:
-            parsed_data = util.parse_issuefile(name, schema_issue, schema_node)
+            parsed_data = self.util.parse_issuefile(name, schema_issue, schema_node)
             parsed_data['node']['time'] = timestamp
             parsed_data['node']['poster'] = reporter
             # Ensure specific items are kept in sync
@@ -195,9 +203,9 @@ class thread:
             #print issue
             #print
             if parsed_data['issue'] != issue:
-                sw.update_issue(parsed_data['issue'])
+                self.sw.update_issue(parsed_data['issue'])
 
-            sw.add_node(parsed_data, node)
+            self.sw.add_node(parsed_data, node)
     #        new_id = sw.new_issue(parsed_data)
     #        logger.entry("Ticket #%s has been created." % str(new_id), 0)
     #        if not sw.config.has_section('cli'):
@@ -205,9 +213,19 @@ class thread:
     #        sw.config.set('cli', 'last_issue', new_id)
     #        sw.config.save()
         else:
-            logger.entry("Ticket reply cancelled.", 0)
+            self.logger.entry("Ticket reply cancelled.", 0)
 
         os.remove(name)
 
-        logger.unregister()
+        self.logger.unregister()
         return (issue, node)
+
+def run(sw, log, util, st, ticket_number):
+    """
+    sw = swarm instance
+    log = log instance
+    util = cli_util instance
+    ticket_number = ticket_number(duh)
+    """
+    t = thread(sw, log, util, st, ticket_number)
+    t.run()
