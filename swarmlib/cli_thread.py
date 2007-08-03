@@ -131,7 +131,7 @@ class thread:
                             more_nodes = False
                         elif choice == 'r':
                             valid_choice = True
-                            (issue, node[0]) = self.new_comment(sw, issue, node[0])
+                            (issue, node[0]) = self.new_comment(issue, node[0])
                             more_nodes = True
                         else:
                             valid_choice = False

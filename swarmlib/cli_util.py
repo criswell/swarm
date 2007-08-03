@@ -22,6 +22,7 @@
 
 import os
 import swarmlib.swarm_time as swarm_time
+import md5
 
 class util:
     def __init__(self, sw, log):
