@@ -142,7 +142,7 @@ class thread:
         self.logger.unregister()
 
     def new_comment(self, issue, node):
-        self.logger.register('cli_new_comment')
+        self.logger.register('new_comment')
         self.logger.entry("Comment on node '%s'" % node['node_id'], 2)
 
         schema_issue = self.sw.get_schema('issue')
