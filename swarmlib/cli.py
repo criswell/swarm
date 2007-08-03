@@ -27,11 +27,12 @@ import tempfile
 import swarmlib.config as Config
 import swarmlib.log as Log
 import swarmlib.swarm_time as swarm_time
+import cli_thread
+import cli_util
 from swarmlib.db import swarmdb
 from swarmlib.db import taxonomy_terms
 from swarmlib.swarm import master_init
 from swarmlib.swarm import swarm as Swarm
-import cli_thread
 
 #import gettext
 #gettext.bindtextdomain('swarmlib')
@@ -60,173 +61,6 @@ def cli_copyright(pre_options, pre_args, command, post_options):
     print " along with this program; if not, write to the Free Software"
     print " Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA"
 
-def cli_space_filler(command, size):
-    a = " "
-    if size > len(command):
-        a = " " * (size - len(command))
-    return a
-
-def cli_parse_datafile(name, column_list):
-    """
-    Given a datafile (name) and a format for the columns (column_list) will parse
-    the file and return a list of the data
-    """
-
-    parsed_list = []
-
-    fd = file(name, 'rb')
-    for line in fd.readlines():
-        temp_line = line.strip()
-        if len(temp_line):
-            if temp_line[0] != '#':
-                temp_split = temp_line.split('|')
-                if len(temp_split) == len(column_list):
-                    temp_parsed = {}
-                    for a in range(len(column_list)):
-                        temp_parsed[column_list[a]] = temp_split[a].strip()
-                    parsed_list.append(temp_parsed)
-                else:
-                    logger.error("Unable to parse line, skipping: '%s'" % temp_line)
-
-    fd.close()
-    return parsed_list
-
-def cli_parse_issuefile(name, schema_issue, schema_node):
-    """
-    cli_parse_issuefile(name, schema_issue, schema_node)
-    Given a issue file(name) and the schemas for issues and nodes,
-    will parse the issuefile and return a hash containing the parsed
-    issue data.
-    returned_data = {'issue': {parsed data}, 'node': {parsed data}}
-    """
-    parsed_data = {'issue': {}, 'node': {}}
-    for column in schema_issue:
-        parsed_data['issue'][column] = None
-
-    for column in schema_node:
-        parsed_data['node'][column] = None
-
-    parsed_data['node']['details'] = ""
-
-    current_section = None
-
-    fd = file(name, 'rb')
-    for line in fd.readlines():
-        temp_line = line.strip()
-        if current_section == 'details':
-            parsed_data['node']['details'] = parsed_data['node']['details'] + temp_line.strip() + "\n"
-        elif len(temp_line):
-            if temp_line[0] != '#':
-                if temp_line[0] == "@":
-                    current_section = temp_line[1:].strip()
-                    current_section = current_section.lower()
-                else:
-                    temp_split = temp_line.split(':')
-                    if len(temp_split) > 1:
-                        setting = temp_split[0].strip()
-                        value = ""
-                        value = value.join(temp_split[1:])
-                        value = value.strip()
-                        if len(value) < 1:
-                            value = None
-                        if current_section == 'header':
-                            if schema_issue[setting].lower() == "integer" and value:
-                                parsed_data['issue'][setting] = int(value)
-                            elif schema_issue[setting].lower() == "float" and value:
-                                parsed_data['issue'][setting] = float(value)
-                            else:
-                                parsed_data['issue'][setting] = value
-                        elif current_section == 'node':
-                            if schema_node[setting].lower() == "integer" and value:
-                                parsed_data['node'][setting] = int(value)
-                            elif schema_node[setting].lower() == "float" and value:
-                                parsed_data['node'][setting] = float(value)
-                            else:
-                                parsed_data['node'][setting] = value
-                        # If we have something outside of the three
-                        # known sections, we kind of have to ignore it
-                        # after all, where would it go?
-    fd.close()
-    return parsed_data
-
-def cli_printnode(fp, issue, node, issue_order, node_order):
-    """
-    cli_printnode(fp, issue, node, schema_issue, schema_node)
-    Given issue and node details, will print
-    the current node to the file object fp
-    """
-    # Start out with the issue metadata
-    data = "TICKET NUMBER : %s\n" % issue['short_hash_id']
-    for i in issue_order['short']:
-        if i != 'short_hash_id':
-            if i == 'time':
-                data = data + "Time: %s\n" % swarm_time.human_readable_from_stamp(issue['time'])
-            else:
-                data = data + "%s : %s\n" % (i, issue[i])
-    data = data + "\n"
-    for i in issue_order['long']:
-        data = data + "%s : %s\n" % (i, issue[i])
-
-    data = data + "\n---------------------------\n\n"
-
-    # Now do the node data
-    for i in node_order['short']:
-        if i == 'time':
-            data = data + "Post time: %s\n" % swarm_time.human_readable_from_stamp(node['time'])
-        else:
-            data = data + "%s : %s\n" % (i, node[i])
-
-    for i in node_order['long']:
-        data = data + "\n%s:\n%s\n" % (i, node[i])
-
-    temp = os.write(fp, data)
-
-def cli_launch_editor(name):
-    """
-    Launch an external editor
-    Returns:
-    (bhash, ahash, bsize, asize)
-    Where:
-    asize = filesize after
-    bsize = filesize before
-    ahash = filehash after
-    bhash = filehash before
-    """
-
-    bstat = os.stat(name)
-    bsize = bstat.st_size
-    fd = file(name, 'rb')
-    bhash = md5.new(fd.read()).digest()
-    fd.close()
-
-    # TODO: Right now, we just use $EDITOR from the system environement, but later on
-    # we will want to make this fancier
-    editor = os.environ.get("EDITOR", "nano")
-    cmd = "%s %s" % (editor, name)
-    status = os.system(cmd)
-
-    # TODO: Should do something with status
-
-    astat = os.stat(name)
-    asize = astat.st_size
-    fd = file(name, 'rb')
-    ahash = md5.new(fd.read()).digest()
-    fd.close()
-
-    return (bhash, ahash, bsize, asize)
-
-def cli_pager(name):
-    """
-    Given a filename, view it in some external pager
-    """
-
-    # TODO: This needs to be fixed, we ought to try various pagers
-    # right now we just kind of assume less is available...
-    # which is dumb :-P
-
-    cmd = "less %s" % (name)
-    status = os.system(cmd)
-
 def cli_help(pre_options, pre_args, command, post_options):
     if post_options:
         for com in post_options:
@@ -237,6 +71,7 @@ def cli_help(pre_options, pre_args, command, post_options):
             for line in option_dispatch[com].desc:
                 print line
     else:
+        util = cli_util.util(None, None)
         print option_dispatch[None].usage
         print option_dispatch[None].summary
         print
@@ -245,7 +80,7 @@ def cli_help(pre_options, pre_args, command, post_options):
         print
         for com in option_dispatch.keys():
             if com:
-                print "   %s%s%s" % (com, cli_space_filler(com, 20), option_dispatch[com].summary)
+                print "   %s%s%s" % (com, util.space_filler(com, 20), option_dispatch[com].summary)
 
 def cli_init(pre_options, pre_args, command, post_options):
     verbose = 0
@@ -299,6 +134,7 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
 
     sw = Swarm(working_dir, log)
     components = sw.get_taxonomy(tax_term)
+    util = cli_util.util(sw, log)
 
     #FIXME: The following needs to be removed
     # as it's legacy before we had the master swarm
@@ -325,9 +161,9 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
 
         os.close(fp)
 
-        (bhash, ahash, bsize, asize) = cli_launch_editor(name)
+        (bhash, ahash, bsize, asize) = util.launch_editor(name)
         if bhash != ahash:
-            new_components = cli_parse_datafile(name, ['id', 'name', 'details'])
+            new_components = util.parse_datafile(name, ['id', 'name', 'details'])
             # FIXME: This needs to be removed as well (see above)
             #db.backend.set_taxonomy(tax_term, new_components)
             sw.set_taxonomy(tax_term, new_components)
@@ -438,86 +274,6 @@ def cli_thread_run(pre_options, pre_args, command, post_options):
         sw.close()
     logger.unregister()
 
-def cli_new_comment(sw, issue, node):
-    logger.register('cli_new_comment')
-    logger.entry("Comment on node '%s'" % node['node_id'], 2)
-
-    schema_issue = sw.get_schema('issue')
-    schema_node = sw.get_schema('node')
-    (fp, name) = tempfile.mkstemp()
-    timestamp = swarm_time.timestamp()
-    reporter = sw.get_user()
-    temp = os.write(fp,
-        "# Adding new comment to ticket\n" +
-        "#--------------------\n" +
-        "# Lines begining with a '#' will be treated as a comment.\n" +
-        "# In the header section, blank lines will be ignored\n" +
-        "# Lines starting with '@' indicate a section divider.\n\n" +
-        "@ HEADER\n\n")
-    if schema_issue.has_key('time'):
-        temp = os.write(fp, "# timestamp: %s\n" % timestamp)
-        temp = os.write(fp, "# %s\n" % swarm_time.human_readable_from_stamp(timestamp))
-    if schema_issue.has_key('reporter'):
-        temp = os.write(fp, "# poster: %s\n" % reporter)
-
-    meta_data = ['component', 'version', 'milestone', 'severity', 'priority', 'owner', 'keywords', 'status']
-    for element in meta_data:
-        if schema_issue.has_key(element):
-            if issue[element]:
-                temp = os.write(fp, "%s:%s\n" % (element, issue[element]))
-            else:
-                temp = os.write(fp, "%s:\n" % element)
-
-    temp = os.write(fp, "\n@ NODE\n")
-    meta_data = ['related', 'summary']
-    for element in meta_data:
-        if schema_node.has_key(element):
-            if node[element]:
-                temp = os.write(fp, "%s:%s\n" % (element, node[element]))
-            else:
-                temp = os.write(fp, "%s:\n" % element)
-
-    temp = os.write(fp, "\n# Everything after details (including lines begining with '#' or '@') will\n# be considered part of the details section\n@ DETAILS\n\n")
-
-    os.close(fp)
-
-    (bhash, ahash, bsize, asize) = cli_launch_editor(name)
-    if bhash != ahash:
-        parsed_data = cli_parse_issuefile(name, schema_issue, schema_node)
-        parsed_data['node']['time'] = timestamp
-        parsed_data['node']['poster'] = reporter
-        # Ensure specific items are kept in sync
-        parsed_data['issue']['root_node'] = issue['root_node']
-        parsed_data['issue']['reporter'] = issue['reporter']
-        parsed_data['issue']['short_hash_id'] = issue['short_hash_id']
-        parsed_data['issue']['time'] = issue['time']
-        parsed_data['issue']['hash_id'] = issue['hash_id']
-        parsed_data['issue']['id'] = issue['id']
-        #print len(parsed_data['node']['details'].strip())
-        print parsed_data['node']
-        #print
-        #print parsed_data['issue']
-        #print
-        #print issue
-        #print
-        if parsed_data['issue'] != issue:
-            sw.update_issue(parsed_data['issue'])
-
-        sw.add_node(parsed_data, node)
-#        new_id = sw.new_issue(parsed_data)
-#        logger.entry("Ticket #%s has been created." % str(new_id), 0)
-#        if not sw.config.has_section('cli'):
-#            sw.config.add_section('cli')
-#        sw.config.set('cli', 'last_issue', new_id)
-#        sw.config.save()
-    else:
-        logger.entry("Ticket reply cancelled.", 0)
-
-    os.remove(name)
-
-    logger.unregister()
-    return (issue, node)
-
 def cli_new(pre_options, pre_args, command, post_options):
     verbose = 0
     working_dir = os.getcwd()
@@ -533,6 +289,7 @@ def cli_new(pre_options, pre_args, command, post_options):
     logger.register("cli_new")
 
     sw = Swarm(working_dir, log)
+    util = cli_util.util(sw, log)
 
     schema_issue = sw.get_schema('issue')
     schema_node = sw.get_schema('node')
@@ -567,9 +324,9 @@ def cli_new(pre_options, pre_args, command, post_options):
 
     os.close(fp)
 
-    (bhash, ahash, bsize, asize) = cli_launch_editor(name)
+    (bhash, ahash, bsize, asize) = util.launch_editor(name)
     if bhash != ahash:
-        parsed_data = cli_parse_issuefile(name, schema_issue, schema_node)
+        parsed_data = util.parse_issuefile(name, schema_issue, schema_node)
         parsed_data['issue']['time'] = timestamp
         parsed_data['issue']['reporter'] = reporter
         parsed_data['node']['time'] = timestamp

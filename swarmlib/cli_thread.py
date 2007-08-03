@@ -21,8 +21,9 @@
 # Author: Sam Hart
 
 class thread:
-    def __init__(self, sw, log, ticket_number):
+    def __init__(self, sw, log,, util, ticket_number):
         self.sw = sw
+        self.util = util
         self.ticket_number = ticket_number
         self.log = log
         self.logger = self.log.get_logger("cli_thread")
@@ -130,3 +131,83 @@ class thread:
                                     print "\n'%s' choice is not a valid option\n" % choice
                 else:
                     logger.error("Something wrong with the ticket.")
+
+    def cli_new_comment(sw, issue, node):
+        logger.register('cli_new_comment')
+        logger.entry("Comment on node '%s'" % node['node_id'], 2)
+
+        schema_issue = sw.get_schema('issue')
+        schema_node = sw.get_schema('node')
+        (fp, name) = tempfile.mkstemp()
+        timestamp = swarm_time.timestamp()
+        reporter = sw.get_user()
+        temp = os.write(fp,
+            "# Adding new comment to ticket\n" +
+            "#--------------------\n" +
+            "# Lines begining with a '#' will be treated as a comment.\n" +
+            "# In the header section, blank lines will be ignored\n" +
+            "# Lines starting with '@' indicate a section divider.\n\n" +
+            "@ HEADER\n\n")
+        if schema_issue.has_key('time'):
+            temp = os.write(fp, "# timestamp: %s\n" % timestamp)
+            temp = os.write(fp, "# %s\n" % swarm_time.human_readable_from_stamp(timestamp))
+        if schema_issue.has_key('reporter'):
+            temp = os.write(fp, "# poster: %s\n" % reporter)
+
+        meta_data = ['component', 'version', 'milestone', 'severity', 'priority', 'owner', 'keywords', 'status']
+        for element in meta_data:
+            if schema_issue.has_key(element):
+                if issue[element]:
+                    temp = os.write(fp, "%s:%s\n" % (element, issue[element]))
+                else:
+                    temp = os.write(fp, "%s:\n" % element)
+
+        temp = os.write(fp, "\n@ NODE\n")
+        meta_data = ['related', 'summary']
+        for element in meta_data:
+            if schema_node.has_key(element):
+                if node[element]:
+                    temp = os.write(fp, "%s:%s\n" % (element, node[element]))
+                else:
+                    temp = os.write(fp, "%s:\n" % element)
+
+        temp = os.write(fp, "\n# Everything after details (including lines begining with '#' or '@') will\n# be considered part of the details section\n@ DETAILS\n\n")
+
+        os.close(fp)
+
+        (bhash, ahash, bsize, asize) = util.launch_editor(name)
+        if bhash != ahash:
+            parsed_data = util.parse_issuefile(name, schema_issue, schema_node)
+            parsed_data['node']['time'] = timestamp
+            parsed_data['node']['poster'] = reporter
+            # Ensure specific items are kept in sync
+            parsed_data['issue']['root_node'] = issue['root_node']
+            parsed_data['issue']['reporter'] = issue['reporter']
+            parsed_data['issue']['short_hash_id'] = issue['short_hash_id']
+            parsed_data['issue']['time'] = issue['time']
+            parsed_data['issue']['hash_id'] = issue['hash_id']
+            parsed_data['issue']['id'] = issue['id']
+            #print len(parsed_data['node']['details'].strip())
+            print parsed_data['node']
+            #print
+            #print parsed_data['issue']
+            #print
+            #print issue
+            #print
+            if parsed_data['issue'] != issue:
+                sw.update_issue(parsed_data['issue'])
+
+            sw.add_node(parsed_data, node)
+    #        new_id = sw.new_issue(parsed_data)
+    #        logger.entry("Ticket #%s has been created." % str(new_id), 0)
+    #        if not sw.config.has_section('cli'):
+    #            sw.config.add_section('cli')
+    #        sw.config.set('cli', 'last_issue', new_id)
+    #        sw.config.save()
+        else:
+            logger.entry("Ticket reply cancelled.", 0)
+
+        os.remove(name)
+
+        logger.unregister()
+        return (issue, node)
