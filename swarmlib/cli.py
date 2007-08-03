@@ -267,7 +267,7 @@ def cli_thread_run(pre_options, pre_args, command, post_options):
                     ticket_number = sw.config.get('cli', 'last_issue')
 
             if ticket_number:
-                cli_thread.run(sw, util, swarm_time, log, ticket_number)
+                cli_thread.run(sw, log, util, swarm_time, ticket_number)
             else:
                 logger.error("No ticket found.")
         else:
