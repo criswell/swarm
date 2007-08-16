@@ -55,16 +55,16 @@ class thread:
         #schema_node = self.sw.get_schema('node')
         if len(self.issue):
             cur_node_id = self.issue['root_node']
-            self.node = self.sw.get_node(cur_node_id)
             more_nodes = True
             while more_nodes:
+                self.node = self.sw.get_node(cur_node_id)
                 if len(self.node):
                     self.page_node()
                     children = self.sw.get_lineage(parent_id=cur_node_id)
                     parents = self.sw.get_lineage(child_id=cur_node_id)
-                    if parents : print "Parents\n" + str(parents) + "\n"
-                    print
-                    if children: print "Children\n" + str(children) + "\n"
+                    #if parents : print "Parents\n" + str(parents) + "\n"
+                    #print
+                    #if children: print "Children\n" + str(children) + "\n"
                     parent_entry = {}
                     child_entry = {}
                     parent_keys = None
@@ -112,7 +112,8 @@ class thread:
                             if choice[1:].isdigit():
                                 num = int(choice[1:])
                                 if num in range(len(parent_keys)):
-                                    node = self.sw.get_node(parent_entry[num][2])
+                                    cur_node_id = parent_entry[parent_keys[num]][2]
+                                    #node = self.sw.get_node(parent_entry[num][2])
                                     more_nodes = True
                                     valid_choice = True
                                 else:
@@ -126,7 +127,8 @@ class thread:
                                 num = int(choice[1:])
                                 if num in range(len(child_keys)):
                                     #print child_entry
-                                    self.node = self.sw.get_node(child_entry[child_keys[num]][2])
+                                    cur_node_id = child_entry[child_keys[num]][2]
+                                    #self.node = self.sw.get_node(child_entry[child_keys[num]][2])
                                     more_nodes = True
                                     valid_choice = True
                                 else:
