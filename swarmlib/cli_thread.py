@@ -32,28 +32,39 @@ class thread:
         self.ticket_number = ticket_number
         self.log = log
         self.logger = self.log.get_logger("cli_thread")
+        [self.issue] = self.sw.get_issue(self.ticket_number)
+        self.node = None
+        self.schema_issue = self.sw.get_schema('issue')
+        self.schema_node = self.sw.get_schema('node')
+
+    def page_node(self):
+        """
+        Page the current node
+        """
+        node = self.node[0]
+        (fp, name) = tempfile.mkstemp()
+        self.util.print_node(fp, self.issue, node, self.sw.get_table_order('issue'), self.sw.get_table_order('node'))
+        self.util.pager(name)
+        os.close(fp)
+        os.remove(name)
 
     def run(self):
         self.logger.register('run')
-        [issue] = self.sw.get_issue(self.ticket_number)
-        schema_issue = self.sw.get_schema('issue')
-        schema_node = self.sw.get_schema('node')
-        if len(issue):
-            cur_node_id = issue['root_node']
-            node = self.sw.get_node(cur_node_id)
+        #[issue] = self.sw.get_issue(self.ticket_number)
+        #schema_issue = self.sw.get_schema('issue')
+        #schema_node = self.sw.get_schema('node')
+        if len(self.issue):
+            cur_node_id = self.issue['root_node']
+            self.node = self.sw.get_node(cur_node_id)
             more_nodes = True
             while more_nodes:
-                if len(node):
-                    (fp, name) = tempfile.mkstemp()
-                    self.util.print_node(fp, issue, node[0], self.sw.get_table_order('issue'), self.sw.get_table_order('node'))
-                    self.util.pager(name)
-                    os.close(fp)
-                    os.remove(name)
+                if len(self.node):
+                    self.page_node()
                     children = self.sw.get_lineage(parent_id=cur_node_id)
                     parents = self.sw.get_lineage(child_id=cur_node_id)
-                    print parents
+                    if parents : print "Parents\n" + str(parents) + "\n"
                     print
-                    print children
+                    if children: print "Children\n" + str(children) + "\n"
                     parent_entry = {}
                     child_entry = {}
                     parent_keys = None
@@ -115,7 +126,7 @@ class thread:
                                 num = int(choice[1:])
                                 if num in range(len(child_keys)):
                                     #print child_entry
-                                    node = self.sw.get_node(child_entry[child_keys[num]][2])
+                                    self.node = self.sw.get_node(child_entry[child_keys[num]][2])
                                     more_nodes = True
                                     valid_choice = True
                                 else:
@@ -131,7 +142,7 @@ class thread:
                             more_nodes = False
                         elif choice == 'r':
                             valid_choice = True
-                            (issue, node[0]) = self.new_comment(issue, node[0])
+                            self.new_comment()
                             more_nodes = True
                         else:
                             valid_choice = False
@@ -141,12 +152,11 @@ class thread:
 
         self.logger.unregister()
 
-    def new_comment(self, issue, node):
+    def new_comment(self):
+        node = self.node[0]
         self.logger.register('new_comment')
         self.logger.entry("Comment on node '%s'" % node['node_id'], 2)
 
-        schema_issue = self.sw.get_schema('issue')
-        schema_node = self.sw.get_schema('node')
         (fp, name) = tempfile.mkstemp()
         timestamp = swarm_time.timestamp()
         reporter = self.sw.get_user()
@@ -157,24 +167,24 @@ class thread:
             "# In the header section, blank lines will be ignored\n" +
             "# Lines starting with '@' indicate a section divider.\n\n" +
             "@ HEADER\n\n")
-        if schema_issue.has_key('time'):
+        if self.schema_issue.has_key('time'):
             temp = os.write(fp, "# timestamp: %s\n" % timestamp)
             temp = os.write(fp, "# %s\n" % swarm_time.human_readable_from_stamp(timestamp))
-        if schema_issue.has_key('reporter'):
+        if self.schema_issue.has_key('reporter'):
             temp = os.write(fp, "# poster: %s\n" % reporter)
 
         meta_data = ['component', 'version', 'milestone', 'severity', 'priority', 'owner', 'keywords', 'status']
         for element in meta_data:
-            if schema_issue.has_key(element):
-                if issue[element]:
-                    temp = os.write(fp, "%s:%s\n" % (element, issue[element]))
+            if self.schema_issue.has_key(element):
+                if self.issue[element]:
+                    temp = os.write(fp, "%s:%s\n" % (element, self.issue[element]))
                 else:
                     temp = os.write(fp, "%s:\n" % element)
 
         temp = os.write(fp, "\n@ NODE\n")
         meta_data = ['related', 'summary']
         for element in meta_data:
-            if schema_node.has_key(element):
+            if self.schema_node.has_key(element):
                 if node[element]:
                     temp = os.write(fp, "%s:%s\n" % (element, node[element]))
                 else:
@@ -186,16 +196,16 @@ class thread:
 
         (bhash, ahash, bsize, asize) = self.util.launch_editor(name)
         if bhash != ahash:
-            parsed_data = self.util.parse_issuefile(name, schema_issue, schema_node)
+            parsed_data = self.util.parse_issuefile(name, self.schema_issue, self.schema_node)
             parsed_data['node']['time'] = timestamp
             parsed_data['node']['poster'] = reporter
             # Ensure specific items are kept in sync
-            parsed_data['issue']['root_node'] = issue['root_node']
-            parsed_data['issue']['reporter'] = issue['reporter']
-            parsed_data['issue']['short_hash_id'] = issue['short_hash_id']
-            parsed_data['issue']['time'] = issue['time']
-            parsed_data['issue']['hash_id'] = issue['hash_id']
-            parsed_data['issue']['id'] = issue['id']
+            parsed_data['issue']['root_node'] = self.issue['root_node']
+            parsed_data['issue']['reporter'] = self.issue['reporter']
+            parsed_data['issue']['short_hash_id'] = self.issue['short_hash_id']
+            parsed_data['issue']['time'] = self.issue['time']
+            parsed_data['issue']['hash_id'] = self.issue['hash_id']
+            parsed_data['issue']['id'] = self.issue['id']
             #print len(parsed_data['node']['details'].strip())
             print parsed_data['node']
             #print
@@ -203,23 +213,25 @@ class thread:
             #print
             #print issue
             #print
-            if parsed_data['issue'] != issue:
+            if parsed_data['issue'] != self.issue:
                 self.sw.update_issue(parsed_data['issue'])
 
-            self.sw.add_node(parsed_data, node)
+            self.sw.add_node(parsed_data, self.node)
     #        new_id = sw.new_issue(parsed_data)
     #        logger.entry("Ticket #%s has been created." % str(new_id), 0)
     #        if not sw.config.has_section('cli'):
     #            sw.config.add_section('cli')
     #        sw.config.set('cli', 'last_issue', new_id)
     #        sw.config.save()
+            self.issue = parsed_data['issue']
+            self.node[0] = parsed_data['node']
         else:
             self.logger.entry("Ticket reply cancelled.", 0)
 
         os.remove(name)
 
         self.logger.unregister()
-        return (issue, node)
+        #return (issue, node)
 
 def run(sw, log, util, ticket_number):
     """
