@@ -24,6 +24,7 @@ import tempfile
 import os
 import swarmlib.swarm_time as swarm_time
 
+from swarmlib.db import taxonomy_terms
 
 class thread:
     def __init__(self, sw, log, util, ticket_number):
@@ -178,6 +179,13 @@ class thread:
         meta_data = ['component', 'version', 'milestone', 'severity', 'priority', 'owner', 'keywords', 'status']
         for element in meta_data:
             if self.schema_issue.has_key(element):
+                if element in taxonomy_terms:
+                    tax = self.sw.get_taxonomy(element)
+                    if tax:
+                        temp = os.write(fp, "\n# %s, possible values\n# " % element)
+                        for item in tax:
+                            temp = os.write(fp, "%s: '%s', " % (str(item['id']), str(item['name'])))
+                        temp = os.write(fp, "\n")
                 if self.issue[element]:
                     temp = os.write(fp, "%s:%s\n" % (element, self.issue[element]))
                 else:

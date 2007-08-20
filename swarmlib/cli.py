@@ -71,7 +71,7 @@ def cli_help(pre_options, pre_args, command, post_options):
             for line in option_dispatch[com].desc:
                 print line
     else:
-        util = cli_util.util(None, None)
+        util = cli_util.util(None, log)
         print option_dispatch[None].usage
         print option_dispatch[None].summary
         print

@@ -24,6 +24,8 @@ import os
 import swarmlib.swarm_time as swarm_time
 import md5
 
+from swarmlib.db import taxonomy_terms
+
 class util:
     def __init__(self, sw, log):
         self.sw = sw
@@ -136,6 +138,14 @@ class util:
             if i != 'short_hash_id':
                 if i == 'time':
                     data = data + "Time: %s\n" % swarm_time.human_readable_from_stamp(issue['time'])
+                elif i in taxonomy_terms:
+                    tax = self.sw.get_taxonomy(i)
+                    if tax:
+                        data = data + "\n# %s, possible values\n# " % i
+                        for item in tax:
+                            data = data + "%s: '%s', " % (str(item['id']), str(item['name']))
+                        data = data + "\n"
+                    data = data + "%s : %s\n" % (i, issue[i])
                 else:
                     data = data + "%s : %s\n" % (i, issue[i])
         data = data + "\n"
