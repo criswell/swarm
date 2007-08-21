@@ -301,6 +301,20 @@ class swarm:
 
         return issue_data['issue']['short_hash_id']
 
+    def update_issue(self, issue_data):
+        """
+        Given new issue data, will update the issue (header)
+        """
+        self._logger.register('update_issue')
+        if issue_data.has_key("hash_id") and issue_data.has_key("short_hash_id"):
+            self._logger.entry("Updating issue #%s" % issue_data['short_hash_id'], 1)
+            self._logger.entry("- Long hash_id '%s'" % issue_data['hash_id'], 3)
+            self.db.backend.update_issue(issue_data)
+
+        raise swarm_error("ERE I AM JH")
+
+        self._logger.unregister()
+
     def add_node(self, issue_data, parent_node):
         """
         add_node(issue_data)

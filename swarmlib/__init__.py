@@ -45,4 +45,5 @@ transactions = {
     'add_lineage' : None,
     'new_node': None,
     'new_issue': None,
+    'update_issue': None,
 }

@@ -314,6 +314,13 @@ def cli_new(pre_options, pre_args, command, post_options):
     meta_data = ['component', 'version', 'milestone', 'severity', 'priority', 'owner', 'keywords']
     for element in meta_data:
         if schema_issue.has_key(element):
+            if element in taxonomy_terms:
+                tax = sw.get_taxonomy(element)
+                if tax:
+                    temp = os.write(fp, "\n# %s, possible values\n# " % element)
+                    for item in tax:
+                        temp = os.write(fp, "%s: '%s', " % (str(item['id']), str(item['name'])))
+                    temp = os.write(fp, "\n")
             temp = os.write(fp, "%s:\n" % element)
 
     temp = os.write(fp, "\n@ NODE\n")

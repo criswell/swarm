@@ -419,7 +419,7 @@ class db:
         else:
             return None
 
-    def _add_entry(self, table_name, table_data):
+    def _add_entry(self, table_name, table_data, update=False):
         """
         Internal add_entry function
         """
@@ -469,7 +469,10 @@ class db:
             final_entries.append(value)
 
         # FIXME : We're not checking if we're connected here
-        sql_code = "INSERT INTO " + table_name +" (" + sql_columns + ") VALUES (" + sql_datatypes + ");"
+        sql_code = "INSERT INTO "
+        if update:
+            sql_code = "REPLACE INTO "
+        sql_code = sql_code + table_name +" (" + sql_columns + ") VALUES (" + sql_datatypes + ");"
         self._logger.entry("SQL code is:\n%s" % (sql_code % tuple(final_entries)), 5)
         self._cursor.execute(sql_code, tuple(final_entries))
 
@@ -526,6 +529,14 @@ class db:
 
         self._add_entry('issue', issue_data)
         self.log_transaction(__MASTER_ISSUE__, 'new_issue', issue_data['hash_id'])
+
+    def update_issue(self, issue_data):
+        """
+        Given updated issue_data, update the issue (header)
+        """
+
+        self._add_entry('issue', issue_data, True)
+        self.log_transaction(issue_data['hash_id'], 'update_issue', issue_data['hash_id'])
 
     def init(self):
         self._logger.register("init")
