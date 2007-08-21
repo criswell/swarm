@@ -233,7 +233,10 @@ class swarm:
         Anyway... there's more you can do with dates and things, but I wont go into that
         here.
         """
-        return self.db.backend.search_transaction_log(issue, lower_entry, upper_entry, lower_date, upper_date, xaction)
+
+        [meta_data] = self.get_issue(issue)
+
+        return self.db.backend.search_transaction_log(meta_data['hash_id'], lower_entry, upper_entry, lower_date, upper_date, xaction)
 
     def get_last_hash(self, table_name):
         """

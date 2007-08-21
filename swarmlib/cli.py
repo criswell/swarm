@@ -178,19 +178,42 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
 def cli_log(pre_options, pre_args, command, post_options):
     verbose = 0
     working_dir = os.getcwd()
+    ticket_number = None
 
     for o, a in pre_options:
         if o in ("-v", "--verbose"):
             verbose = verbose + 1
 
-    if post_options:
-        working_dir = post_options[0]
-
     log.set_universal_loglevel(verbose)
     logger.register("cli_log")
 
-    sw = Swarm(working_dir, log)
-    xlog = sw.get_transaction_log()
+    if len(post_options) == 2:
+        # swarm log ##### directory
+        working_dir = post_options[1]
+        ticket_number = post_options[0]
+        sw = Swarm(working_dir, log)
+    elif len(post_options) == 1:
+        # 1) swarm log #####
+        # OR
+        # 2) swarm log directory
+        ticket_number = post_options[0]
+        sw = Swarm(working_dir, log)
+        if not sw.loaded:
+            # Try #2
+            sw.close()
+            ticket_number = None
+            working_dir = post_options[0]
+            sw = Swarm(working_dir, log)
+    else:
+        # Default is to use the last issue
+        sw = Swarm(working_dir, log)
+
+    #if post_options:
+    #    working_dir = post_options[0]
+    #sw = Swarm(working_dir, log)
+    if ticket_number == 0:
+        ticket_number = None
+    xlog = sw.get_transaction_log(issue=ticket_number)
     # FIXME
     # This is ugly, was just an early hack that
     # is still around

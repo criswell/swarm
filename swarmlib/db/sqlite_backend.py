@@ -248,7 +248,7 @@ class db:
         self._logger.register('search_transaction_log')
         args = [ issue, lower_entry, upper_entry, lower_date, upper_date, xaction]
         limit_text = [
-            "root = %s"
+            "root = '%s'"
             , "id > %s"
             , "id < %s"
             , "time > %s"
