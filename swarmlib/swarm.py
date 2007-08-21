@@ -311,8 +311,6 @@ class swarm:
             self._logger.entry("- Long hash_id '%s'" % issue_data['hash_id'], 3)
             self.db.backend.update_issue(issue_data)
 
-        raise swarm_error("ERE I AM JH")
-
         self._logger.unregister()
 
     def add_node(self, issue_data, parent_node):

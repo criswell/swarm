@@ -226,7 +226,7 @@ class thread:
             if parsed_data['issue'] != self.issue:
                 self.sw.update_issue(parsed_data['issue'])
 
-            self.sw.add_node(parsed_data, self.node)
+            self.sw.add_node(parsed_data, self.node[0])
     #        new_id = sw.new_issue(parsed_data)
     #        logger.entry("Ticket #%s has been created." % str(new_id), 0)
     #        if not sw.config.has_section('cli'):
