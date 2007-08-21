@@ -217,7 +217,7 @@ class thread:
             parsed_data['issue']['hash_id'] = self.issue['hash_id']
             parsed_data['issue']['id'] = self.issue['id']
             #print len(parsed_data['node']['details'].strip())
-            print parsed_data['node']
+            #print parsed_data['node']
             #print
             #print parsed_data['issue']
             #print
