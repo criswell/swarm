@@ -72,7 +72,7 @@ class db:
                 sql_code = sql_code + column.name
                 if column.data_type: sql_code = sql_code + " %s" % column.data_type
                 if column.primary_key: sql_code = sql_code + " PRIMARY KEY"
-                if column.auto_increment and __sqlite_version__ >= 3: sql_code = sql_code + " AUTO_INCREMENT"
+                if column.auto_increment and __sqlite_version__ >= 3: sql_code = sql_code + " AUTOINCREMENT"
                 if column.unique: sql_code = sql_code + " UNIQUE"
             sql_code = sql_code +"\n);\n"
             self._logger.entry("SQL code is:\n%s" % sql_code, 5)
