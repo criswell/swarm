@@ -22,6 +22,7 @@
 
 import socket
 import os
+from urlparse import urlparse
 
 import swarmlib.config as Config
 import swarmlib.data_tools as data_tools
@@ -31,6 +32,7 @@ from swarmlib.db import taxonomy_terms
 from swarmlib.db import __MASTER_ISSUE__
 from swarmlib.db import table_schema
 from swarmlib.db import table_orders
+from swarmlib.remote import remote
 
 def master_init(project_name, working_dir, log, force=False):
     """
@@ -47,14 +49,55 @@ def master_init(project_name, working_dir, log, force=False):
     db.backend.init()
     db.backend.close()
 
+class Repo:
+    def __init__(self, url, log):
+        """
+        __init__(self, url)
+        Basic URL parsing wrapper class
+        Accessable members:
+         .scheme = The scheme in use
+         .netloc = The network location
+         .path = The path
+         .params = Parameters for path element
+         .query = Query component
+         .fragment = fragment identifier
+         .username = username to use (if authentication is needed)
+         .password = password to use (if authentication is needed)
+         .hostname = hostname
+         .port = port
+        """
+        self._url = url
+        self._parsed = urlparse(url)
+        self.scheme = self._parsed.scheme.lower()
+        if self._parsed.scheme == '':
+            self.scheme = 'file'
+        self.netloc = self._parsed.netloc
+        self.path = self._parsed.path
+        self.params = self._parsed.params
+        self.query = self._parsed.query
+        self.fragment = self._parsed.fragment
+        self.username = self._parsed.username
+        self.password = self._parsed.password
+        self.hostname = self._parsed.hostname
+        self.port = self._parsed.port
+        self.remote = None
+        self._log = log
+        self._logger = log.get_logger("swarm")
+
+        if self.scheme != 'file':
+            self.remote = remote(self, self._log)
+
 class swarm:
-    def __init__(self, working_dir, log, force=False):
+    def __init__(self, working_url, log, force=False):
         """
         __init__(working_dir, log, force=False)
         Main swarm class interface for all the nastiness
         that goes on behind the scene.
         """
-        self._working_dir = working_dir
+        self._url = working_url
+        self._working_dir = None
+        self._repo = Repo(working_url, log)
+        self._local = True
         self._log = log
         self._force = force
         self._logger = log.get_logger("swarm")
@@ -70,13 +113,20 @@ class swarm:
         """
         self._logger.register("_setup")
 
-        self.config = Config.config(self._working_dir, self._log)
-        self.db = swarmdb(self._working_dir, self.config, self._log)
-        if self.db.backend:
-            self.loaded = True
-            self.db.backend.connect()
+        # First, we need to see if we're working locally or not
+        if self._repo.scheme == 'file':
+            self._local = True
         else:
-            self._logger.error("Database backend not loaded")
+            self._local = False
+
+        self.config = Config.config(self._working_dir, self._log)
+        if self._local:
+            self.db = swarmdb(self._working_dir, self.config, self._log)
+            if self.db.backend:
+                self.loaded = True
+                self.db.backend.connect()
+            else:
+                self._logger.error("Database backend not loaded")
 
         self._logger.unregister()
 
