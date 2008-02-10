@@ -426,7 +426,6 @@ class db:
         self._logger.register("_add_entry")
         column_names = []
         column_values = []
-        final_entries = []
         sql_code = ""
         sql_columns = ""
         sql_datatypes = ""
@@ -442,39 +441,32 @@ class db:
         first_entry = True
         for key_name in table_data.keys():
             column_names.append(key_name)
-            local_type = '%s'
-            #if key_name == 'id':
-            #    column_values.append(None)
             if table_data[key_name]:
                 (local_type, converted) = table_in_use.convert(key_name, table_data[key_name])
                 column_values.append(converted)
             else:
                 column_values.append(None)
             if first_entry:
-                sql_datatypes = sql_datatypes + local_type
+                sql_datatypes = sql_datatypes + '?'
                 first_entry = False
             else:
-                sql_datatypes = sql_datatypes + ", %s" % local_type
+                sql_datatypes = sql_datatypes + ', ?'
 
         first_entry = True
         for name in column_names:
-            final_entries.append(name)
             if first_entry:
-                sql_columns = sql_columns + "%s"
+                sql_columns = sql_columns + name
                 first_entry = False
             else:
-                sql_columns = sql_columns + ", %s"
-
-        for value in column_values:
-            final_entries.append(value)
+                sql_columns = sql_columns + ", %s" % name
 
         # FIXME : We're not checking if we're connected here
         sql_code = "INSERT INTO "
         if update:
             sql_code = "REPLACE INTO "
         sql_code = sql_code + table_name +" (" + sql_columns + ") VALUES (" + sql_datatypes + ");"
-        self._logger.entry("SQL code is:\n%s" % (sql_code % tuple(final_entries)), 5)
-        self._cursor.execute(sql_code, tuple(final_entries))
+        self._logger.entry("SQL code is:\n%s\n%s" % (sql_code, tuple(column_values)), 5)
+        self._cursor.execute(sql_code, tuple(column_values))
 
         self._logger.unregister()
 
