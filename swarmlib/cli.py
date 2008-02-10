@@ -499,6 +499,17 @@ option_dispatch = {
         ['Copyright (C) 2006 Sam Hart\n','This program is free software; you can redistribute it and/or modify',
          'it under the terms of the GNU General Public License.'],
         cli_copyright),
+    'clone' : Command(
+        ['v', 'f'],
+        ['verbose', 'force'],
+        'swarm [OPTIONS] clone [FROM] [TO]',
+        ['Clones an existing Swarm DITS repository from the [FROM]',
+         'URI to the [TO] URI.',
+         '',
+         '  OPTIONS:',
+         '  -v|--verbose    Be verbose about actions',
+         "  -f|--force      Force even if [TO] directory isn't empty"],
+        cli_clone),
 
 }
 
