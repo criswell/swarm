@@ -42,6 +42,10 @@ from swarmlib.swarm import swarm as Swarm
 log = Log.log()
 logger = log.get_logger("swarm_cli")
 
+#########################
+# Informative Interfaces
+#########################
+
 def cli_copyright(pre_options, pre_args, command, post_options):
     print " Swarm DITS\n"
 
@@ -81,6 +85,82 @@ def cli_help(pre_options, pre_args, command, post_options):
         for com in option_dispatch.keys():
             if com:
                 print "   %s%s%s" % (com, util.space_filler(com, 20), option_dispatch[com].summary)
+
+def cli_log(pre_options, pre_args, command, post_options):
+    verbose = 0
+    working_dir = os.getcwd()
+    ticket_number = None
+
+    for o, a in pre_options:
+        if o in ("-v", "--verbose"):
+            verbose = verbose + 1
+
+    log.set_universal_loglevel(verbose)
+    logger.register("cli_log")
+
+    if len(post_options) == 2:
+        # swarm log ##### directory
+        working_dir = post_options[1]
+        ticket_number = post_options[0]
+        sw = Swarm(working_dir, log)
+    elif len(post_options) == 1:
+        # 1) swarm log #####
+        # OR
+        # 2) swarm log directory
+        ticket_number = post_options[0]
+        sw = Swarm(working_dir, log)
+        if not sw.loaded:
+            # Try #2
+            sw.close()
+            ticket_number = None
+            working_dir = post_options[0]
+            sw = Swarm(working_dir, log)
+    else:
+        # Default is to use the last issue
+        sw = Swarm(working_dir, log)
+
+    #if post_options:
+    #    working_dir = post_options[0]
+    #sw = Swarm(working_dir, log)
+    if ticket_number == 0:
+        ticket_number = None
+    xlog = sw.get_transaction_log(issue=ticket_number)
+    # FIXME
+    # This is ugly, was just an early hack that
+    # is still around
+    for entry in xlog:
+        print "[%i] %s - %s" % (entry[0], swarm_time.human_readable_from_stamp(entry[2]), entry[3])
+
+    sw.close()
+    logger.unregister()
+
+def cli_last(pre_options, pre_args, command, post_options):
+    verbose = 0
+    working_dir = os.getcwd()
+
+    for o, a in pre_options:
+        if o in ("-v", "--verbose"):
+            verbose = verbose + 1
+
+    if post_options:
+        working_dir = post_options[0]
+
+    log.set_universal_loglevel(verbose)
+    logger.register("cli_last")
+
+    sw = Swarm(working_dir, log)
+    if sw.config.has_section('cli'):
+        last_id = sw.config.get('cli', 'last_issue')
+        logger.entry("The last issue was #%s." % last_id, 0)
+    else:
+        logger.entry("There is no last issue set.", 0)
+
+    sw.close()
+    logger.unregister()
+
+#########################
+# Utility Interfaces
+#########################
 
 def cli_init(pre_options, pre_args, command, post_options):
     verbose = 0
@@ -171,78 +251,6 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
             logger.entry("'%s' list unchanged." % tax_term, 0)
 
         os.remove(name)
-
-    sw.close()
-    logger.unregister()
-
-def cli_log(pre_options, pre_args, command, post_options):
-    verbose = 0
-    working_dir = os.getcwd()
-    ticket_number = None
-
-    for o, a in pre_options:
-        if o in ("-v", "--verbose"):
-            verbose = verbose + 1
-
-    log.set_universal_loglevel(verbose)
-    logger.register("cli_log")
-
-    if len(post_options) == 2:
-        # swarm log ##### directory
-        working_dir = post_options[1]
-        ticket_number = post_options[0]
-        sw = Swarm(working_dir, log)
-    elif len(post_options) == 1:
-        # 1) swarm log #####
-        # OR
-        # 2) swarm log directory
-        ticket_number = post_options[0]
-        sw = Swarm(working_dir, log)
-        if not sw.loaded:
-            # Try #2
-            sw.close()
-            ticket_number = None
-            working_dir = post_options[0]
-            sw = Swarm(working_dir, log)
-    else:
-        # Default is to use the last issue
-        sw = Swarm(working_dir, log)
-
-    #if post_options:
-    #    working_dir = post_options[0]
-    #sw = Swarm(working_dir, log)
-    if ticket_number == 0:
-        ticket_number = None
-    xlog = sw.get_transaction_log(issue=ticket_number)
-    # FIXME
-    # This is ugly, was just an early hack that
-    # is still around
-    for entry in xlog:
-        print "[%i] %s - %s" % (entry[0], swarm_time.human_readable_from_stamp(entry[2]), entry[3])
-
-    sw.close()
-    logger.unregister()
-
-def cli_last(pre_options, pre_args, command, post_options):
-    verbose = 0
-    working_dir = os.getcwd()
-
-    for o, a in pre_options:
-        if o in ("-v", "--verbose"):
-            verbose = verbose + 1
-
-    if post_options:
-        working_dir = post_options[0]
-
-    log.set_universal_loglevel(verbose)
-    logger.register("cli_last")
-
-    sw = Swarm(working_dir, log)
-    if sw.config.has_section('cli'):
-        last_id = sw.config.get('cli', 'last_issue')
-        logger.entry("The last issue was #%s." % last_id, 0)
-    else:
-        logger.entry("There is no last issue set.", 0)
 
     sw.close()
     logger.unregister()
@@ -377,6 +385,17 @@ def cli_new(pre_options, pre_args, command, post_options):
     sw.close()
     logger.unregister()
 
+def cli_clone(pre_options, pre_args, command, post_options):
+    # Clone a repository
+    print pre_options
+    print pre_args
+    print command
+    print post_options
+
+#########################
+# Internal Interfaces
+#########################
+
 class Command:
     def __init__(self, short_opts, long_opts, usage, summary, desc, callback):
         self.short_opts = short_opts
@@ -503,12 +522,14 @@ option_dispatch = {
         ['v', 'f'],
         ['verbose', 'force'],
         'swarm [OPTIONS] clone [FROM] [TO]',
-        ['Clones an existing Swarm DITS repository from the [FROM]',
-         'URI to the [TO] URI.',
+        'Clones a repository',
+        ['   Clones an existing Swarm DITS repository from the [FROM]',
+         '   URI to the [TO] URI. If [TO] is not specified, will',
+         '   default to the current working directory.',
          '',
-         '  OPTIONS:',
-         '  -v|--verbose    Be verbose about actions',
-         "  -f|--force      Force even if [TO] directory isn't empty"],
+         '   OPTIONS:',
+         '   -v|--verbose    Be verbose about actions',
+         "   -f|--force      Force even if [TO] directory isn't empty"],
         cli_clone),
 
 }
