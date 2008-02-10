@@ -134,6 +134,7 @@ def cli_log(pre_options, pre_args, command, post_options):
         # This is ugly, was just an early hack that
         # is still around
         for entry in xlog:
+            print entry
             print "[%i] %s - %s" % (entry[0], swarm_time.human_readable_from_stamp(entry[2]), entry[3])
     else:
         logger.error("Problem accessing Swarm repository '%s'." % working_dir)
