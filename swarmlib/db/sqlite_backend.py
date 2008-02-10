@@ -174,7 +174,7 @@ class db:
 
         self._logger.unregister()
 
-    def log_transaction(self, root, xaction, xdata, setid=None):
+    def log_transaction(self, root, xaction, xdata, setid=None, timestamp=None):
         """
         log_transaction(root, xaction, xdata, setid=None)
         Log a given transaction.
@@ -195,6 +195,9 @@ class db:
                 Really... unless you're doing something wacky like creating
                 a new repo or a new root issue, just leave this setting
                 alone.
+        timestamp = The time stamp for the entry. This should be None or
+                not specified *unless* you're cloning a repo or branching
+                a ticket.
         """
         self._logger.register('_log_transaction')
         if self._connected:
@@ -205,7 +208,8 @@ class db:
                 sys.exit(2)
             else:
                 # Default is db_version 1
-                timestamp = swarmlib.swarm_time.timestamp()
+                if not timestamp:
+                    timestamp = swarmlib.swarm_time.timestamp()
                 rowid = None
                 if setid:
                     # Let's make sure you have a requested id that's larger than the max
