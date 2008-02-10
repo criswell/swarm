@@ -116,6 +116,7 @@ class swarm:
         # First, we need to see if we're working locally or not
         if self._repo.scheme == 'file':
             self._local = True
+            self._working_dir = self._repo.path
         else:
             self._local = False
 
@@ -127,6 +128,8 @@ class swarm:
                 self.db.backend.connect()
             else:
                 self._logger.error("Database backend not loaded")
+        else:
+            self._logger.error("Remote repositories are not supported yet. Help us add them!")
 
         self._logger.unregister()
 

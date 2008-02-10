@@ -36,7 +36,7 @@ class remote:
         self._logger.register("_load_backend")
 
         self._logger.entry("Loading '%s' backend" % self._repo.scheme, 2)
-        if self._repo.scheme in repo_backends.keys()
+        if self._repo.scheme in repo_backends.keys():
             mod_to_load = "swarmlib.remote.%s" % repo_backends[self._repo.scheme]
             self._logger.entry("Loading '%s'" % mod_to_load, 5)
             self._backend_class = import_at_runtime(mod_to_load, "remote")
