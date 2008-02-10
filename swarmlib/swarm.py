@@ -127,11 +127,28 @@ class swarm:
                 self.loaded = True
                 self.db.backend.connect()
             else:
+                self.loaded = False
                 self._logger.error("Database backend not loaded")
         else:
             self._logger.error("Remote repositories are not supported yet. Help us add them!")
+            self.loaded = False
 
         self._logger.unregister()
+
+    def clone(self, sw):
+        """
+        clone(self, sw)
+        Given a Swarm instance (sw) will make the current Swarm instance (self)
+        a clone.
+
+        Think of it as clone sw to self.
+
+        Note that this wont be a *real* clone. Only the project_name and contents
+        of the ticket/xlog databases will be cloned.
+        """
+        self.config.set('main', 'project_name', sw.config.get('main', 'project_name', 'swarm'))
+        self.config.save()
+        # ERE I AM JH
 
     def get_issue(self, ticket_number):
         """
@@ -287,7 +304,12 @@ class swarm:
         here.
         """
 
-        [meta_data] = self.get_issue(issue)
+        meta_data = {}
+
+        if not issue:
+            meta_data['hash_id'] = None
+        else:
+            [meta_data] = self.get_issue(issue)
 
         return self.db.backend.search_transaction_log(meta_data['hash_id'], lower_entry, upper_entry, lower_date, upper_date, xaction)
 

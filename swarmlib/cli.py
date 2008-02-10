@@ -107,14 +107,18 @@ def cli_log(pre_options, pre_args, command, post_options):
         # 1) swarm log #####
         # OR
         # 2) swarm log directory
+        logger.entry("Ambiguous request, trying local directory for Swarm repository", 0)
         ticket_number = post_options[0]
         sw = Swarm(working_dir, log)
         if not sw.loaded:
             # Try #2
+            logger.entry("Local directory not Swarm repository, trying parameter as directory", 0)
             sw.close()
             ticket_number = None
             working_dir = post_options[0]
             sw = Swarm(working_dir, log)
+            if not sw.loaded:
+                logger.error("Problem accessing Swarm repository '%s'." % working_dir)
     else:
         # Default is to use the last issue
         sw = Swarm(working_dir, log)
@@ -124,12 +128,15 @@ def cli_log(pre_options, pre_args, command, post_options):
     #sw = Swarm(working_dir, log)
     if ticket_number == 0:
         ticket_number = None
-    xlog = sw.get_transaction_log(issue=ticket_number)
-    # FIXME
-    # This is ugly, was just an early hack that
-    # is still around
-    for entry in xlog:
-        print "[%i] %s - %s" % (entry[0], swarm_time.human_readable_from_stamp(entry[2]), entry[3])
+    if sw.loaded:
+        xlog = sw.get_transaction_log(issue=ticket_number)
+        # FIXME
+        # This is ugly, was just an early hack that
+        # is still around
+        for entry in xlog:
+            print "[%i] %s - %s" % (entry[0], swarm_time.human_readable_from_stamp(entry[2]), entry[3])
+    else:
+        logger.error("Problem accessing Swarm repository '%s'." % working_dir)
 
     sw.close()
     logger.unregister()
