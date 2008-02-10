@@ -24,12 +24,12 @@ import getopt
 #import md5 # Do we need this anymore?
 import tempfile
 
-import swarmlib.config as Config
+#import swarmlib.config as Config
 import swarmlib.log as Log
 import swarmlib.swarm_time as swarm_time
 import cli_thread
 import cli_util
-from swarmlib.db import swarmdb
+#from swarmlib.db import swarmdb
 from swarmlib.db import taxonomy_terms
 from swarmlib.swarm import master_init
 from swarmlib.swarm import swarm as Swarm
@@ -391,6 +391,44 @@ def cli_clone(pre_options, pre_args, command, post_options):
     print pre_args
     print command
     print post_options
+    verbose = 0
+    force = False
+    to_url = os.getcwd()
+    from_url = None
+
+    for o, a in pre_options:
+        if o in ("-v", "--verbose"):
+            verbose = verbose + 1
+        if o in (-'f', '--force'):
+            force = True
+
+    log.set_universal_loglevel(verbose)
+    logger.register("cli_clone")
+
+    if len(post_options) == 2:
+        # clone FROM TO
+        from_url = post_options[0]
+        to_url = post_options[1]
+    elif len(post_options) == 1:
+        # clone FROM -- TO is cwd
+        from_url = post_options[0]
+    else:
+        # Wrong number of arguments
+        logger.error("clone requires at least one argument. See 'help clone' for more information")
+
+    if from_url and to_url:
+        # First, we bootstrap the clone destination
+        cli_init(pre_options, pre_args, "cli_init", to_url)
+        sw_to = Swarm(to_url, log)
+        # Next, we need a swarm instance for the source
+        sw_from = Swam(from_url, log)
+        # Finally, activate the clone
+        sw_to.clone(sw_from)
+
+        sw_from.close()
+        sw_to.close()
+
+    logger.unregister()
 
 #########################
 # Internal Interfaces
