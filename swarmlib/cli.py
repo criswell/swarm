@@ -245,13 +245,13 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
             "# id | name | details\n")
 
         for entry in components:
-            temp = os.write(fp, "%s | %s | %s\n" % (entry['id'], entry['name'], entry['details']))
+            temp = os.write(fp, "%s | %s | %s\n" % (entry['id'], entry['name'], entry['isdefault']))
 
         os.close(fp)
 
         (bhash, ahash, bsize, asize) = util.launch_editor(name)
         if bhash != ahash:
-            new_components = util.parse_datafile(name, ['id', 'name', 'details'])
+            new_components = util.parse_datafile(name, ['id', 'name', 'isdefault'])
             # FIXME: This needs to be removed as well (see above)
             #db.backend.set_taxonomy(tax_term, new_components)
             sw.set_taxonomy(tax_term, new_components)
