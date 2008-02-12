@@ -35,8 +35,6 @@ from swarmlib.db import table_orders
 from swarmlib.remote import remote
 import swarmlib.xaction as xaction
 
-xactions = xaction.xaction_dispatch()
-
 def master_init(project_name, working_dir, log, force=False):
     """
     master_init(working_dir, log, force=False)
@@ -48,7 +46,8 @@ def master_init(project_name, working_dir, log, force=False):
     config = Config.config(working_dir, log, force)
     project_hash = data_tools.get_hash(project_name, swarm_time.human_readable_from_stamp(), socket.getfqdn())
     config.init(project_name, project_hash)
-    db = swarmdb(working_dir, config, log, force, xactions)
+    xactions = xaction.xaction_dispatch()
+    db = swarmdb(working_dir, config, log, xactions, force)
     db.backend.init()
     db.backend.close()
 
@@ -107,7 +106,8 @@ class swarm:
         self.config = None
         self.db = None
         self.loaded = False
-        self.xactions = xactions
+        self.xactions = xaction.xaction_dispatch()
+        self.xactions.set_swarm(self)
 
         self._setup()
 
@@ -126,7 +126,7 @@ class swarm:
 
         self.config = Config.config(self._working_dir, self._log)
         if self._local:
-            self.db = swarmdb(self._working_dir, self.config, self._log, xactions)
+            self.db = swarmdb(self._working_dir, self.config, self._log, self.xactions)
             if self.db.backend:
                 self.loaded = True
                 self.db.backend.connect()
@@ -154,18 +154,22 @@ class swarm:
         self.config.save()
         # ERE I AM JH
 
-    def get_issue(self, ticket_number):
+    def get_issue(self, ticket_number, issue_id=None):
         """
-        Given a ticket_number, get the issue
+        Given a ticket_number or issue_id, get the issue
         """
 
         self._logger.register("get_issue")
         search_criteria = {}
 
         issue = None
-        if ticket_number and self.loaded:
-            search_criteria['short_hash_id'] = ticket_number
-            self._logger.entry("Fetching for ticket '%s'." % ticket_number, 1)
+        if (ticket_number or issue_id) and self.loaded:
+            if ticket_number:
+                search_criteria['short_hash_id'] = ticket_number
+                self._logger.entry("Fetching for ticket '%s'." % ticket_number, 1)
+            else:
+                search_criteria['hash_id'] = issue_id
+                self._logger.entry("Fetching for ticket with issue ID '%s'." % issue_id, 1)
             issue = self.db.backend.fetch('issue', search_criteria)
 
         self._logger.unregister()
@@ -183,10 +187,10 @@ class swarm:
         if node_id and self.loaded:
             search_criteria['node_id'] = node_id
             self._logger.entry("Fetching for node '%s'." % node_id, 1)
-            issue = self.db.backend.fetch('node', search_criteria)
+            node = self.db.backend.fetch('node', search_criteria)
 
         self._logger.unregister()
-        return issue
+        return node
 
     def get_lineage(self, parent_id=None, child_id=None):
         """

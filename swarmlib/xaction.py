@@ -26,43 +26,58 @@ import binascii
 import swarmlib.data_tools as data_tools
 
 class Xaction:
-    def __init__(self, description, encoder_callback, decoder_callback):
+    def __init__(self, description, encoder_callback, decoder_callback, hr_callback):
         self.description = description
         self.encode = encoder_callback
         self.decode = decoder_callback
+        self.decode_human_readable = hr_callback
 
 class xaction_dispatch:
     def __init__(self):
+        self.sw = None
         self.dispatch = {
             'xlog_start' : Xaction(
                 'Transaction log start',
                 self.null_callback,
-                self.null_callback),
+                self.null_callback,
+                self.hr_xlog_start),
             'set_taxonomy' : Xaction(
                 'Set taxonomy terms',
                 self.enc_simple_obj,
-                self.dec_simple_obj),
+                self.dec_simple_obj,
+                self.hr_set_taxonomy),
             'link_issue_to_node' : Xaction(
                 'Link an issue to a node',
                 self.enc_simple_obj,
-                self.dec_simple_obj),
+                self.dec_simple_obj,
+                self.hr_link_issue_to_node),
             'add_lineage' : Xaction(
                 'Link parent and children in lineage',
                 self.enc_simple_obj,
-                self.dec_simple_obj),
+                self.dec_simple_obj,
+                self.hr_add_lineage),
             'new_node' : Xaction(
                 'Create a new node',
                 self.enc_node_id,
-                self.dec_node_id),
+                self.dec_node_id,
+                self.hr_new_node),
             'new_issue' : Xaction(
                 'Create a new issue',
                 self.enc_hash_id,
-                self.dec_hash_id),
+                self.dec_hash_id,
+                self.hr_issue_data),
             'update_issue' : Xaction(
                 'Update an issue',
                 self.enc_hash_id,
-                self.dec_hash_id),
+                self.dec_hash_id,
+                self.hr_issue_data),
         }
+
+    def set_swarm(self, sw):
+        """
+        Call this to set the Swarm instance. If this isn't called, some functionality will be lost.
+        """
+        self.sw = sw
 
     # The following should only be accessed through the dispatch!
     def null_callback(self, xdata=None):
@@ -76,7 +91,7 @@ class xaction_dispatch:
         return binascii.hexlify(pickle.dumps(xdata))
 
     def dec_simple_obj(self, xdata):
-        return binascii.unhexlify(pickle.loads(xdata))
+        return pickle.loads(binascii.unhexlify(xdata))
 
     def enc_node_id(self, xdata):
         return xdata['node_id']
@@ -94,3 +109,41 @@ class xaction_dispatch:
         rdata['hash_id'] = xdata
         return rdata
 
+    # The following are the human readable (hr) functions
+    # They should return human readable text (someday,
+    # localization would be lovely) describing what happened
+    # This isn't intended to be parsable by machines, it's
+    # just something to help humans understand what happened.
+    # So really, the format could change at any time.
+
+    def hr_xlog_start(self, root, xdata):
+        return "Swarm repository was created and transaction log started."
+
+    def hr_set_taxonomy(self, root, xdata):
+        tax_list = self.dispatch['set_taxonomy'].decode(xdata)
+        message = ""
+        for key in tax_list.keys():
+            message = message + "Taxonomy for term '%s' updated to the following:\n\t%s\n" % (key, tax_list[key])
+        return message
+
+    def hr_link_issue_to_node(self, root, xdata):
+        return self.dispatch['link_issue_to_node'].decode(xdata)
+
+    def hr_add_lineage(self, root, xdata):
+        return self.dispatch['add_lineage'].decode(xdata)
+
+    def hr_new_node(self, root, xdata):
+        issue = self.sw.get_issue(None, root)
+        node = xdata
+        print "ISSUE"
+        print issue
+        print "NODE"
+        print node
+        return ""
+
+    def hr_issue_data(self, root, xdata):
+        data = self.dec_hash_id(xdata)
+        issue = self.sw.get_issue(None, data['hash_id'])
+        print "ISSUE"
+        print issue
+        return ""

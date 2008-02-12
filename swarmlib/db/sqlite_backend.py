@@ -385,7 +385,9 @@ class db:
             self._logger.entry("SQL code is:\n%s" % sql_code, 5)
             self._cursor.execute(sql_code)
 
-        self.log_transaction(__MASTER_ISSUE__, 'set_taxonomy', self.xactions.dispatch['set_taxonomy'].encode(the_list))
+        data_to_encode = { term : the_list }
+
+        self.log_transaction(__MASTER_ISSUE__, 'set_taxonomy', self.xactions.dispatch['set_taxonomy'].encode(data_to_encode))
 
         self._logger.unregister()
 
@@ -486,6 +488,7 @@ class db:
         link_issue_to_node(self, issue_to_node_data):
         link issue to node data
         """
+        print issue_to_node_data
         self._add_entry('issue_to_node', issue_to_node_data)
         self.log_transaction(issue_to_node_data['issue_id'], 'link_issue_to_node', self.xactions.dispatch['link_issue_to_node'].encode(issue_to_node_data))
 
