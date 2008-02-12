@@ -107,18 +107,18 @@ def cli_log(pre_options, pre_args, command, post_options):
         # 1) swarm log #####
         # OR
         # 2) swarm log directory
-        logger.entry("Ambiguous request, trying local directory for Swarm repository", 0)
+        logger.entry("Ambiguous request, trying local directory for Swarm hive", 0)
         ticket_number = post_options[0]
         sw = Swarm(working_dir, log)
         if not sw.loaded:
             # Try #2
-            logger.entry("Local directory not Swarm repository, trying parameter as directory", 0)
+            logger.entry("Local directory not Swarm hive, trying parameter as directory", 0)
             sw.close()
             ticket_number = None
             working_dir = post_options[0]
             sw = Swarm(working_dir, log)
             if not sw.loaded:
-                logger.error("Problem accessing Swarm repository '%s'." % working_dir)
+                logger.error("Problem accessing Swarm hive '%s'." % working_dir)
     else:
         # Default is to use the last issue
         sw = Swarm(working_dir, log)
@@ -140,7 +140,7 @@ def cli_log(pre_options, pre_args, command, post_options):
             if verbose > 0:
                 print sw.xactions.dispatch[entry[3]].decode_human_readable(entry[1], entry[4])
     else:
-        logger.error("Problem accessing Swarm repository '%s'." % working_dir)
+        logger.error("Problem accessing Swarm hive '%s'." % working_dir)
 
     sw.close()
     logger.unregister()
@@ -317,7 +317,7 @@ def cli_thread_run(pre_options, pre_args, command, post_options):
             else:
                 logger.error("No ticket found.")
         else:
-            logger.error("No swarm repository found.")
+            logger.error("No swarm hive found.")
 
         sw.close()
     logger.unregister()
@@ -401,7 +401,7 @@ def cli_new(pre_options, pre_args, command, post_options):
     logger.unregister()
 
 def cli_clone(pre_options, pre_args, command, post_options):
-    # Clone a repository
+    # Clone a hive
     print pre_options
     print pre_args
     print command
@@ -471,9 +471,9 @@ option_dispatch = {
         ['v', 'f'],
         ['verbose', 'force'],
         'swarm [OPTIONS] init [DEST]',
-        'Initialize a swarm DITS repository in given directory',
-        ['  Initializes a new swarm DITS repository. Will use the',
-         '  [DEST] directory for the new repository, or the current',
+        'Initialize a swarm DITS hive in given directory',
+        ['  Initializes a new swarm DITS hive. Will use the',
+         '  [DEST] directory for the new hive, or the current',
          '   directory if nothing is specified.',
          '',
          '  OPTIONS:',
@@ -513,7 +513,7 @@ option_dispatch = {
         'swarm [OPTIONS] log [ISSUE] [DIR]',
         'Displays the log (master log or for a given issue)',
         ['  Will display the log. If [ISSUE] is empty (or 0), will',
-         '  display the master log for the DITS repository. If',
+         '  display the master log for the DITS hive. If',
          '  [ISSUE] is a legitimate issue, will only display the log',
          '  pertaining to it.'
          '',
@@ -575,8 +575,8 @@ option_dispatch = {
         ['v', 'f'],
         ['verbose', 'force'],
         'swarm [OPTIONS] clone [FROM] [TO]',
-        'Clones a repository',
-        ['   Clones an existing Swarm DITS repository from the [FROM]',
+        'Clones a hive',
+        ['   Clones an existing Swarm DITS hive from the [FROM]',
          '   URI to the [TO] URI. If [TO] is not specified, will',
          '   default to the current working directory.',
          '',

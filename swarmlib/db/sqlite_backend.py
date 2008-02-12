@@ -116,7 +116,7 @@ class db:
                     raise swarm_error("Attempted to prepopulate table while not connected to the database. Could it be that the connection failed for some reason?")
 
         # Add the first entry to the xlog
-        # The 0th entry will always be the date stamp of when the issue tracker repo started
+        # The 0th entry will always be the date stamp of when the issue tracker hive started
         self.log_transaction(__MASTER_ISSUE__, 'xlog_start', 'Null', self.xactions.dispatch['xlog_start'].encode(0))
         self._logger.unregister()
 
@@ -197,10 +197,10 @@ class db:
                 want to specify a specific log id. You can request one here,
                 but the request may be ignored if the id isn't valid.
                 Really... unless you're doing something wacky like creating
-                a new repo or a new root issue, just leave this setting
+                a new hive or a new root issue, just leave this setting
                 alone.
         timestamp = The time stamp for the entry. This should be None or
-                not specified *unless* you're cloning a repo or branching
+                not specified *unless* you're cloning a hive or branching
                 a ticket.
         """
         self._logger.register('_log_transaction')

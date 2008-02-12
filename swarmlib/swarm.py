@@ -38,10 +38,10 @@ import swarmlib.xaction as xaction
 def master_init(project_name, working_dir, log, force=False):
     """
     master_init(working_dir, log, force=False)
-    This is called when an issue repository is to be
+    This is called when an issue hive is to be
     initialized for the first time.
     Use force=True to overwrite any existing issue
-    repository elements that may be found.
+    hive elements that may be found.
     """
     config = Config.config(working_dir, log, force)
     project_hash = data_tools.get_hash(project_name, swarm_time.human_readable_from_stamp(), socket.getfqdn())
@@ -51,7 +51,7 @@ def master_init(project_name, working_dir, log, force=False):
     db.backend.init()
     db.backend.close()
 
-class Repo:
+class Hive:
     def __init__(self, url, log):
         """
         __init__(self, url)
@@ -98,7 +98,7 @@ class swarm:
         """
         self._url = working_url
         self._working_dir = None
-        self._repo = Repo(working_url, log)
+        self._hive = Hive(working_url, log)
         self._local = True
         self._log = log
         self._force = force
@@ -118,9 +118,9 @@ class swarm:
         self._logger.register("_setup")
 
         # First, we need to see if we're working locally or not
-        if self._repo.scheme == 'file':
+        if self._hive.scheme == 'file':
             self._local = True
-            self._working_dir = self._repo.path
+            self._working_dir = self._hive.path
         else:
             self._local = False
 
@@ -134,7 +134,7 @@ class swarm:
                 self.loaded = False
                 self._logger.error("Database backend not loaded")
         else:
-            self._logger.error("Remote repositories are not supported yet. Help us add them!")
+            self._logger.error("Remote hives are not supported yet. Help us add them!")
             self.loaded = False
 
         self._logger.unregister()
@@ -241,7 +241,7 @@ class swarm:
         Returns the user information.
         Will search in the following order for it:
         environ variable "SWARMUSER"
-        configs (system, user, repo)
+        configs (system, user, hive)
         figure it out from os.env and fqdn
         """
         # FIXME!
@@ -295,16 +295,16 @@ class swarm:
 
         If called with no parameters will just return the entire transaction log.
 
-        The most common use for this will be to find changes to the repo or to individual
-        issues. For example, let's say there's an external repo that is wanting to sync
+        The most common use for this will be to find changes to the hive or to individual
+        issues. For example, let's say there's an external hive that is wanting to sync
         with us. The last time they synced was at log entry #871, and they are requesting
         all the changes since then. This function would be called as:
           get_transaction(lower_entry=871)
 
         easy, no?
 
-        Okay, let's next suppose that we have an external repo that is tracking issue #45
-        on our repo. They haven't synced since log entry #4711, so they want all changes
+        Okay, let's next suppose that we have an external hive that is tracking issue #45
+        on our hive. They haven't synced since log entry #4711, so they want all changes
         since then for issue #45 only. The function would be called as:
           get_transaction(issue=45, lower_entry=4711)
 

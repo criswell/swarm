@@ -117,7 +117,7 @@ class xaction_dispatch:
     # So really, the format could change at any time.
 
     def hr_xlog_start(self, root, xdata):
-        return "Swarm repository was created and transaction log started."
+        return "Swarm hive was created and transaction log started."
 
     def hr_set_taxonomy(self, root, xdata):
         tax_list = self.dispatch['set_taxonomy'].decode(xdata)
