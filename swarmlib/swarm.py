@@ -126,7 +126,7 @@ class swarm:
 
         self.config = Config.config(self._working_dir, self._log)
         if self._local:
-            self.db = swarmdb(self._working_dir, self.config, self._log, self._force, xactions)
+            self.db = swarmdb(self._working_dir, self.config, self._log, xactions)
             if self.db.backend:
                 self.loaded = True
                 self.db.backend.connect()

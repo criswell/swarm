@@ -310,7 +310,7 @@ database_backends = {
 taxonomy_terms = ['component', 'version', 'milestone', 'severity', 'priority', 'status', 'resolution', 'component']
 
 class swarmdb:
-    def __init__(self, project_root, config, log, force=False):
+    def __init__(self, project_root, config, log, xactions, force=False):
         self._config = config
         self._log = log
         self._logger = log.get_logger("swarmdb")
@@ -318,6 +318,7 @@ class swarmdb:
         self._project_root = project_root
         self.backend = None
         self._backend_class = None
+        self._xactions = xactions
         self.backend_type = self._config.get('db', 'type')
         if self.backend_type:
             self._load_backend()
@@ -329,6 +330,6 @@ class swarmdb:
         mod_to_load = "swarmlib.db.%s" % database_backends[self.backend_type]
         self._logger.entry("Loading '%s'" % mod_to_load, 5)
         self._backend_class = import_at_runtime(mod_to_load, "db")
-        self.backend = self._backend_class(self._project_root, self._config, self._log, self._force)
+        self.backend = self._backend_class(self._project_root, self._config, self._log, self._force, self._xactions)
 
         self._logger.unregister()
