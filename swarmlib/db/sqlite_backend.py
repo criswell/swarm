@@ -23,7 +23,7 @@ import sys
 
 import swarmlib.swarm_time
 from swarmlib import swarm_error
-import swarmlib.xaction as xaction
+#import swarmlib.xaction as xaction
 #import swarmlib.data_tools as data_tools
 from swarmlib.db import table_schema
 from swarmlib.db import table_defaults
@@ -46,10 +46,10 @@ except ImportError:
         __db_subversion__ = None
         __sqlite_version__ = None
 
-xactions = xaction.xaction_dispatch()
+#xactions = xaction.xaction_dispatch()
 
 class db:
-    def __init__(self, cwd, config, log, force):
+    def __init__(self, cwd, config, log, force, xactions):
         self._db_filename = "%s/%s" % (config.dot_swarm, config.get('db', 'dbfile', 'swarm'))
         self._project_root = cwd
         self._config = config
@@ -59,6 +59,7 @@ class db:
         self._connect = None
         self._cursor = None
         self._connected = False
+        self.xactions = xactions
 
     def _create_table(self):
         for table in table_schema:
@@ -116,7 +117,7 @@ class db:
 
         # Add the first entry to the xlog
         # The 0th entry will always be the date stamp of when the issue tracker repo started
-        self.log_transaction(__MASTER_ISSUE__, 'xlog_start', 'Null', xactions.dispatch['xlog_start'].encode(0))
+        self.log_transaction(__MASTER_ISSUE__, 'xlog_start', 'Null', self.xactions.dispatch['xlog_start'].encode(0))
         self._logger.unregister()
 
     def _convert_entry(self, entry, columns):
@@ -384,7 +385,7 @@ class db:
             self._logger.entry("SQL code is:\n%s" % sql_code, 5)
             self._cursor.execute(sql_code)
 
-        self.log_transaction(__MASTER_ISSUE__, 'set_taxonomy', xactions.dispatch['set_taxonomy'].encode(the_list))
+        self.log_transaction(__MASTER_ISSUE__, 'set_taxonomy', self.xactions.dispatch['set_taxonomy'].encode(the_list))
 
         self._logger.unregister()
 
@@ -486,7 +487,7 @@ class db:
         link issue to node data
         """
         self._add_entry('issue_to_node', issue_to_node_data)
-        self.log_transaction(issue_to_node_data['issue_id'], 'link_issue_to_node', xactions.dispatch['link_issue_to_node'].encode(issue_to_node_data))
+        self.log_transaction(issue_to_node_data['issue_id'], 'link_issue_to_node', self.xactions.dispatch['link_issue_to_node'].encode(issue_to_node_data))
 
     def add_lineage(self, node_lineage, issue_id=None):
         """
@@ -501,7 +502,7 @@ class db:
             search_criteria['node_id'] = node_lineage['parent_id']
             issue = self.fetch('issue_to_node', search_criteria)
             issue_id = issue['issue_id']
-        self.log_transaction(issue_id, 'add_lineage', xactions.dispatch['add_lineage'].encode(node_lineage))
+        self.log_transaction(issue_id, 'add_lineage', self.xactions.dispatch['add_lineage'].encode(node_lineage))
 
     def new_node(self, node_data, issue_id=None):
         """
@@ -518,7 +519,7 @@ class db:
             issue = self.fetch('issue_to_node', search_criteria)
             print issue
             issue_id = issue['issue_id']
-        self.log_transaction(issue_id, 'new_node', xactions.dispatch['new_node'].encode(node_data))
+        self.log_transaction(issue_id, 'new_node', self.xactions.dispatch['new_node'].encode(node_data))
 
     def new_issue(self, issue_data):
         """
@@ -530,7 +531,7 @@ class db:
         issue_data['id'] = None
 
         self._add_entry('issue', issue_data)
-        self.log_transaction(__MASTER_ISSUE__, 'new_issue', xactions.dispatch['new_issue'].encode(issue_data))
+        self.log_transaction(__MASTER_ISSUE__, 'new_issue', self.xactions.dispatch['new_issue'].encode(issue_data))
 
     def update_issue(self, issue_data):
         """
@@ -538,7 +539,7 @@ class db:
         """
 
         self._add_entry('issue', issue_data, True)
-        self.log_transaction(issue_data['hash_id'], 'update_issue', xactions.dispatch['update_issue'].encode(issue_data))
+        self.log_transaction(issue_data['hash_id'], 'update_issue', self.xactions.dispatch['update_issue'].encode(issue_data))
 
     def init(self):
         self._logger.register("init")

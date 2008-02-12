@@ -33,6 +33,9 @@ from swarmlib.db import __MASTER_ISSUE__
 from swarmlib.db import table_schema
 from swarmlib.db import table_orders
 from swarmlib.remote import remote
+import swarmlib.xaction as xaction
+
+xactions = xaction.xaction_dispatch()
 
 def master_init(project_name, working_dir, log, force=False):
     """
@@ -45,7 +48,7 @@ def master_init(project_name, working_dir, log, force=False):
     config = Config.config(working_dir, log, force)
     project_hash = data_tools.get_hash(project_name, swarm_time.human_readable_from_stamp(), socket.getfqdn())
     config.init(project_name, project_hash)
-    db = swarmdb(working_dir, config, log, force)
+    db = swarmdb(working_dir, config, log, force, xactions)
     db.backend.init()
     db.backend.close()
 
@@ -104,6 +107,7 @@ class swarm:
         self.config = None
         self.db = None
         self.loaded = False
+        self.xactions = xactions
 
         self._setup()
 
@@ -122,7 +126,7 @@ class swarm:
 
         self.config = Config.config(self._working_dir, self._log)
         if self._local:
-            self.db = swarmdb(self._working_dir, self.config, self._log)
+            self.db = swarmdb(self._working_dir, self.config, self._log, self._force, xactions)
             if self.db.backend:
                 self.loaded = True
                 self.db.backend.connect()
