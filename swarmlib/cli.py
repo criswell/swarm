@@ -242,7 +242,7 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
             "# NOTE THAT CHANGING ENTRIES FOR A GIVEN\n" +
             "# 'id' will overwrite that entry globally\n\n" +
             "# FORMAT:\n" +
-            "# id | name | details\n")
+            "# id | name | isdefault\n")
 
         for entry in components:
             temp = os.write(fp, "%s | %s | %s\n" % (entry['id'], entry['name'], entry['isdefault']))

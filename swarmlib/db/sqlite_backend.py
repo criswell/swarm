@@ -366,11 +366,13 @@ class db:
             first_entry = True
             for name in column_names:
                 final_entries.append(name)
+                # FIXME
+                # Should use ?'s for safety
                 if first_entry:
-                    sql_columns = sql_columns + "%s"
+                    sql_columns = sql_columns + "'%s'"
                     first_entry = False
                 else:
-                    sql_columns = sql_columns + ", %s"
+                    sql_columns = sql_columns + ", '%s'"
 
             for value in column_values:
                 final_entries.append(value)
@@ -378,8 +380,9 @@ class db:
             # We've removed the error checker here, we need to put it back in
             # We no longer check to see if connected. FIXME
             sql_code = "REPLACE INTO %s (" + sql_columns + ") VALUES (" + sql_columns + ");"
-            self._logger.entry("SQL code is:\n%s" % (sql_code % tuple(final_entries)), 5)
-            self._cursor.execute(sql_code, tuple(final_entries))
+            sql_code = sql_code % tuple(final_entries)
+            self._logger.entry("SQL code is:\n%s" % sql_code, 5)
+            self._cursor.execute(sql_code)
 
         self.log_transaction(__MASTER_ISSUE__, 'set_taxonomy', xactions.dispatch['set_taxonomy'].encode(the_list))
 
