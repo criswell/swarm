@@ -18,6 +18,11 @@
 #
 # Author: Sam Hart
 
+# FIXME
+# Should do some tests here, import pickle if cPickle doesn't work
+import cPickle as pickle
+import binascii
+
 import swarmlib.data_tools as data_tools
 
 class Xaction:
@@ -35,16 +40,16 @@ class xaction_dispatch:
                 self.null_callback),
             'set_taxonomy' : Xaction(
                 'Set taxonomy terms',
-                self.enc_binary,
-                self.dec_binary),
+                self.enc_simple_obj,
+                self.dec_simple_obj),
             'link_issue_to_node' : Xaction(
                 'Link an issue to a node',
-                self.enc_binary,
-                self.dec_binary),
+                self.enc_simple_obj,
+                self.dec_simple_obj),
             'add_lineage' : Xaction(
                 'Link parent and children in lineage',
-                self.enc_binary,
-                self.dec_binary),
+                self.enc_simple_obj,
+                self.dec_simple_obj),
             'new_node' : Xaction(
                 'Create a new node',
                 self.enc_node_id,
@@ -67,11 +72,11 @@ class xaction_dispatch:
         """
         return xdata
 
-    def enc_binary(self, xdata):
-        return data_tools.encode_content(xdata)
-
-    def dec_binary(self, xdata):
-        return data_tools.decode_content(xdata)
+    def enc_simple_obj(self, xdata):
+        return binascii.hexlify(pickle.dumps(xdata))
+    
+    def dec_simple_obj(self, xdata):
+        return binascii.unhexlify(pickle.loads(xdata))
 
     def enc_node_id(self, xdata):
         return xdata['node_id']
