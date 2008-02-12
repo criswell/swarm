@@ -138,19 +138,19 @@ table_schema = [
     table('component')[
         column('id', unique=True),
         column('name'),
-        column('details'),
+        column('isdefault', data_type='INTEGER'),
     ],
 
     table('version')[
         column('id', unique=True),
         column('name'),
-        column('details'),
+        column('isdefault', data_type='INTEGER'),
     ],
 
     table('milestone')[
         column('id', unique=True),
         column('name'),
-        column('details'),
+        column('isdefault', data_type='INTEGER'),
     ],
 
     table('severity')[

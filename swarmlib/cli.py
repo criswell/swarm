@@ -233,8 +233,11 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
     #components = db.backend.get_taxonomy(tax_term)
 
     if tax_command.lower() == 'list':
-        for entry in components:
-            print entry
+        if components:
+            for entry in components:
+                print entry
+        else:
+            logger.entry("'%s' is empty." % tax_term, 0)
     if tax_command.lower() == 'edit':
         (fp, name) = tempfile.mkstemp()
         temp = os.write(fp,
@@ -244,8 +247,9 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
             "# FORMAT:\n" +
             "# id | name | isdefault\n")
 
-        for entry in components:
-            temp = os.write(fp, "%s | %s | %s\n" % (entry['id'], entry['name'], entry['isdefault']))
+        if components:
+            for entry in components:
+                temp = os.write(fp, "%s | %s | %s\n" % (entry['id'], entry['name'], entry['isdefault']))
 
         os.close(fp)
 
