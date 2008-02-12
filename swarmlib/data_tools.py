@@ -29,11 +29,11 @@ import sha
 # where it'll *only* be used. Also, we don't want to use marshal, I was misinformed
 # as to what it did... turns out I likely want pickle instead
 #def encode_content(content_obj):
-    """
-    encode_content(content_obj)
-    Given some sort of content that is marshalable, will
-    encode it into a transportable format
-    """
+#    """
+#    encode_content(content_obj)
+#    Given some sort of content that is marshalable, will
+#    encode it into a transportable format
+#    """
 #    return binascii.hexlify(marshal.dumps(content_obj))
 
 def get_hash(str1, str2, str3):
