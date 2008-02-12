@@ -74,7 +74,7 @@ class xaction_dispatch:
 
     def enc_simple_obj(self, xdata):
         return binascii.hexlify(pickle.dumps(xdata))
-    
+
     def dec_simple_obj(self, xdata):
         return binascii.unhexlify(pickle.loads(xdata))
 
