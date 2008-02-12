@@ -299,7 +299,7 @@ table_defaults = {
     "component" : [
         {'id': 0,
         'name': "None",
-        'details' : 'No component'},
+        'isdefault' : 1},
     ],
 }
 
