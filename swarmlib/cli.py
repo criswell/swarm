@@ -123,9 +123,6 @@ def cli_log(pre_options, pre_args, command, post_options):
         # Default is to use the last issue
         sw = Swarm(working_dir, log)
 
-    #if post_options:
-    #    working_dir = post_options[0]
-    #sw = Swarm(working_dir, log)
     if ticket_number == 0:
         ticket_number = None
     if sw.loaded:
@@ -134,11 +131,10 @@ def cli_log(pre_options, pre_args, command, post_options):
         # This is ugly, was just an early hack that
         # is still around
         for entry in xlog:
-            #print entry
-            #print "[%i] %s - %s" % (entry[0], swarm_time.human_readable_from_stamp(entry[2]), entry[3])
-            print "[%i] %s - %s" % (entry[0], swarm_time.human_readable_from_stamp(entry[2]), sw.xactions.dispatch[entry[3]].description)
+            message = "[%i] %s - %s" % (entry[0], swarm_time.human_readable_from_stamp(entry[2]), sw.xactions.dispatch[entry[3]].description)
             if verbose > 0:
-                print sw.xactions.dispatch[entry[3]].decode_human_readable(entry[1], entry[4])
+                message = message + " : %s" % sw.xactions.dispatch[entry[3]].decode_human_readable(entry[1], entry[4])
+            print message
     else:
         logger.error("Problem accessing Swarm hive '%s'." % working_dir)
 

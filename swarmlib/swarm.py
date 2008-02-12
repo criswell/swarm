@@ -166,10 +166,10 @@ class swarm:
         if (ticket_number or issue_id) and self.loaded:
             if ticket_number:
                 search_criteria['short_hash_id'] = ticket_number
-                self._logger.entry("Fetching for ticket '%s'." % ticket_number, 1)
+                self._logger.entry("Fetching for ticket '%s'." % ticket_number, 2)
             else:
                 search_criteria['hash_id'] = issue_id
-                self._logger.entry("Fetching for ticket with issue ID '%s'." % issue_id, 1)
+                self._logger.entry("Fetching for ticket with issue ID '%s'." % issue_id, 2)
             issue = self.db.backend.fetch('issue', search_criteria)
 
         self._logger.unregister()
@@ -186,7 +186,7 @@ class swarm:
         node = None
         if node_id and self.loaded:
             search_criteria['node_id'] = node_id
-            self._logger.entry("Fetching for node '%s'." % node_id, 1)
+            self._logger.entry("Fetching for node '%s'." % node_id, 2)
             node = self.db.backend.fetch('node', search_criteria)
 
         self._logger.unregister()
@@ -203,10 +203,10 @@ class swarm:
 
         if not child_id and parent_id:
             search_criteria['parent_id'] = parent_id
-            self._logger.entry("Fetching children of parent_id '%s'." % parent_id, 1)
+            self._logger.entry("Fetching children of parent_id '%s'." % parent_id, 2)
         elif not parent_id and child_id:
             search_criteria['child_id'] = child_id
-            self._logger.entry("Fetching parent(s) of child_id '%s'." % child_id, 1)
+            self._logger.entry("Fetching parent(s) of child_id '%s'." % child_id, 2)
 
         if search_criteria: lineage = self.db.backend.fetch('lineage', search_criteria)
 

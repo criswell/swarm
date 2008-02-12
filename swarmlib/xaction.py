@@ -123,7 +123,7 @@ class xaction_dispatch:
         tax_list = self.dispatch['set_taxonomy'].decode(xdata)
         message = ""
         for key in tax_list.keys():
-            message = message + "Taxonomy for term '%s' updated to the following:\n\t%s\n" % (key, tax_list[key])
+            message = message + "Taxonomy for term '%s' updated to the following:\n\t%s" % (key, tax_list[key])
         return message
 
     def hr_link_issue_to_node(self, root, xdata):
@@ -133,17 +133,19 @@ class xaction_dispatch:
         return self.dispatch['add_lineage'].decode(xdata)
 
     def hr_new_node(self, root, xdata):
-        issue = self.sw.get_issue(None, root)
-        node = xdata
-        print "ISSUE"
-        print issue
-        print "NODE"
-        print node
-        return ""
+        [issue] = self.sw.get_issue(None, root)
+        [node] = self.sw.get_node(xdata)
+        #print "ISSUE"
+        #print issue
+        #print "NODE"
+        #print node
+        message = "Node with subject '%s' by '%s' was created for issue id '%s'." % (node['summary'], node['poster'], issue['short_hash_id'])
+        return message
 
     def hr_issue_data(self, root, xdata):
         data = self.dec_hash_id(xdata)
-        issue = self.sw.get_issue(None, data['hash_id'])
-        print "ISSUE"
-        print issue
-        return ""
+        [issue] = self.sw.get_issue(None, data['hash_id'])
+        message = "Issue id '%s' created or changed." % issue['short_hash_id']
+        #print "ISSUE"
+        #print issue
+        return message
