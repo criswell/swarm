@@ -178,7 +178,7 @@ class db:
 
         self._logger.unregister()
 
-    def log_transaction(self, root, xaction, xdata, setid=None, timestamp=None):
+    def log_transaction(self, root, xaction, xdata, setid=None, timestamp=None, update=False):
         """
         log_transaction(root, xaction, xdata, setid=None)
         Log a given transaction.
@@ -202,6 +202,14 @@ class db:
         timestamp = The time stamp for the entry. This should be None or
                 not specified *unless* you're cloning a hive or branching
                 a ticket.
+        update = If this is true, we treat this as an update request, which
+                means that the setid record has already been logged and we
+                are going to change it. The *only* situation where this
+                should happen is in the event of a clone where we need to
+                rewrite a recently init'ed xlog_start entry or other
+                situations pertaining to cloning. Note that there is some
+                potential for abuse with this setting, so developers really
+                do have to just use their best judgement with this flag.
         """
         self._logger.register('_log_transaction')
         if self._connected:
@@ -216,14 +224,17 @@ class db:
                     timestamp = swarmlib.swarm_time.timestamp()
                 rowid = None
                 if setid:
-                    # Let's make sure you have a requested id that's larger than the max
-                    self._cursor.execute("select max(id) from xlog;")
-                    maxid = self._cursor.fetchcall()
-                    if not maxid[0][0] or int(setid) > int(maxid[0][0]):
-                        rowid = str(setid)
+                    if not update:
+                        # Let's make sure you have a requested id that's larger than the max
+                        self._cursor.execute("select max(id) from xlog;")
+                        maxid = self._cursor.fetchcall()
+                        if not maxid[0][0] or int(setid) > int(maxid[0][0]):
+                            rowid = str(setid)
+                        else:
+                            self._logger.error("Requested id for xlog entry, '%s', was lower than the maxid, '%s'. Ignoring request." % (str(setid), str(maxid)))
                     else:
-                        self._logger.error("Requested id for xlog entry, '%s', was lower than the maxid, '%s'. Ignoring request." % (str(setid), str(maxid)))
-                    rowid = str(setid)
+                        # And this is why update needs to be used with care
+                        rowid = str(setid)
                 #sql_code = "INSERT INTO xlog (id, root, time, xaction, xdata) VALUES ('" + str(rowid) + "', '" + str(root) + "', %f, '%s', '%s');"
                 data = {}
                 if rowid:
@@ -232,7 +243,7 @@ class db:
                 data['time'] = float(timestamp)
                 data['xaction'] = xaction
                 data['xdata'] = xdata
-                self._add_entry('xlog', data)
+                self._add_entry('xlog', data, update)
                 #self._logger.entry("SQL code is:\n%s" % (sql_code % (float(timestamp), xaction, xdata)), 5)
                 #self._cursor.execute(sql_code, (float(timestamp), xaction, xdata))
         else:

@@ -398,10 +398,10 @@ def cli_new(pre_options, pre_args, command, post_options):
 
 def cli_clone(pre_options, pre_args, command, post_options):
     # Clone a hive
-    print pre_options
-    print pre_args
-    print command
-    print post_options
+    #print pre_options
+    #print pre_args
+    #print command
+    #print post_options
     verbose = 0
     force = False
     to_url = os.getcwd()
@@ -429,10 +429,10 @@ def cli_clone(pre_options, pre_args, command, post_options):
 
     if from_url and to_url:
         # First, we bootstrap the clone destination
-        cli_init(pre_options, pre_args, "cli_init", to_url)
+        cli_init(pre_options, pre_args, "cli_init", [to_url])
         sw_to = Swarm(to_url, log)
         # Next, we need a swarm instance for the source
-        sw_from = Swam(from_url, log)
+        sw_from = Swarm(from_url, log)
         # Finally, activate the clone
         sw_to.clone(sw_from)
 

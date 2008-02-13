@@ -152,6 +152,10 @@ class swarm:
         """
         self.config.set('main', 'project_name', sw.config.get('main', 'project_name', 'swarm'))
         self.config.save()
+        xlog = sw.get_transaction_log()
+        for (xid, root, time, xaction, xdata) in xlog:
+            if xaction == 'xlog_start':
+                print "bah"
         # ERE I AM JH
 
     def get_issue(self, ticket_number, issue_id=None):
