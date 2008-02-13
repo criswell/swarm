@@ -127,7 +127,11 @@ class xaction_dispatch:
         return message
 
     def hr_link_issue_to_node(self, root, xdata):
-        return self.dispatch['link_issue_to_node'].decode(xdata)
+        data = self.dispatch['link_issue_to_node'].decode(xdata)
+        [issue] = self.sw.get_issue(None, data['issue_id'])
+        [node] = self.sw.get_node(data['node_id'])
+        message = "Node with subject '%s' by '%s' was linked to issue with id '%s'." % (node['summary'], node['poster'], issue['short_hash_id'])
+        return message
 
     def hr_add_lineage(self, root, xdata):
         return self.dispatch['add_lineage'].decode(xdata)
@@ -135,10 +139,6 @@ class xaction_dispatch:
     def hr_new_node(self, root, xdata):
         [issue] = self.sw.get_issue(None, root)
         [node] = self.sw.get_node(xdata)
-        #print "ISSUE"
-        #print issue
-        #print "NODE"
-        #print node
         message = "Node with subject '%s' by '%s' was created for issue id '%s'." % (node['summary'], node['poster'], issue['short_hash_id'])
         return message
 
