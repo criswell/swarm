@@ -134,7 +134,8 @@ class xaction_dispatch:
         return message
 
     def hr_add_lineage(self, root, xdata):
-        return self.dispatch['add_lineage'].decode(xdata)
+        data = self.dispatch['add_lineage'].decode(xdata)
+        return "Link child node '%s' with parent node '%s'." % (data['child_id'], data['parent_id'])
 
     def hr_new_node(self, root, xdata):
         [issue] = self.sw.get_issue(None, root)
@@ -146,6 +147,4 @@ class xaction_dispatch:
         data = self.dec_hash_id(xdata)
         [issue] = self.sw.get_issue(None, data['hash_id'])
         message = "Issue id '%s' created or changed." % issue['short_hash_id']
-        #print "ISSUE"
-        #print issue
         return message
