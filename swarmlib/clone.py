@@ -55,6 +55,8 @@ class clone:
         self._dest_sw.config.save()
 
         # Next, get the transaction log from the source_sw
+        # FIXME: This isn't very scalable, we probably should
+        # do this in clumps of xaction log entries
         xlog = self._source_sw.get_transaction_log()
         self._logger.entry("Processing '%i' transactions" % len(xlog), 0)
 
