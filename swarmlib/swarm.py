@@ -34,6 +34,7 @@ from swarmlib.db import table_schema
 from swarmlib.db import table_orders
 from swarmlib.remote import remote
 import swarmlib.xaction as xaction
+from swarmlib.clone import clone as Clone
 
 def master_init(project_name, working_dir, log, force=False):
     """
@@ -150,13 +151,8 @@ class swarm:
         Note that this wont be a *real* clone. Only the project_name and contents
         of the ticket/xlog databases will be cloned.
         """
-        self.config.set('main', 'project_name', sw.config.get('main', 'project_name', 'swarm'))
-        self.config.save()
-        xlog = sw.get_transaction_log()
-        for (xid, root, time, xaction, xdata) in xlog:
-            if xaction == 'xlog_start':
-                print "bah"
-        # ERE I AM JH
+        c = Clone(sw, self, self._log)
+        c.run()
 
     def get_issue(self, ticket_number, issue_id=None):
         """
