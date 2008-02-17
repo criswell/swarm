@@ -104,3 +104,17 @@ class clone:
         self._dest_sw.set_taxonomy(term, the_list)
 
         self._logger.unregister()
+
+    def clone_add_lineage(self, xid, root, time, xaction, xdata):
+        """
+        add_lineage transaction
+        root = root issue id
+        xdata = {'parent_id': parent_node_id , 'child_id': child_node_id}
+        """
+        self._logger.register('clone_add_lineage')
+
+        data = self._dest_sw.xactions.dispatch[xaction].decode(xdata)
+
+        self._dest_sw.db.backend.add_lineage(data, root)
+
+        self._logger.unregister()
