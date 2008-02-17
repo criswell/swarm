@@ -118,3 +118,13 @@ class clone:
         self._dest_sw.db.backend.add_lineage(data, root)
 
         self._logger.unregister()
+
+    def clone_new_node(self, xid, root, time, xaction, xdata):
+        """
+        new_node transaction
+        root = root issue id
+        xdata = data['node_id'] = node_id
+        """
+        self._logger.register('clone_new_node')
+
+        self._logger.unregister()
