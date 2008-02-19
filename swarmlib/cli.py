@@ -410,7 +410,7 @@ def cli_clone(pre_options, pre_args, command, post_options):
     for o, a in pre_options:
         if o in ("-v", "--verbose"):
             verbose = verbose + 1
-        if o in (-'f', '--force'):
+        if o in ('-f', '--force'):
             force = True
 
     log.set_universal_loglevel(verbose)

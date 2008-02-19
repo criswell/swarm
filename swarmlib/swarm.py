@@ -403,6 +403,13 @@ class swarm:
         """
         add_node(issue_data)
         Add a new node to the DB
+        FIXME:
+        The variables here seem confusing, shouldn't
+        this be "node_data" and "parent_issue"?
+        This needs to be verified and fix, this is
+        likely ancient swarm code from before the terminology
+        solidified. If it isn't, and these variables are correct,
+        this needs to be clarrified here.
         """
 
         self._logger.register('add_node')

@@ -64,7 +64,8 @@ class clone:
         # into the dest_sw
         errors = 0
         for (xid, root, time, xaction, xdata) in xlog:
-            errors = errors + self._callback[xaction](xid, root, time, xaction, xdata)
+            if not self._callback[xaction](xid, root, time, xaction, xdata):
+                errors = errors
 
         if errors > 0:
             self._logger.error("There were '%i' errors in the clone transaction" % errors)
@@ -85,8 +86,9 @@ class clone:
         xdata = Nothing
         """
         self._logger.register('xlog_start')
+        self._logger.entry('Cloning %s transaction' % xaction, 1)
 
-        self._dest_sw.db.log_transaction(root, xaction, xdata, xid, time, True)
+        self._dest_sw.db.backend.log_transaction(root, xaction, xdata, xid, time, True)
 
         self._logger.unregister()
 
@@ -97,6 +99,7 @@ class clone:
         xaction = 'set_taxonomy'
         """
         self._logger.register('set_taxonomy')
+        self._logger.entry('Cloning %s transaction' % xaction, 1)
         data = self._dest_sw.xactions.dispatch[xaction].decode(xdata)
         [term] = data.keys()
         the_list = data[term]
@@ -112,6 +115,7 @@ class clone:
         xdata = {'parent_id': parent_node_id , 'child_id': child_node_id}
         """
         self._logger.register('clone_add_lineage')
+        self._logger.entry('Cloning %s transaction' % xaction, 1)
 
         data = self._dest_sw.xactions.dispatch[xaction].decode(xdata)
 
@@ -126,5 +130,54 @@ class clone:
         xdata = data['node_id'] = node_id
         """
         self._logger.register('clone_new_node')
+        self._logger.entry('Cloning %s transaction' % xaction, 1)
+
+        # Technically, this is just stored as node_id, however
+        # since we reserve the right to change the transaction
+        # log schema at any time the safest way to get this is
+        # to use the dispatch.decode function.
+        node_id = self._source_sw.xactions.dispatch[xaction].decode(xdata)['node_id']
+
+        node_data = self._source_sw.get_node(node_id)
+        # ERE I AM JH
+        print node_data
+
+        self._logger.unregister()
+
+    def clone_new_issue(self, xid, root, time, xaction, xdata):
+        """
+        new_issue transaction
+        root = __MASTER_ISSUE__
+        xdata = data['hash_id'] = hash_id
+        """
+
+        self._logger.register('clone_new_issue')
+        self._logger.entry('Cloning %s transaction' % xaction, 1)
+
+        hash_id = self._source_sw.xactions.dispatch[xaction].decode(xdata)['hash_id']
+
+        issue_data = self._source_sw.get_issue(None, hash_id)
+        # ERE I AM JH
+        print issue_data
+
+        self._logger.unregister()
+
+    def clone_link_issue_to_node(self, xid, root, time, xaction, xdata):
+        """
+        stub
+        """
+
+        self._logger.register('clone_link_issue_to_node')
+        self._logger.entry('Cloning %s transaction' % xaction, 1)
+
+        self._logger.unregister()
+
+    def clone_update_issue(self, xid, root, time, xaction, xdata):
+        """
+        stub
+        """
+
+        self._logger.register('clone_update_issue')
+        self._logger.entry('Cloning %s transaction' % xaction, 1)
 
         self._logger.unregister()
