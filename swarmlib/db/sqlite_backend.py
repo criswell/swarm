@@ -503,7 +503,7 @@ class db:
         self._add_entry('issue_to_node', issue_to_node_data)
         self.log_transaction(issue_to_node_data['issue_id'], 'link_issue_to_node', self.xactions.dispatch['link_issue_to_node'].encode(issue_to_node_data))
 
-    def add_lineage(self, node_lineage, issue_id=None):
+    def add_lineage(self, node_lineage, issue_id=None, timestamp=None):
         """
         add_lineage(self, node_lineage, issue_id=None):
         link parents and children in lineage
@@ -516,7 +516,9 @@ class db:
             search_criteria['node_id'] = node_lineage['parent_id']
             issue = self.fetch('issue_to_node', search_criteria)
             issue_id = issue['issue_id']
-        self.log_transaction(issue_id, 'add_lineage', self.xactions.dispatch['add_lineage'].encode(node_lineage))
+        update = False
+        if timestamp: update = True
+        self.log_transaction(issue_id, 'add_lineage', self.xactions.dispatch['add_lineage'].encode(node_lineage), None, timestamp, update)
 
     def new_node(self, node_data, issue_id=None):
         """

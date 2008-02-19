@@ -119,7 +119,7 @@ class clone:
 
         data = self._dest_sw.xactions.dispatch[xaction].decode(xdata)
 
-        self._dest_sw.db.backend.add_lineage(data, root)
+        self._dest_sw.db.backend.add_lineage(data, root, time)
 
         self._logger.unregister()
 
