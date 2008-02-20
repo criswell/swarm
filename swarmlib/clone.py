@@ -156,7 +156,7 @@ class clone:
 
         hash_id = self._source_sw.xactions.dispatch[xaction].decode(xdata)['hash_id']
 
-        issue_data = self._source_sw.get_issue(None, hash_id)
+        [issue_data] = self._source_sw.get_issue(None, hash_id)
         # ERE I AM JH
         print issue_data
 
