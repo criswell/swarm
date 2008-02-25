@@ -112,6 +112,9 @@ class swarm:
 
         self._setup()
 
+    ####################
+    # Internal methods
+    ####################
     def _setup(self):
         """
         Internal setup function
@@ -140,19 +143,17 @@ class swarm:
 
         self._logger.unregister()
 
-    def clone(self, sw):
+    def _set_taxonomy(self, term, the_list):
         """
-        clone(self, sw)
-        Given a Swarm instance (sw) will make the current Swarm instance (self)
-        a clone.
-
-        Think of it as clone sw to self.
-
-        Note that this wont be a *real* clone. Only the project_name and contents
-        of the ticket/xlog databases will be cloned.
+        INTERNAL FUNCTION, DONT CALL
+        Given a table name, will update its contents with the new
+        terms from 'the_list'
         """
-        c = Clone(sw, self, self._log)
-        c.run()
+        self.db.backend.set_taxonomy(term, the_list)
+
+    ######################
+    # Swarm query methods
+    ######################
 
     def get_issue(self, ticket_number, issue_id=None):
         """
@@ -220,21 +221,6 @@ class swarm:
         """
         return self.db.backend.get_taxonomy(tax_term)
 
-    def _set_taxonomy(self, term, the_list):
-        """
-        INTERNAL FUNCTION, DONT CALL
-        Given a table name, will update its contents with the new
-        terms from 'the_list'
-        """
-        self.db.backend.set_taxonomy(term, the_list)
-
-    def set_taxonomy(self, term, the_list):
-        """
-        Given a table name, will update its contents with the new
-        terms from 'the_list'
-        """
-        # TODO, we should probably do some error checking here
-        self._set_taxonomy(term, the_list)
 
     def get_user(self):
         """
@@ -350,6 +336,32 @@ class swarm:
                 return None
 
         return hash_id
+
+    #######################
+    # Swarm action methods
+    #######################
+
+    def clone(self, sw):
+        """
+        clone(self, sw)
+        Given a Swarm instance (sw) will make the current Swarm instance (self)
+        a clone.
+
+        Think of it as clone sw to self.
+
+        Note that this wont be a *real* clone. Only the project_name and contents
+        of the ticket/xlog databases will be cloned.
+        """
+        c = Clone(sw, self, self._log)
+        c.run()
+
+    def set_taxonomy(self, term, the_list):
+        """
+        Given a table name, will update its contents with the new
+        terms from 'the_list'
+        """
+        # TODO, we should probably do some error checking here
+        self._set_taxonomy(term, the_list)
 
     def new_issue(self, issue_data):
         """
