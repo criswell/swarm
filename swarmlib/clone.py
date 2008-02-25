@@ -138,9 +138,10 @@ class clone:
         # to use the dispatch.decode function.
         node_id = self._source_sw.xactions.dispatch[xaction].decode(xdata)['node_id']
 
-        node_data = self._source_sw.get_node(node_id)
+        [node_data] = self._source_sw.get_node(node_id)
         # ERE I AM JH
-        print node_data
+        #print node_data
+        self._dest_sw.db.new_node(node_data, root, time):
 
         self._logger.unregister()
 
@@ -158,7 +159,8 @@ class clone:
 
         [issue_data] = self._source_sw.get_issue(None, hash_id)
         # ERE I AM JH
-        print issue_data
+        #print issue_data
+        self._dest_sw.db.backend.new_issue(issue_data, time)
 
         self._logger.unregister()
 

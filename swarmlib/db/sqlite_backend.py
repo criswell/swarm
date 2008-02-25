@@ -520,7 +520,7 @@ class db:
         if timestamp: update = True
         self.log_transaction(issue_id, 'add_lineage', self.xactions.dispatch['add_lineage'].encode(node_lineage), None, timestamp, update)
 
-    def new_node(self, node_data, issue_id=None):
+    def new_node(self, node_data, issue_id=None, timestamp):
         """
         new_node(node_data, issue_id=None):
         Given node_data, add to node table
@@ -535,9 +535,9 @@ class db:
             issue = self.fetch('issue_to_node', search_criteria)
             print issue
             issue_id = issue['issue_id']
-        self.log_transaction(issue_id, 'new_node', self.xactions.dispatch['new_node'].encode(node_data))
+        self.log_transaction(issue_id, 'new_node', self.xactions.dispatch['new_node'].encode(node_data), None, timestamp)
 
-    def new_issue(self, issue_data):
+    def new_issue(self, issue_data, timestamp=None):
         """
         new_issue(issue_data)
         Given issue_data, add to issue table.
@@ -547,7 +547,7 @@ class db:
         issue_data['id'] = None
 
         self._add_entry('issue', issue_data)
-        self.log_transaction(__MASTER_ISSUE__, 'new_issue', self.xactions.dispatch['new_issue'].encode(issue_data))
+        self.log_transaction(__MASTER_ISSUE__, 'new_issue', self.xactions.dispatch['new_issue'].encode(issue_data), None, timestamp)
 
     def update_issue(self, issue_data):
         """
