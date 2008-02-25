@@ -494,14 +494,14 @@ class db:
 
         self._logger.unregister()
 
-    def link_issue_to_node(self, issue_to_node_data):
+    def link_issue_to_node(self, issue_to_node_data, timestamp=None):
         """
         link_issue_to_node(self, issue_to_node_data):
         link issue to node data
         """
-        print issue_to_node_data
+        #print issue_to_node_data
         self._add_entry('issue_to_node', issue_to_node_data)
-        self.log_transaction(issue_to_node_data['issue_id'], 'link_issue_to_node', self.xactions.dispatch['link_issue_to_node'].encode(issue_to_node_data))
+        self.log_transaction(issue_to_node_data['issue_id'], 'link_issue_to_node', self.xactions.dispatch['link_issue_to_node'].encode(issue_to_node_data), None, timestamp)
 
     def add_lineage(self, node_lineage, issue_id=None, timestamp=None):
         """
