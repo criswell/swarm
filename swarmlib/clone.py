@@ -141,7 +141,7 @@ class clone:
         [node_data] = self._source_sw.get_node(node_id)
         # ERE I AM JH
         #print node_data
-        self._dest_sw.db.new_node(node_data, root, time):
+        self._dest_sw.db.new_node(node_data, root, time)
 
         self._logger.unregister()
 
