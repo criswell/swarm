@@ -141,7 +141,7 @@ class clone:
         [node_data] = self._source_sw.get_node(node_id)
         # ERE I AM JH
         #print node_data
-        self._dest_sw.db.new_node(node_data, root, time)
+        self._dest_sw.db.backend.new_node(node_data, root, time)
 
         self._logger.unregister()
 
@@ -166,16 +166,15 @@ class clone:
 
     def clone_link_issue_to_node(self, xid, root, time, xaction, xdata):
         """
-        root : this is the issue id the node is linked to
-        xdata : this will be the issue to node linking
+        root : this is the issue id the node is linked to xdata : this will be the issue to node linking
         eg, xdata['issue_id'] and xdata['node_id']  
         """
 
         self._logger.register('clone_link_issue_to_node')
         self._logger.entry('Cloning %s transaction' % xaction, 1)
         linking = self._source_sw.xactions.dispatch[xaction].decode(xdata)
-        
-        self._dest_sw.db.link_issue_to_node(linking, time)
+
+        self._dest_sw.db.backend.link_issue_to_node(linking, time)
 
         self._logger.unregister()
 
