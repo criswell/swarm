@@ -166,11 +166,16 @@ class clone:
 
     def clone_link_issue_to_node(self, xid, root, time, xaction, xdata):
         """
-        stub
+        root : this is the issue id the node is linked to
+        xdata : this will be the issue to node linking
+        eg, xdata['issue_id'] and xdata['node_id']  
         """
 
         self._logger.register('clone_link_issue_to_node')
         self._logger.entry('Cloning %s transaction' % xaction, 1)
+        linking = self._source_sw.xactions.dispatch[xaction].decode(xdata)
+        
+        self._dest_sw.db.link_issue_to_node(linking, time)
 
         self._logger.unregister()
 
