@@ -69,6 +69,9 @@ class clone:
 
         if errors > 0:
             self._logger.error("There were '%i' errors in the clone transaction" % errors)
+            # FIXME
+            # We should bail here, probably, since the cloned hive will be in an
+            # unknown state
         else:
             self._logger.entry("No errors in the clone transaction", 0)
 
