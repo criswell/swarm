@@ -21,19 +21,18 @@
 import sys
 import os
 import getopt
-#import md5 # Do we need this anymore?
 import tempfile
 
-#import swarmlib.config as Config
 import swarmlib.log as Log
 import swarmlib.swarm_time as swarm_time
 import cli_thread
 import cli_util
-#from swarmlib.db import swarmdb
 from swarmlib.db import taxonomy_terms
 from swarmlib.swarm import master_init
 from swarmlib.swarm import swarm as Swarm
 
+# This would be really nice to include someday
+# FIXME
 #import gettext
 #gettext.bindtextdomain('swarmlib')
 #gettext.textdomain('swarmlib')
@@ -47,6 +46,9 @@ logger = log.get_logger("swarm_cli")
 #########################
 
 def cli_copyright(pre_options, pre_args, command, post_options):
+    """
+    Prints the copyright information for Swarm
+    """
     print " Swarm DITS\n"
 
     print " Copyright 2007 Sam Hart\n"
@@ -66,6 +68,10 @@ def cli_copyright(pre_options, pre_args, command, post_options):
     print " Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA"
 
 def cli_help(pre_options, pre_args, command, post_options):
+    """
+    Given a swarm command, will print detailed help for that
+    command from the option_dispatch.
+    """
     if post_options:
         for com in post_options:
             print option_dispatch[com].usage
@@ -87,6 +93,9 @@ def cli_help(pre_options, pre_args, command, post_options):
                 print "   %s%s%s" % (com, util.space_filler(com, 20), option_dispatch[com].summary)
 
 def cli_log(pre_options, pre_args, command, post_options):
+    """
+    Displays the log information for a hive or a particular issue
+    """
     verbose = 0
     working_dir = os.getcwd()
     ticket_number = None
@@ -142,6 +151,9 @@ def cli_log(pre_options, pre_args, command, post_options):
     logger.unregister()
 
 def cli_last(pre_options, pre_args, command, post_options):
+    """
+    Prints the last issue accessed in the hive
+    """
     verbose = 0
     working_dir = os.getcwd()
 
@@ -170,6 +182,9 @@ def cli_last(pre_options, pre_args, command, post_options):
 #########################
 
 def cli_init(pre_options, pre_args, command, post_options):
+    """
+    Initializes a local hive
+    """
     verbose = 0
     force = False
     working_dir = os.getcwd()
@@ -192,6 +207,9 @@ def cli_init(pre_options, pre_args, command, post_options):
     logger.unregister()
 
 def cli_taxonomy(pre_options, pre_args, command, post_options):
+    """
+    The CLI Taxonomy subcommand interpreter
+    """
     verbose = 0
     tax_command = None
     tax_term = 'component'
@@ -223,14 +241,6 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
     components = sw.get_taxonomy(tax_term)
     util = cli_util.util(sw, log)
 
-    #FIXME: The following needs to be removed
-    # as it's legacy before we had the master swarm
-    # abstraction class
-    #config = Config.config(working_dir, log)
-    #db = swarmdb(working_dir, config, log)
-    #db.backend.connect()
-    #components = db.backend.get_taxonomy(tax_term)
-
     if tax_command.lower() == 'list':
         if components:
             for entry in components:
@@ -255,8 +265,6 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
         (bhash, ahash, bsize, asize) = util.launch_editor(name)
         if bhash != ahash:
             new_components = util.parse_datafile(name, ['id', 'name', 'isdefault'])
-            # FIXME: This needs to be removed as well (see above)
-            #db.backend.set_taxonomy(tax_term, new_components)
             sw.set_taxonomy(tax_term, new_components)
         else:
             logger.entry("'%s' list unchanged." % tax_term, 0)
@@ -267,6 +275,9 @@ def cli_taxonomy(pre_options, pre_args, command, post_options):
     logger.unregister()
 
 def cli_thread_run(pre_options, pre_args, command, post_options):
+    """
+    View an issue in a threaded fashion
+    """
     verbose = 0
     working_dir = os.getcwd()
     ticket_number = None
@@ -319,6 +330,9 @@ def cli_thread_run(pre_options, pre_args, command, post_options):
     logger.unregister()
 
 def cli_new(pre_options, pre_args, command, post_options):
+    """
+    Create a new issue
+    """
     verbose = 0
     working_dir = os.getcwd()
 
@@ -397,11 +411,9 @@ def cli_new(pre_options, pre_args, command, post_options):
     logger.unregister()
 
 def cli_clone(pre_options, pre_args, command, post_options):
-    # Clone a hive
-    #print pre_options
-    #print pre_args
-    #print command
-    #print post_options
+    """
+    Clone a hive from a source to the destination
+    """
     verbose = 0
     force = False
     to_url = os.getcwd()
@@ -584,6 +596,9 @@ option_dispatch = {
 }
 
 def cli_parse(argv):
+    """
+    Parse the command line options
+    """
     pre_opt = []
     command = None
     post_opt = []
@@ -612,5 +627,8 @@ def cli_parse(argv):
     return (opts, args, command, post_opt)
 
 def run(argv):
+    """
+    The main CLI run trigger
+    """
     (pre_options, pre_args, command, post_options)= cli_parse(argv)
     option_dispatch[command].callback(pre_options, pre_args, command, post_options)
