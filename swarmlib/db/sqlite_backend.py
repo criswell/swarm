@@ -520,7 +520,7 @@ class db:
         if timestamp: update = True
         self.log_transaction(issue_id, 'add_lineage', self.xactions.dispatch['add_lineage'].encode(node_lineage), None, timestamp, update)
 
-    def new_node(self, node_data, issue_id=None, timestamp):
+    def new_node(self, node_data, issue_id=None, timestamp=None):
         """
         new_node(node_data, issue_id=None):
         Given node_data, add to node table
