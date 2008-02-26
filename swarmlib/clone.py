@@ -19,6 +19,7 @@
 # Author: Sam Hart
 
 from swarmlib.replicate import replicate
+from swarmlib.db import __MASTER_ISSUE__
 
 class clone:
     def __init__(self, source_sw, dest_sw, log):
@@ -66,10 +67,9 @@ class clone:
             # We should bail here, probably, since the cloned hive will be in an
             # unknown state
         else:
+            # add this clone to tbe upstream tracker
+            self._rep.add_tracker(__MASTER_ISSUE__)
             self._logger.entry("No errors in the clone transaction", 0)
-
-        # add this clone to tbe upstream tracker
-        self._rep.add_tracker(self._dest_sw.db.__MASTER_ISSUE__)
 
         # Log the clone transaction
         # ERE I AM JH

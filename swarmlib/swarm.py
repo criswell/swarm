@@ -69,7 +69,7 @@ class Hive:
          .hostname = hostname
          .port = port
         """
-        self._url = url
+        self.url = url
         self._parsed = urlparse(url)
         self.scheme = self._parsed.scheme.lower()
         if self._parsed.scheme == '':

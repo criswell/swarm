@@ -21,6 +21,8 @@
 # This should be treated as a backend for the clone/branch/pull/etc. modules.
 # Basically, don't touch the items in here unless you know what you're doing.
 
+from tracker import tracker
+
 class replicate:
     def __init__(self, source_sw, dest_sw, log):
         """
@@ -47,6 +49,18 @@ class replicate:
         Run the replicate transaction
         """
         return self._callback[xaction](xid, root, time, xaction, xdata)
+
+    def add_tracker(self, issue_id):
+        """
+        Add the tracker for the upstream souce
+        """
+        self._logger.register("add_tracker")
+
+        tracker.hive = self._source_sw.get_hive()
+        upstream = tracker.encode(issue_id)
+        self._logger.entry("Upstream tracker debugging information: '%s'" % str(upstream), 5)
+
+        self._logger.unregister()
 
     # The replicate transactions
     # These should not be called outside of the callback
