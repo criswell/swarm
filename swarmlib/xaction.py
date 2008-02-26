@@ -71,6 +71,11 @@ class xaction_dispatch:
                 self.enc_hash_id,
                 self.dec_hash_id,
                 self.hr_issue_data),
+            'clone' : Xaction(
+                'Clone a hive',
+                self.null_callback,
+                self.null_callback,
+                self.hr_clone),
         }
 
     def set_swarm(self, sw):
@@ -147,4 +152,11 @@ class xaction_dispatch:
         data = self.dec_hash_id(xdata)
         [issue] = self.sw.get_issue(None, data['hash_id'])
         message = "Issue id '%s' created or changed." % issue['short_hash_id']
+        return message
+
+    def hr_clone(self, root, xdata):
+        data = self.null_callback(xdata)
+        # FIXME
+        # This needs to be better fleshed out
+        message = "Upstream hive cloned."
         return message

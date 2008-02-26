@@ -68,4 +68,8 @@ class clone:
         else:
             self._logger.entry("No errors in the clone transaction", 0)
 
+        # Log the clone transaction
+        # ERE I AM JH
+        #self._dest_sw.db.backend.log_transaction(self._dest_sw.db.__MASTER_ISSUE__, 'clone', self._dest_sw.xactions.dispatch['clone'].encode(SOMETHING HERE))
+
         self._logger.unregister()
