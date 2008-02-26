@@ -73,7 +73,7 @@ class Hive:
         self._parsed = urlparse(url)
         self.scheme = self._parsed.scheme.lower()
         if self._parsed.scheme == '':
-            self.scheme = 'file'
+            self.scheme = 'swarm_local'
         self.netloc = self._parsed.netloc
         self.path = self._parsed.path
         self.params = self._parsed.params
@@ -87,7 +87,7 @@ class Hive:
         self._log = log
         self._logger = log.get_logger("swarm")
 
-        if self.scheme != 'file':
+        if self.scheme != 'swarm_local':
             self.remote = remote(self, self._log)
 
 class swarm:
@@ -122,7 +122,7 @@ class swarm:
         self._logger.register("_setup")
 
         # First, we need to see if we're working locally or not
-        if self._hive.scheme == 'file':
+        if self._hive.scheme == 'swarm_local':
             self._local = True
             self._working_dir = self._hive.path
         else:
@@ -154,6 +154,12 @@ class swarm:
     ######################
     # Swarm query methods
     ######################
+
+    def get_hive(self):
+        """
+        Return the local Hive instance
+        """
+        return self._hive
 
     def get_issue(self, ticket_number, issue_id=None):
         """
