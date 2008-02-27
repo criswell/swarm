@@ -376,6 +376,21 @@ class swarm:
         c = Clone(sw, self, self._log)
         c.run()
 
+    def branch(self, ticket_number, sw):
+        """
+        branch(self, ticket_number, sw)
+        Given a Swarm instance (sw) and a ticket number (ticket_number) from that
+        Swarm instance, will make a local branch of the ticket.
+
+        In the event of a ticket number collision with a ticket from the local
+        hive, the branched ticket will recieve an additional digit from the ticket's
+        full hash_id.
+        """
+
+        #b = Branch(ticket_number, sw, self, self._log)
+        #b.run()
+        print "Branch not engineered yet... FIXME"
+
     def set_taxonomy(self, term, the_list):
         """
         Given a table name, will update its contents with the new
