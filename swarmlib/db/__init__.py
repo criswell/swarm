@@ -127,7 +127,7 @@ table_schema = [
 
     #upstream tracker
     table('upstream')[
-        column('id'),
+        column('tracker_id'),
         column('uri'),
         column('type'),
         column('authentication', data_type='blob'), # blob containing auth info
