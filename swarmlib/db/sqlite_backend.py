@@ -450,7 +450,7 @@ class db:
         """
         self._logger.register('add_upstream_tracker')
 
-        self._add_entry('upstream', tracker_data)
+        self._add_entry('upstream', tracker_data, update)
         self.log_transaction(root, 'add_tracker', self.xactions.dispatch['add_tracker'].encode(tracker_data), None, timestamp)
 
         self._logger.unregister()

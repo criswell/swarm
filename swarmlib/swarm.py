@@ -227,6 +227,21 @@ class swarm:
         """
         return self.db.backend.get_taxonomy(tax_term)
 
+    def get_upstream_tracker(self, tracker_id=None):
+        """
+        Given the tracker_id, return the upstream tracker information.
+        If tracker_id is None, return all upstream trackers
+        """
+        self._logger.register('get_upstream_tracker')
+
+        search_criteria = {}
+        if tracker_id:
+            search_criteria = { 'tracker_id' : tracker_id }
+        else:
+            search_criteria = { 'tracker_id' : "*" }
+
+        self._logger.unregister()
+        return self.db.backend.fetch('upstream', search_criteria)
 
     def get_user(self):
         """

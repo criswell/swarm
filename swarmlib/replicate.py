@@ -42,6 +42,7 @@ class replicate:
             'new_node' : self.replicate_new_node,
             'new_issue' : self.replicate_new_issue,
             'update_issue' :self.replicate_update_issue,
+            'add_tracker' : self.replicate_add_tracker,
         }
 
     def run(self, xid, root, time, xaction, xdata):
@@ -50,16 +51,17 @@ class replicate:
         """
         return self._callback[xaction](xid, root, time, xaction, xdata)
 
-    def add_tracker(self, issue_id):
+    def add_tracker(self, issue_id, upstream=None, timestamp=None):
         """
         Add the tracker for the upstream souce
         """
         self._logger.register("add_tracker")
 
         tracker.hive = self._source_sw.get_hive()
-        upstream = tracker.encode(issue_id)
+        if not upstream:
+            upstream = tracker.encode(issue_id)
         self._logger.entry("Upstream tracker debugging information: '%s'" % str(upstream), 5)
-        self._dest_sw.db.backend.add_upstream_tracker(upstream, issue_id)
+        self._dest_sw.db.backend.add_upstream_tracker(upstream, issue_id, timestamp)
 
         self._logger.unregister()
 
@@ -176,10 +178,28 @@ class replicate:
     def replicate_update_issue(self, xid, root, time, xaction, xdata):
         """
         stub
+        FIXME THIS IS A STUB
         """
 
         self._logger.register('replicate_update_issue')
         self._logger.entry('Replicating %s transaction' % xaction, 1)
+
+        self._logger.unregister()
+        return 0
+
+    def replicate_add_tracker(self, xid, root, time, xaction, xdata):
+        """
+        root : root issue this tracker is tied to. if __MASTER_ISSUE__, will bit the entire hive
+        xdata : upstream tracker_id
+        """
+
+        self._logger.register('replicate_add_tracker')
+        self._logger.entry('Replicating %s transaction' % xaction, 1)
+
+        tracker_id = self._source_sw.xactions.dispatch[xaction].decode(xdata)['tracker_id']
+
+        [upstream_tracker] = self._source_sw.get_upstream_tracker(tracker_id)
+        self.add_tracker(root, upstream_tracker, time)
 
         self._logger.unregister()
         return 0
