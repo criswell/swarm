@@ -21,6 +21,7 @@
 # This encodes and decodes the tracker information
 
 import os.path
+import swarmlib.data_tools as data_tools
 
 class Tracker:
     def __init__(self, description, encoder_callback, decoder_callback):
@@ -66,8 +67,11 @@ class tracker_dispatch:
         upstream = None
 
         if self.hive:
+            uri = os.path.abspath(self.hive.path)
+            tracker_id = data_tools.get_hash(uri, transport, self.hive.scheme)
             upstream = {
-                'uri' :  os.path.abspath(self.hive.path),
+                'tracker_id' : tracker_id,
+                'uri' :  uri,
                 'type' : 'swarm_local',
                 'authentication' : None,
                 'transport' : transport
