@@ -72,6 +72,12 @@ def cli_help(pre_options, pre_args, command, post_options):
     Given a swarm command, will print detailed help for that
     command from the option_dispatch.
     """
+    # FIXME
+    # The following assumes the user entered a valid command
+    # and will crash if an invalid command is given
+    # Additionally, do we really want to allow for multiple
+    # helps in one command line? e.g.:
+    #  swarm help branch log clone
     if post_options:
         for com in post_options:
             print option_dispatch[com].usage
