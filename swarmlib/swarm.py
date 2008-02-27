@@ -388,9 +388,8 @@ class swarm:
         full hash_id.
         """
 
-        #b = Branch(ticket_number, sw, self, self._log)
-        #b.run()
-        print "Branch not engineered yet... FIXME"
+        b = Branch(ticket_number, sw, self, self._log)
+        b.run()
 
     def set_taxonomy(self, term, the_list):
         """
