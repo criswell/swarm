@@ -35,7 +35,7 @@ from swarmlib.db import table_orders
 from swarmlib.remote import remote
 import swarmlib.xaction as xaction
 from swarmlib.clone import clone as Clone
-from swarmlib.clone import branch as Branch
+from swarmlib.branch import branch as Branch
 
 def master_init(project_name, working_dir, log, force=False):
     """
