@@ -71,11 +71,11 @@ class xaction_dispatch:
                 self.enc_hash_id,
                 self.dec_hash_id,
                 self.hr_issue_data),
-            'clone' : Xaction(
-                'Clone a hive',
+            'add_tracker' : Xaction(
+                'Add an upstream tracker',
                 self.null_callback,
                 self.null_callback,
-                self.hr_clone),
+                self.hr_tracker),
         }
 
     def set_swarm(self, sw):
@@ -154,9 +154,9 @@ class xaction_dispatch:
         message = "Issue id '%s' created or changed." % issue['short_hash_id']
         return message
 
-    def hr_clone(self, root, xdata):
+    def hr_tracker(self, root, xdata):
         data = self.null_callback(xdata)
         # FIXME
         # This needs to be better fleshed out
-        message = "Upstream hive cloned."
+        message = "Add upstream tracker."
         return message
