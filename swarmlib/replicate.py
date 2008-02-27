@@ -59,6 +59,7 @@ class replicate:
         tracker.hive = self._source_sw.get_hive()
         upstream = tracker.encode(issue_id)
         self._logger.entry("Upstream tracker debugging information: '%s'" % str(upstream), 5)
+        self._dest_sw.db.add_tracker(upstream, issue_id)
 
         self._logger.unregister()
 

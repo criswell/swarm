@@ -443,6 +443,18 @@ class db:
         else:
             return None
 
+    def add_upstream_tracker(self, tracker_data, root, timestamp=None, update=False):
+        """
+        Given some upstream tracker data, add or update the
+        information for it in the upstream table
+        """
+        self._logger.register('add_upstream_tracker')
+
+        self._add_entry('upstream', tracker_data)
+        self.log_transaction(root, 'add_tracker', self.xactions.dispatch['add_tracker'].encode(tracker_data), None, timestamp)
+
+        self._logger.unregister()
+
     def _add_entry(self, table_name, table_data, update=False):
         """
         Internal add_entry function
