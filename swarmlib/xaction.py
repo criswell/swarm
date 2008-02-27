@@ -73,8 +73,8 @@ class xaction_dispatch:
                 self.hr_issue_data),
             'add_tracker' : Xaction(
                 'Add an upstream tracker',
-                self.null_callback,
-                self.null_callback,
+                self.enc_tracker_id,
+                self.dec_tracker_id,
                 self.hr_tracker),
         }
 
@@ -112,6 +112,14 @@ class xaction_dispatch:
     def dec_hash_id(self, xdata):
         rdata = {}
         rdata['hash_id'] = xdata
+        return rdata
+
+    def enc_tracker_id(self, xdata):
+        return xdata['tracker_id']
+
+    def dec_tracker_id(self, xdata):
+        rdata = {}
+        rdata['tracker_id'] = xdata
         return rdata
 
     # The following are the human readable (hr) functions
