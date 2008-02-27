@@ -592,6 +592,19 @@ option_dispatch = {
          '   -v|--verbose    Be verbose about actions',
          "   -f|--force      Force even if [TO] directory isn't empty"],
         cli_clone),
+    'branch' : Command(
+        ['v', 'f'],
+        ['verbose', 'force'],
+        'swarm [OPTIONS] branch [TICKET] [FROM] [TO]',
+        'Branch a ticket from a hive.',
+        ['   Branches a given ticket from the hive at [FROM]',
+         '   URI to the [TO] URI. If the [TO] URI is not specified it will',
+         '   default to the current working directory.',
+         '',
+         '   OPTIONS:',
+         '   -v|--verbose    Be verbose about actions',
+         "   -f|--force      Force even if [TO] directory isn't empty"],
+        cli_branch),
 
 }
 
