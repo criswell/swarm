@@ -68,13 +68,13 @@ class tracker_dispatch:
 
         if self.hive:
             uri = os.path.abspath(self.hive.path)
-            tracker_id = data_tools.get_hash(uri, transport, self.hive.scheme)
+            tracker_id = data_tools.get_hash(uri, str(transport), self.hive.scheme)
             upstream = {
                 'tracker_id' : tracker_id,
                 'uri' :  uri,
                 'type' : 'swarm_local',
                 'authentication' : None,
-                'transport' : transport
+                'transport' : str(transport)
             }
 
         return upstream
