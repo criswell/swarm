@@ -453,6 +453,49 @@ def cli_clone(pre_options, pre_args, command, post_options):
 
     logger.unregister()
 
+def cli_branch(pre_options, pre_args, command, post_options):
+    """
+    Branch a ticket from one hive to another
+    """
+    ticket_number = None
+    verbose = 0
+    force = False
+    to_url = os.getcwd()
+    from_url = None
+
+    for o, a in pre_options:
+        if o in ("-v", "--verbose"):
+            verbose = verbose + 1
+        if o in ('-f', '--force'):
+            force = True
+
+    log.set_universal_loglevel(verbose)
+    logger.register('cli_branch')
+
+    if len(post_options) == 3:
+        # branch TICKET_NUMBER FROM TO
+        ticket_number = post_options[0]
+        from_url = post_options[1]
+        to_url = post_options[2]
+    elif len(post_options) == 2:
+        # branch TICKET_NUMBER FROM -- TO is cwd
+        ticket_number = post_options[0]
+        from_url = post_options[1]
+    else:
+        # Wrong number of arguments
+        logger.error("branch requires at least two arguments. See 'help branch' for more information")
+
+    if from_url and to_url:
+        sw_to = Swarm(to_url, log)
+        sw_from = Swarm(from_url, log)
+
+        sw_to.branch(ticket_number, sw_from)
+
+        sw_from.close()
+        sw_to.close()
+
+    logger.unregister()
+
 #########################
 # Internal Interfaces
 #########################
