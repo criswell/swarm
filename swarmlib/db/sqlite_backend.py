@@ -558,7 +558,7 @@ class db:
         issue_data['id'] = None
 
         self._add_entry('issue', issue_data)
-        self.log_transaction(__MASTER_ISSUE__, 'new_issue', self.xactions.dispatch['new_issue'].encode(issue_data), None, timestamp)
+        self.log_transaction(issue_data['hash_id'], 'new_issue', self.xactions.dispatch['new_issue'].encode(issue_data), None, timestamp)
 
     def update_issue(self, issue_data):
         """

@@ -63,13 +63,13 @@ class xaction_dispatch:
                 self.hr_new_node),
             'new_issue' : Xaction(
                 'Create a new issue',
-                self.enc_hash_id,
-                self.dec_hash_id,
+                self.enc_short_hash_id,
+                self.dec_short_hash_id,
                 self.hr_issue_data),
             'update_issue' : Xaction(
                 'Update an issue',
-                self.enc_hash_id,
-                self.dec_hash_id,
+                self.enc_short_hash_id,
+                self.dec_short_hash_id,
                 self.hr_issue_data),
             'add_tracker' : Xaction(
                 'Add an upstream tracker',
@@ -106,12 +106,12 @@ class xaction_dispatch:
         rdata['node_id'] = xdata
         return rdata
 
-    def enc_hash_id(self, xdata):
-        return xdata['hash_id']
+    def enc_short_hash_id(self, xdata):
+        return xdata['short_hash_id']
 
-    def dec_hash_id(self, xdata):
+    def dec_short_hash_id(self, xdata):
         rdata = {}
-        rdata['hash_id'] = xdata
+        rdata['short_hash_id'] = xdata
         return rdata
 
     def enc_tracker_id(self, xdata):
