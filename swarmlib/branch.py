@@ -42,7 +42,7 @@ class branch:
 
         self._logger.register("run")
 
-        # Next, get the transaction log from the source_sw
+        # get the transaction log from the source_sw
         # FIXME: This isn't very scalable, we probably should
         # do this in clumps of xaction log entries
         xlog = self._source_sw.get_transaction_log(issue=self._ticket_number)
