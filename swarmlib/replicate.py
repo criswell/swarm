@@ -150,9 +150,9 @@ class replicate:
         self._logger.register('replicate_new_issue')
         self._logger.entry('Replicating %s transaction' % xaction, 1)
 
-        hash_id = self._source_sw.xactions.dispatch[xaction].decode(xdata)['hash_id']
+        #hash_id = self._source_sw.xactions.dispatch[xaction].decode(xdata)['hash_id']
 
-        [issue_data] = self._source_sw.get_issue(None, hash_id)
+        [issue_data] = self._source_sw.get_issue(None, root)
         # ERE I AM JH
         #print issue_data
         self._dest_sw.db.backend.new_issue(issue_data, time)

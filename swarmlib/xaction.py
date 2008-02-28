@@ -157,8 +157,8 @@ class xaction_dispatch:
         return message
 
     def hr_issue_data(self, root, xdata):
-        data = self.dec_hash_id(xdata)
-        [issue] = self.sw.get_issue(None, data['hash_id'])
+        #data = self.dec_short_hash_id(xdata)
+        [issue] = self.sw.get_issue(None, root)
         message = "Issue id '%s' created or changed." % issue['short_hash_id']
         return message
 
