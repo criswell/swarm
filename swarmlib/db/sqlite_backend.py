@@ -553,7 +553,6 @@ class db:
         """
         new_issue(issue_data)
         Given issue_data, add to issue table.
-        Returns new issue id
         """
         # The ID needs to be None
         issue_data['id'] = None
