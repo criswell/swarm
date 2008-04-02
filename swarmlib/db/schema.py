@@ -36,8 +36,10 @@ __USER_ID_LENGTH__ = 60
 __SUMMARY_LENGTH__ = 255
 
 issues_table = Table('issues', metadata,
-    Column('hash_id', String(__HASH_ID_LENGTH__), primary_key=True, unique=True, nullable=False),
-    Column('short_hash_id', String(__HASH_ID_LENGTH__), unique=True, nullable=False),
+    Column('hash_id', String(__HASH_ID_LENGTH__),
+            primary_key=True, unique=True, nullable=False),
+    Column('short_hash_id', String(__HASH_ID_LENGTH__),
+            unique=True, nullable=False),
 
     # XXX: The following all need to have default values. The best way
     # will probably be to set up a mapping in sqlalchemy orm, but I don't
@@ -61,10 +63,13 @@ issues_table = Table('issues', metadata,
 )
 
 self.nodes_table = Table('nodes', metadata,
-    Column('hash_id', String(__HASH_ID_LENGTH__), primary_key=True, unique=True, nullable=False),
+    Column('hash_id', String(__HASH_ID_LENGTH__),
+            primary_key=True, unique=True, nullable=False),
     Column('summary', String(__SUMMARY_LENGTH__), nullable=False),
-    Column('issue_id', String(__HASH_ID_LENGTH__), ForeignKey('issues.hash_id')),
-    Column('parent_node_id', String(__HASH_ID_LENGTH__), ForeignKey('nodes.hash_id')),
+    Column('issue_id', String(__HASH_ID_LENGTH__),
+            ForeignKey('issues.hash_id')),
+    Column('parent_node_id', String(__HASH_ID_LENGTH__),
+            ForeignKey('nodes.hash_id')),
 
     Column('time', Float),
 
@@ -97,6 +102,7 @@ mapper(Issue, issues_table, properties={
     'root_nodes':relation(Node) #, backref='issue')
 })
 mapper(Node, nodes_table, properties={
-    'children':relation(Node, backref=backref('parent', remote_side=[nodes_table.c.hash_id]))
+    'children':relation(Node, backref=backref('parent',
+            remote_side=[nodes_table.c.hash_id])),
 })
 
