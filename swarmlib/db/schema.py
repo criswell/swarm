@@ -31,12 +31,6 @@ from sqlalchemy.orm import mapper, relation, backref
 
 from swarmlib.db import metadata
 
-#metadata = MetaData()
-# REMOVE
-#from sqlalchemy import create_engine
-#engine = create_engine('sqlite:///:memory:', echo=True)
-#metadata.create_all(engine)
-
 __HASH_ID_LENGTH__ = 40
 __USER_ID_LENGTH__ = 60
 __SUMMARY_LENGTH__ = 255
@@ -99,9 +93,6 @@ class Node(object):
     def __repr__(self):
         return "<Node('%s', '%s')>" % (self.hash_id, self.summary)
 
-# REMOVE
-#metadata.create_all(engine)
-
 mapper(Issue, issues_table, properties={
     'root_nodes':relation(Node) #, backref='issue')
 })
@@ -109,9 +100,3 @@ mapper(Node, nodes_table, properties={
     'children':relation(Node, backref=backref('parent', remote_side=[nodes_table.c.hash_id]))
 })
 
-
-# REMOVE
-
-#from sqlalchemy.orm import sessionmaker
-#Session = sessionmaker(bind=engine, autoflush=True, transactional=True)
-#session = Session()
