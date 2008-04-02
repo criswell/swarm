@@ -36,47 +36,47 @@ __USER_ID_LENGTH__ = 60
 __SUMMARY_LENGTH__ = 255
 
 issues_table = Table('issues', metadata,
-    Column('hash_id', String(40), primary_key=True, unique=True, nullable=False),
-    Column('short_hash_id', String(40), unique=True, nullable=False),
+    Column('hash_id', String(__HASH_ID_LENGTH__), primary_key=True, unique=True, nullable=False),
+    Column('short_hash_id', String(__HASH_ID_LENGTH__), unique=True, nullable=False),
 
     # XXX: The following all need to have default values. The best way
     # will probably be to set up a mapping in sqlalchemy orm, but I don't
     # yet know how best to do this, so I'm marking it as a FIXME
-    #Column('component', Integer, nullable=False),
-    #Column('version', Integer, nullable=False),
-    #Column('milestone', Integer, nullable=False),
-    #Column('severity', Integer, nullable=False),
-    #Column('priority', Integer, nullable=False),
-    #Column('status', Integer, nullable=False),
-    #Column('resolution', Integer, nullable=False),
+    Column('component', Integer, nullable=False),
+    Column('version', Integer, nullable=False),
+    Column('milestone', Integer, nullable=False),
+    Column('severity', Integer, nullable=False),
+    Column('priority', Integer, nullable=False),
+    Column('status', Integer, nullable=False),
+    Column('resolution', Integer, nullable=False),
 
-    #Column('owner', String(__USER_ID_LENGTH__)),
-    #Column('reporter', String(__USER_ID_LENGTH__), nullable=False),
+    Column('owner', String(__USER_ID_LENGTH__)),
+    Column('reporter', String(__USER_ID_LENGTH__), nullable=False),
 
     # FIXME XXX: More mappings will be needed here
-    #Column('cc_id', Integer),
-    #Column('subscribers_id', Integer),
+    Column('cc_id', Integer),
+    Column('subscribers_id', Integer),
 
-    #Column('time', Float),
+    Column('time', Float),
 )
 
 self.nodes_table = Table('nodes', metadata,
-    Column('hash_id', String(40), primary_key=True, unique=True, nullable=False),
-    Column('summary', String(100), nullable=False),
-    Column('issue_id', String(40), ForeignKey('issues.hash_id')),
-    Column('parent_node_id', String(40), ForeignKey('nodes.hash_id')),
+    Column('hash_id', String(__HASH_ID_LENGTH__), primary_key=True, unique=True, nullable=False),
+    Column('summary', String(__SUMMARY_LENGTH__), nullable=False),
+    Column('issue_id', String(__HASH_ID_LENGTH__), ForeignKey('issues.hash_id')),
+    Column('parent_node_id', String(__HASH_ID_LENGTH__), ForeignKey('nodes.hash_id')),
 
-    #Column('time', Float),
+    Column('time', Float),
 
-    #Column('poster', String(__USER_ID_LENGTH__)),
+    Column('poster', String(__USER_ID_LENGTH__)),
 
     # FIXME XXX: Need to be mapped
-    #Column('related_id', Integer),
+    Column('related_id', Integer),
 
-    #Column('summary', String(__SUMMARY_LENGTH__)),
-    #Column('details', Text),
+    Column('summary', String(__SUMMARY_LENGTH__)),
+    Column('details', Text),
 
-    #Column('attachment_id', String(__HASH_ID_LENGTH__)),
+    Column('attachment_id', String(__HASH_ID_LENGTH__)),
 )
 
 class Issue(object):
