@@ -27,6 +27,8 @@ This package defines the database schema used in a Swarm Hive.
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, \
                        Float, PickleType, Text
 
+from sqlalchemy.orm import mapper
+
 metadata = MetaData()
 
 __HASH_ID_LENGTH__ = 40
@@ -56,10 +58,11 @@ issue_table = Table('issue', metadata,
     Column('subscribers_id', Integer),
 
     Column('time', Float),
-
-    Column('root_node_id', String(__HASH_ID_LENGTH__),
-            ForeignKey('node.node_id')),
 )
+
+class Issue(object):
+    # FIXME XXX: Is this how we want to do this?
+    pass
 
 node_table = Table('node', metadata,
     Column('node_id', String(__HASH_ID_LENGTH__), unique=True),
@@ -80,9 +83,17 @@ node_table = Table('node', metadata,
             ForeignKey('issue.hash_id')),
 )
 
-lineage_table = Table('lineage', metadata,
-    Column('parent_id', String(__HASH_ID_LENGTH__),
-            ForeignKey('node.node_id')),
-    Column('child_id', String(__HASH_ID_LENGTH__),
-            ForeignKey('node.node_id')),
-)
+class Node(object):
+    # FIXME XXX: See Issue above
+    pass
+
+try:
+    mapper(Node, node_table, properties={
+        'parents':relation(Node, backref='node'),
+        'children':relation(Node, backref='node'),
+    })
+    mapper(Issue, issue_table, properties={
+        'root_node':relation(Node, uselist=False, backref='node'),
+    })
+except:
+    pass
