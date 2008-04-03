@@ -62,7 +62,7 @@ issues_table = Table('issues', metadata,
     Column('time', Float),
 )
 
-self.nodes_table = Table('nodes', metadata,
+nodes_table = Table('nodes', metadata,
     Column('hash_id', String(__HASH_ID_LENGTH__),
             primary_key=True, unique=True, nullable=False),
     Column('summary', String(__SUMMARY_LENGTH__), nullable=False),
