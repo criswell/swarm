@@ -25,11 +25,16 @@ This package defines the database schema used in a Swarm Hive.
 """
 
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, \
-                       Float, PickleType, Text
+                       Float, PickleType, Text, Binary
 
 from sqlalchemy.orm import mapper, relation, backref
+import sqlalchemy.types as types
 
 from swarmlib.db.db_bits import metadata
+
+###################################
+# Define the issue and node tables
+###################################
 
 __HASH_ID_LENGTH__ = 40
 __USER_ID_LENGTH__ = 60
@@ -41,6 +46,13 @@ issues_table = Table('issues', metadata,
     Column('short_hash_id', String(__HASH_ID_LENGTH__),
             unique=True, nullable=False),
 
+    Column('block_id', String(__HASH_ID_LENGTH__),
+            ForeignKey('issues.hash_id')),
+
+    # Status will no longer be a user definable list
+    # This is to better refine searches.
+    Column('status', Integer, nullable=False),
+
     # XXX: The following all need to have default values. The best way
     # will probably be to set up a mapping in sqlalchemy orm, but I don't
     # yet know how best to do this, so I'm marking it as a FIXME
@@ -49,7 +61,6 @@ issues_table = Table('issues', metadata,
     Column('milestone', Integer, nullable=False),
     Column('severity', Integer, nullable=False),
     Column('priority', Integer, nullable=False),
-    Column('status', Integer, nullable=False),
     Column('resolution', Integer, nullable=False),
 
     Column('owner', String(__USER_ID_LENGTH__)),
@@ -75,13 +86,10 @@ nodes_table = Table('nodes', metadata,
 
     Column('poster', String(__USER_ID_LENGTH__)),
 
-    # FIXME XXX: Need to be mapped
-    Column('related_id', Integer),
-
     Column('summary', String(__SUMMARY_LENGTH__)),
     Column('details', Text),
 
-    Column('attachment_id', String(__HASH_ID_LENGTH__)),
+    Column('attachment', Binary),
 )
 
 class Issue(object):
@@ -99,10 +107,36 @@ class Node(object):
         return "<Node('%s', '%s')>" % (self.hash_id, self.summary)
 
 mapper(Issue, issues_table, properties={
-    'root_nodes':relation(Node) #, backref='issue')
+    'root_nodes':relation(Node), #, backref='issue')
+    'depends':relation(Issue, backref=backref('blocks',
+            remote_side=[issues_table.c.hash_id])),
 })
 mapper(Node, nodes_table, properties={
     'children':relation(Node, backref=backref('parent',
             remote_side=[nodes_table.c.hash_id])),
 })
 
+###################################
+# Define the Transaction log table
+###################################
+
+transaction_log_table = Table('transaction_log', metadata,
+    Column('id', Integer,  primary_key=True, auto_increment=True),
+    Column('root', String(__HASH_ID_LENGTH__)),
+    Column('time', Float),
+    Column('transaction', Integer),
+    Column('transaction_data', PickleType),
+)
+
+class TransactionEntry(object):
+    def __init__(self, root, time, transaction, transaction_data):
+        self.root = root
+        self.time = time
+        self.transaction = transaction
+        self.transaction_log = transaction_log
+
+    def __repr__(self):
+        return "<TransactionEntry(root:'%s', time:'%s'>" % (self.root,
+                self.time)
+
+mapper(TransactionEntry, transaction_log_table)
