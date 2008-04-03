@@ -19,10 +19,14 @@
 # Author: Sam Hart
 
 """
-Swarm DB module
+Misc Swarm DB Bits
 
-This package defines the Swarm Database module
+This module contains the various DB bits for Swarm thet just don't fit
+anywhere else.
+
+You will find the following instances and functions:
+    * metadata      - Local instance of sqlalchemy.orm.MetaData
 """
 
-import swarmlib.db.schema as schema
-
+from sqlalchemy.orm import MetaData
+metadata = MetaData()

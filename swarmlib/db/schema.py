@@ -29,7 +29,7 @@ from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, \
 
 from sqlalchemy.orm import mapper, relation, backref
 
-from swarmlib.db import metadata
+from swarmlib.db.db_bits import metadata
 
 __HASH_ID_LENGTH__ = 40
 __USER_ID_LENGTH__ = 60
