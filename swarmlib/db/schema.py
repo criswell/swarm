@@ -25,7 +25,7 @@ This package defines the database schema used in a Swarm Hive.
 """
 
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, \
-                       Float, PickleType, Text, Binary
+                       Float, PickleType, Text, Binary, Boolean
 
 from sqlalchemy.orm import mapper, relation, backref
 import sqlalchemy.types as types
@@ -140,3 +140,134 @@ class TransactionEntry(object):
                 self.time)
 
 mapper(TransactionEntry, transaction_log_table)
+
+############################################
+# Define the user-definable Taxonomy tables
+############################################
+__TAX_NAME_LENGTH__ = 25
+##################
+component_table = Table('components', metadata
+    Column('id', Integer, primary_key=True, unique=True, auto_increment=True),
+    Column('name', String(__TAX_NAME_LENGTH__)),
+    Column('isdefault', Boolean),
+)
+
+class ComponentEntry(object):
+    def __init__(self, name, isdefault=False):
+        self.name = name
+        self.isdefault = isdefault
+
+    def __repr__(self):
+        return "<ComponentEntry('%s', default:'%s')>" % (self.name,
+                self.isdefault)
+
+mapper(ComponentEntry, component_table)
+##################
+version_table = Table('versions', metadata
+        column('id',Integer, primary_key=True, unique=True,
+                auto_increment=True),
+        column('name', String(__TAX_NAME_LENGTH__)),
+        column('isdefault', Boolean),
+)
+
+class VersionEntry(object):
+    def __init__(self, name, isdefault=False):
+        self.name = name
+        self.isdefault = isdefault
+
+    def __repr__(self):
+        return "<VersionEntry('%s', default:'%s')>" % (self.name,
+                self.isdefault)
+
+mapper(VersionEntry, version_table)
+##################
+milestone_table = Table('milestones', metadata
+        column('id',Integer, primary_key=True, unique=True,
+                auto_increment=True),
+        column('name', String(__TAX_NAME_LENGTH__)),
+        column('isdefault', Boolean),
+)
+
+class MilestoneEntry(object):
+    def __init__(self, name, isdefault=False):
+        self.name = name
+        self.isdefault = isdefault
+
+    def __repr__(self):
+        return "<MilestoneEntry('%s', default:'%s')>" % (self.name,
+                self.isdefault)
+
+mapper(MilestoneEntry, milestone_table)
+##################
+severity_table = Table('severities', metadata
+        column('id',Integer, primary_key=True, unique=True,
+                auto_increment=True),
+        column('name', String(__TAX_NAME_LENGTH__)),
+        column('isdefault', Boolean),
+)
+
+class SeverityEntry(object):
+    def __init__(self, name, isdefault=False):
+        self.name = name
+        self.isdefault = isdefault
+
+    def __repr__(self):
+        return "<SeverityEntry('%s', default:'%s')>" % (self.name,
+                self.isdefault)
+
+mapper(SeverityEntry, severity_table)
+##################
+priority_table = Table('priorities', metadata
+        column('id',Integer, primary_key=True, unique=True,
+                auto_increment=True),
+        column('name', String(__TAX_NAME_LENGTH__)),
+        column('isdefault', Boolean),
+)
+
+class PriorityEntry(object):
+    def __init__(self, name, isdefault=False):
+        self.name = name
+        self.isdefault = isdefault
+
+    def __repr__(self):
+        return "<PriorityEntry('%s', default:'%s')>" % (self.name,
+                self.isdefault)
+
+mapper(PriorityEntry, priority_table)
+##################
+status_table = Table('status', metadata
+        column('id',Integer, primary_key=True, unique=True,
+                auto_increment=True),
+        column('name', String(__TAX_NAME_LENGTH__)),
+        column('isdefault', Boolean),
+)
+
+class StatusEntry(object):
+    def __init__(self, name, isdefault=False):
+        self.name = name
+        self.isdefault = isdefault
+
+    def __repr__(self):
+        return "<StatusEntry('%s', default:'%s')>" % (self.name,
+                self.isdefault)
+
+mapper(StatusEntry, status_table)
+##################
+resolution_table = Table('resolutions', metadata
+        column('id',Integer, primary_key=True, unique=True,
+                auto_increment=True),
+        column('name', String(__TAX_NAME_LENGTH__)),
+        column('isdefault', Boolean),
+)
+
+class ResolutionEntry(object):
+    def __init__(self, name, isdefault=False):
+        self.name = name
+        self.isdefault = isdefault
+
+    def __repr__(self):
+        return "<ResolutionEntry('%s', default:'%s')>" % (self.name,
+                self.isdefault)
+
+mapper(ResolutionEntry, resolution_table)
+##################
