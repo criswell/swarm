@@ -18,3 +18,47 @@
 #
 # Author: Sam Hart
 
+"""
+The Swarm Hive "super" class
+
+This class houses the most common Swarm Hive interactions.
+"""
+
+import urlparse
+
+class Hive(object):
+    def __init__(self, url, log):
+        """
+        Basic URL parsing wrapper class
+        Accessable members:
+         .scheme = The scheme in use
+         .netloc = The network location
+         .path = The path
+         .params = Parameters for path element
+         .query = Query component
+         .fragment = fragment identifier
+         .username = username to use (if authentication is needed)
+         .password = password to use (if authentication is needed)
+         .hostname = hostname
+         .port = port
+        """
+        self.url = url
+        self._parsed = urlparse(url)
+        self.scheme = self._parsed.scheme.lower()
+        if self._parsed.scheme == '':
+            self.scheme = 'swarm_local'
+        self.netloc = self._parsed.netloc
+        self.path = self._parsed.path
+        self.params = self._parsed.params
+        self.query = self._parsed.query
+        self.fragment = self._parsed.fragment
+        self.username = self._parsed.username
+        self.password = self._parsed.password
+        self.hostname = self._parsed.hostname
+        self.port = self._parsed.port
+        self.remote = None
+        self._log = log
+        self._logger = log.get_logger("Hive")
+
+        if self.scheme != 'swarm_local':
+            self.remote = remote(self, self._log)
