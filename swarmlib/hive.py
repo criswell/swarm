@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2007 Sam Hart
 #
 # This program is free software; you can redistribute it and/or modify
@@ -62,3 +60,4 @@ class Hive(object):
 
         if self.scheme != 'swarm_local':
             self.remote = remote(self, self._log)
+
