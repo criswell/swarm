@@ -27,10 +27,11 @@ This package defines the database schema used in a Swarm Hive.
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, \
                        Float, PickleType, Text, Binary, Boolean
 
-from sqlalchemy.orm import mapper, relation, backref
-import sqlalchemy.types as types
+#from sqlalchemy.orm import mapper, relation, backref
+#import sqlalchemy.types as types
 
 from swarmlib.db.db_bits import metadata
+import swarmlib.db.data_objects as dobj
 
 ###################################
 # Define the issue and node tables
@@ -92,26 +93,12 @@ nodes_table = Table('nodes', metadata,
     Column('attachment', Binary),
 )
 
-class Issue(object):
-    def __init__(self, hash_id, short_hash_id):
-        self.short_hash_id = short_hash_id
-        self.hash_id = hash_id
-    def __repr__(self):
-       return "<Issue('%s', '%s')>" % (self.hash_id, self.short_hash_id)
-
-class Node(object):
-    def __init__(self, hash_id, summary):
-        self.hash_id = hash_id
-        self.summary = summary
-    def __repr__(self):
-        return "<Node('%s', '%s')>" % (self.hash_id, self.summary)
-
-mapper(Issue, issues_table, properties={
+mapper(dobj.Issue, issues_table, properties={
     'root_nodes':relation(Node), #, backref='issue')
     'depends':relation(Issue, backref=backref('blocks',
             remote_side=[issues_table.c.hash_id])),
 })
-mapper(Node, nodes_table, properties={
+mapper(dobj.Node, nodes_table, properties={
     'children':relation(Node, backref=backref('parent',
             remote_side=[nodes_table.c.hash_id])),
 })
@@ -128,18 +115,7 @@ transaction_log_table = Table('transaction_log', metadata,
     Column('transaction_data', PickleType),
 )
 
-class TransactionEntry(object):
-    def __init__(self, root, time, transaction, transaction_data):
-        self.root = root
-        self.time = time
-        self.transaction = transaction
-        self.transaction_log = transaction_log
-
-    def __repr__(self):
-        return "<TransactionEntry(root:'%s', time:'%s'>" % (self.root,
-                self.time)
-
-mapper(TransactionEntry, transaction_log_table)
+mapper(dobj.TransactionEntry, transaction_log_table)
 
 ############################################
 # Define the user-definable Taxonomy tables
@@ -152,17 +128,8 @@ component_table = Table('components', metadata
     Column('isdefault', Boolean),
 )
 
-class ComponentEntry(object):
-    def __init__(self, name, isdefault=False):
-        self.name = name
-        self.isdefault = isdefault
+mapper(dobj.ComponentEntry, component_table)
 
-    def __repr__(self):
-        return "<ComponentEntry('%s', default:'%s')>" % (self.name,
-                self.isdefault)
-
-mapper(ComponentEntry, component_table)
-##################
 version_table = Table('versions', metadata
         column('id',Integer, primary_key=True, unique=True,
                 auto_increment=True),
@@ -170,17 +137,8 @@ version_table = Table('versions', metadata
         column('isdefault', Boolean),
 )
 
-class VersionEntry(object):
-    def __init__(self, name, isdefault=False):
-        self.name = name
-        self.isdefault = isdefault
+mapper(dobj.VersionEntry, version_table)
 
-    def __repr__(self):
-        return "<VersionEntry('%s', default:'%s')>" % (self.name,
-                self.isdefault)
-
-mapper(VersionEntry, version_table)
-##################
 milestone_table = Table('milestones', metadata
         column('id',Integer, primary_key=True, unique=True,
                 auto_increment=True),
@@ -188,17 +146,8 @@ milestone_table = Table('milestones', metadata
         column('isdefault', Boolean),
 )
 
-class MilestoneEntry(object):
-    def __init__(self, name, isdefault=False):
-        self.name = name
-        self.isdefault = isdefault
+mapper(dobj.MilestoneEntry, milestone_table)
 
-    def __repr__(self):
-        return "<MilestoneEntry('%s', default:'%s')>" % (self.name,
-                self.isdefault)
-
-mapper(MilestoneEntry, milestone_table)
-##################
 severity_table = Table('severities', metadata
         column('id',Integer, primary_key=True, unique=True,
                 auto_increment=True),
@@ -206,17 +155,8 @@ severity_table = Table('severities', metadata
         column('isdefault', Boolean),
 )
 
-class SeverityEntry(object):
-    def __init__(self, name, isdefault=False):
-        self.name = name
-        self.isdefault = isdefault
+mapper(dobj.SeverityEntry, severity_table)
 
-    def __repr__(self):
-        return "<SeverityEntry('%s', default:'%s')>" % (self.name,
-                self.isdefault)
-
-mapper(SeverityEntry, severity_table)
-##################
 priority_table = Table('priorities', metadata
         column('id',Integer, primary_key=True, unique=True,
                 auto_increment=True),
@@ -224,17 +164,8 @@ priority_table = Table('priorities', metadata
         column('isdefault', Boolean),
 )
 
-class PriorityEntry(object):
-    def __init__(self, name, isdefault=False):
-        self.name = name
-        self.isdefault = isdefault
+mapper(dobj.PriorityEntry, priority_table)
 
-    def __repr__(self):
-        return "<PriorityEntry('%s', default:'%s')>" % (self.name,
-                self.isdefault)
-
-mapper(PriorityEntry, priority_table)
-##################
 status_table = Table('status', metadata
         column('id',Integer, primary_key=True, unique=True,
                 auto_increment=True),
@@ -242,17 +173,8 @@ status_table = Table('status', metadata
         column('isdefault', Boolean),
 )
 
-class StatusEntry(object):
-    def __init__(self, name, isdefault=False):
-        self.name = name
-        self.isdefault = isdefault
+mapper(dobj.StatusEntry, status_table)
 
-    def __repr__(self):
-        return "<StatusEntry('%s', default:'%s')>" % (self.name,
-                self.isdefault)
-
-mapper(StatusEntry, status_table)
-##################
 resolution_table = Table('resolutions', metadata
         column('id',Integer, primary_key=True, unique=True,
                 auto_increment=True),
@@ -260,14 +182,19 @@ resolution_table = Table('resolutions', metadata
         column('isdefault', Boolean),
 )
 
-class ResolutionEntry(object):
-    def __init__(self, name, isdefault=False):
-        self.name = name
-        self.isdefault = isdefault
+mapper(dobj.ResolutionEntry, resolution_table)
 
-    def __repr__(self):
-        return "<ResolutionEntry('%s', default:'%s')>" % (self.name,
-                self.isdefault)
+##############################
+# Upstream tracker definition
+##############################
+__URI_LENGTH__ = 200
+upstream_table = Table('upstream', metadata
+    column('id', Integer, primary_key=True, unique=True,
+            auto_increment=True),
+    column('uri', String(__URI_LENGTH__),
+    column('type', Integer),
+    column('authentication', PickleType), # blob containing auth info
+    column('transport', PickleType), # blob containing transport info
+)
 
-mapper(ResolutionEntry, resolution_table)
-##################
+mapper(dobj.Upstream, upstream_table)
