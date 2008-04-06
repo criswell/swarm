@@ -25,7 +25,7 @@ This class houses the most common Swarm Hive interactions.
 import urlparse
 
 class Hive(object):
-    def __init__(self, url, log, config=None):
+    def __init__(self, url, log, Force=False, config=None):
         """
         Basic URL parsing wrapper class
         Accessable members:
@@ -56,6 +56,8 @@ class Hive(object):
         self.connection = None
         self._log = log
         self._alt_config_file = config
+        self.config = None
+        self.force = force
         self._logger = log.get_logger("Hive")
 
     def init(self, force=False, ):
@@ -70,8 +72,11 @@ class Hive(object):
         Returns nothing on success, otherwise raises an exception.
         """
         try:
-            self.connection = connect.get_connection(self._parsed, self._log)
+            self.connection = connect.get_connection(self._parsed, self._log,
+                                                     self.force)
         except:
             pass
+
+        self.config = self.connection.get_config()
 
         self.connected = True

@@ -30,7 +30,7 @@ __scheme_lookup = {
     '' : Local
 }
 
-def get_connection(parsed_url, log):
+def get_connection(parsed_url, log, force=False):
     """
     Given a scheme_classifer (typically, as determined by urlparse), return
     a scheme object which can handle it.
@@ -39,7 +39,8 @@ def get_connection(parsed_url, log):
     scheme_classifer = parsed_url.scheme.lower()
 
     if scheme_classifer in __scheme_lookup.keys():
-        return __scheme_lookup[scheme_classifer](parsed_url, config, log)
+        return __scheme_lookup[scheme_classifer](parsed_url, config, log,
+                                                    force)
     else:
         raise SchemeNotFoundError(_("'%s' scheme not defined.") %
                                 scheme_classifer)
