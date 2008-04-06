@@ -55,7 +55,7 @@ class Hive(object):
         self.connected = False
         self.connection = None
         self._log = log
-        self._config = config
+        self._alt_config_file = config
         self._logger = log.get_logger("Hive")
 
     def init(self, force=False, ):
