@@ -67,7 +67,7 @@ class Hive(object):
         """
         Connects to the Hive.
 
-        Returns nothing on success, otherwise raises and exception.
+        Returns nothing on success, otherwise raises an exception.
         """
         try:
             self.connection = connect.get_connection(self._parsed, self._log)
