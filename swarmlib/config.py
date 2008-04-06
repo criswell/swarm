@@ -19,11 +19,18 @@
 #
 # Author: Sam Hart
 
+"""
+Swarm Config class definition
+
+This module contains the Config(..) class for Swarm which interfaces with
+any config file natively on the filesystem.
+"""
+
 import os
 import sys
 import ConfigParser
 
-class config:
+class Config(object):
     def __init__(self, cwd, log, force=False):
         """
         Main config class
