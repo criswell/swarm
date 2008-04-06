@@ -28,7 +28,7 @@ Contains all of the data objects defined and used by Swarm.
 
 class Issue(object):
     def __init__(self, hash_id, short_hash_id):
-        self.short_hash_id = short_hash_id
+        self.issue_id = short_hash_id
         self.hash_id = hash_id
     def __repr__(self):
        return "<Issue('%s', '%s')>" % (self.hash_id, self.short_hash_id)
