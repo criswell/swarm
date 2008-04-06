@@ -17,10 +17,30 @@
 # Author: Sam Hart
 
 """
+Swarm Hive Connection utilities
+
+Contains various utilities dealing with hive connections
 """
 
-def get_scheme(scheme_classifer):
+from i18n import _
+from swarmlib.exceptions import SchemeNotFoundError
+from swarmlib.connect.schemes.local import Local
+
+__scheme_lookup = {
+    '' : Local
+}
+
+def get_scheme(scheme_classifer, parsed_url, config, log, force=False):
     """
     Given a scheme_classifer (typically, as determined by urlparse), return
     a scheme object which can handle it.
     """
+
+    scheme_classifer = scheme_classifer.lower()
+
+    if scheme_classifer in __scheme_lookup.keys():
+        return __scheme_lookup[scheme_classifer](parsed_url, config,
+                                                    log, force)
+    else:
+        raise SchemeNotFoundError(_("'%s' scheme not defined.") %
+                                scheme_classifer)
