@@ -25,7 +25,7 @@ This class houses the most common Swarm Hive interactions.
 import urlparse
 
 class Hive(object):
-    def __init__(self, url, log):
+    def __init__(self, url, log, config=None):
         """
         Basic URL parsing wrapper class
         Accessable members:
@@ -56,8 +56,20 @@ class Hive(object):
         self.port = self._parsed.port
         self.remote = None
         self._log = log
+        self._config = config
         self._logger = log.get_logger("Hive")
 
         if self.scheme != 'swarm_local':
             self.remote = remote(self, self._log)
 
+    def init(self, force=False, ):
+        """
+        Called when a new Hive is to be initialized
+        """
+
+    def connect(self):
+        """
+        Connects to the Hive.
+
+        Returns nothing on success, otherwise raises and exception.
+        """

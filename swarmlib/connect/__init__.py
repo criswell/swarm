@@ -18,3 +18,9 @@
 
 """
 """
+
+def get_scheme(scheme_classifer):
+    """
+    Given a scheme_classifer (typically, as determined by urlparse), return
+    a scheme object which can handle it.
+    """
