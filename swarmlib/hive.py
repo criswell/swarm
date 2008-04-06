@@ -43,8 +43,6 @@ class Hive(object):
         self.url = url
         self._parsed = urlparse(url)
         self.scheme = self._parsed.scheme.lower()
-        if self._parsed.scheme == '':
-            self.scheme = 'swarm_local'
         self.netloc = self._parsed.netloc
         self.path = self._parsed.path
         self.params = self._parsed.params
@@ -54,13 +52,11 @@ class Hive(object):
         self.password = self._parsed.password
         self.hostname = self._parsed.hostname
         self.port = self._parsed.port
-        self.remote = None
+        self.connected = False
+        self.connection = None
         self._log = log
         self._config = config
         self._logger = log.get_logger("Hive")
-
-        if self.scheme != 'swarm_local':
-            self.remote = remote(self, self._log)
 
     def init(self, force=False, ):
         """
@@ -73,3 +69,9 @@ class Hive(object):
 
         Returns nothing on success, otherwise raises and exception.
         """
+        try:
+            self.connection = connect.get_connection(self._parsed, self._log)
+        except:
+            pass
+
+        self.connected = True
