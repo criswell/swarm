@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # swarmlib.config - The config abstraction layer for swarmlib.
 # Use this module to interface with swarmrc and config files.
 #
