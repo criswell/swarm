@@ -23,8 +23,4 @@ Local connections
 from swarmlib.connect.base_schema import BaseScheme
 
 class Local(BaseScheme):
-    def __init__(self, parsed_url, config, log, force=False):
-        self._parsed_url = parsed_url
-        self._config = config
-        self._force = force
-        self._logger = log.get_logger("Local")
+    scheme_name = 'Local'

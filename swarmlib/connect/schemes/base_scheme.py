@@ -25,11 +25,13 @@ This contains the base scheme class by which all schemes are derived
 from swarmlib.config import Config
 
 class BaseScheme(object):
+    scheme_name = 'Base'
     def __init__(self, parsed_url, config, log, force=False):
         self._parsed_url = parsed_url
         self._config = config
         self._force = force
         self._log = log
+        self._logger = log.get_logger(self.scheme_name)
 
     def get_config(self):
         """

@@ -60,7 +60,7 @@ class Hive(object):
         self.force = force
         self._logger = log.get_logger("Hive")
 
-    def init(self, force=False, ):
+    def init_hive(self, force=False, ):
         """
         Called when a new Hive is to be initialized
         """
