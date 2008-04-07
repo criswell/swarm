@@ -17,14 +17,25 @@
 # Author: Sam Hart
 
 """
-Local connections
+Swarm Connection Schemes: Base Scheme class
+
+This contains the base scheme class by which all schemes are derived
 """
 
-from swarmlib.connect.base_schema import BaseScheme
+from swarmlib.config import Config
 
-class Local(BaseScheme):
+class BaseScheme(object):
     def __init__(self, parsed_url, config, log, force=False):
         self._parsed_url = parsed_url
         self._config = config
         self._force = force
-        self._logger = log.get_logger("Local")
+        self._log = log
+
+    def get_config(self):
+        """
+        The BaseScheme defaults to local directories. Overwrite if you
+        don't want this
+        """
+        cwd = self._parsed_url.path
+        self._config = Config(cwd, self._log, self._force)
+        return self._config
