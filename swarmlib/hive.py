@@ -24,6 +24,8 @@ This class houses the most common Swarm Hive interactions.
 
 import urlparse
 
+#from swarmlib.exceptions import 
+
 class Hive(object):
     def __init__(self, url, log, Force=False, config=None):
         """
@@ -64,6 +66,13 @@ class Hive(object):
         """
         Called when a new Hive is to be initialized
         """
+        config = Config.config(working_dir, log, force)
+        project_hash = data_tools.get_hash(project_name, swarm_time.human_readable_from_stamp(), socket.getfqdn())
+        config.init(project_name, project_hash)
+        xactions = xaction.xaction_dispatch()
+        db = swarmdb(working_dir, config, log, xactions, force)
+        db.backend.init()
+        db.backend.close()
 
     def connect(self):
         """

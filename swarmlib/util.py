@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+#
 # data_tools - Various tools to manipulate data
 #
 # Copyright 2007 Sam Hart
@@ -8,33 +8,25 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 # Author: Sam Hart
 
-import marshal
-import binascii
-import sha
+"""
+Swarm utility functions
 
-# FIXME
-# The following needs to go away... it's being moved into xaction since that's
-# where it'll *only* be used. Also, we don't want to use marshal, I was misinformed
-# as to what it did... turns out I likely want pickle instead
-#def encode_content(content_obj):
-#    """
-#    encode_content(content_obj)
-#    Given some sort of content that is marshalable, will
-#    encode it into a transportable format
-#    """
-#    return binascii.hexlify(marshal.dumps(content_obj))
+A collection of utility functions used by Swarm
+"""
+
+import sha
 
 def get_hash(str1, str2, str3):
     """
