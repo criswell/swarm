@@ -22,16 +22,46 @@ Swarm Data Objects
 Contains all of the data objects defined and used by Swarm.
 """
 
-#from sqlalchemy.orm import mapper, relation, backref
+# FIXME - Do we really want to just import everything?
+from elixir import *
 
-#import swarmlib.db.schema as schema
+class Issue(Entity):
+    using_options(tablename='issue')
 
-class Issue(object):
-    def __init__(self, hash_id, short_hash_id):
-        self.issue_id = short_hash_id
-        self.hash_id = hash_id
+    # The hash id for the issue
+    hash_id = Field(String(128), required=True, unique=True, primary_key=True)
+
+    # The shorter, human-readable issue id
+    short_hash_id = Field(String(50), required=True, unique=True)
+
+    # The summary field for the issue
+    summary = Field(Unicode(256), required=True)
+
+    # The date/time when this issue was reported
+    report_time = Field(DateTime, required=True)
+
+    # The last time this issue was changed
+    change_time = Field(DateTime)
+
+    # The issue can be any number of user defined types
+    issue_type = OneToMany('IssueType')
+
     def __repr__(self):
        return "<Issue('%s', '%s')>" % (self.hash_id, self.short_hash_id)
+
+class IssueType(Entity):
+    using_options(tablename='issue_type')
+
+    # The name for this issue type
+    type_name = Field(Unicode(100, required=True, unique=True)
+
+    # Optional description for this issue type
+    type_description = Field(UnicodeText)
+
+    issue = ManyToOne('Issue')
+
+    def __repr__(self):
+        return "<IssueType('%s')>" % (self.type_name)
 
 class Node(object):
     def __init__(self, hash_id, summary):
