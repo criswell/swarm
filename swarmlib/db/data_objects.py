@@ -43,11 +43,56 @@ class Issue(Entity):
     # The last time this issue was changed
     change_time = Field(DateTime)
 
-    # The issue can be any number of user defined types
+    # The issue can be any of a number of user defined types
     issue_type = OneToMany('IssueType')
+
+    # The issue can be any of a number of user defined severity types
+    severity_type = OneToMany('SeverityType')
+
+    # The status of the issue
+    status_type = OneToMany('StatusType');
 
     def __repr__(self):
        return "<Issue('%s', '%s')>" % (self.hash_id, self.short_hash_id)
+
+class SeverityType(Entity):
+    using_options(tablename='severity_type')
+
+    # The human-readable name for this severity type
+    type_name = Field(Unicode(100, required=True, unique=True)
+
+    # optional description for this severity type
+    type_description = Field(UnicodeText)
+
+    # whether this should be a default severity or not
+    is_default = Field(Boolean, required=True)
+
+    # issue mapping
+    issue = ManyToOne('Issue')
+
+    def __repr__(self):
+        return "<SeverityType('%s', default)>" % (self.type_name,
+                self.is_default)
+
+class StatusType(Entity):
+    using_options(tablename='status_type')
+
+    # The human-readable name for this status type
+    type_name = Field(Unicode(100, required=True, unique=True)
+
+    # optional description for this status type
+    type_description = Field(UnicodeText)
+
+    # whether this should be a default status or not
+    is_default = Field(Boolean, required=True)
+
+    # issue mapping
+    issue = ManyToOne('Issue')
+
+    def __repr__(self):
+        return "<StatusType('%s', default)>" % (self.type_name,
+                self.is_default)
+
 
 class IssueType(Entity):
     using_options(tablename='issue_type')
@@ -108,15 +153,6 @@ class MilestoneEntry(object):
         return "<MilestoneEntry('%s', default:'%s')>" % (self.name,
                 self.isdefault)
 
-class SeverityEntry(object):
-    def __init__(self, name, isdefault=False):
-        self.name = name
-        self.isdefault = isdefault
-
-    def __repr__(self):
-        return "<SeverityEntry('%s', default:'%s')>" % (self.name,
-                self.isdefault)
-
 class PriorityEntry(object):
     def __init__(self, name, isdefault=False):
         self.name = name
@@ -124,15 +160,6 @@ class PriorityEntry(object):
 
     def __repr__(self):
         return "<PriorityEntry('%s', default:'%s')>" % (self.name,
-                self.isdefault)
-
-class StatusEntry(object):
-    def __init__(self, name, isdefault=False):
-        self.name = name
-        self.isdefault = isdefault
-
-    def __repr__(self):
-        return "<StatusEntry('%s', default:'%s')>" % (self.name,
                 self.isdefault)
 
 class ResolutionEntry(object):
