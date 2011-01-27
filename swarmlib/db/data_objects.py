@@ -62,13 +62,43 @@ class Issue(Entity):
     version = OneToMany('VersionEntry')
 
     # The original reporter of the issue
+    # FIXME -
+    # Should this use the same sort of many to many mapping as followers?
     reporter = Field(Unicode(128), require=True)
 
     # The owner of the issue
     owner = Field(Unicode(128), require=True)
 
+    # Keyword lookups
+    keywords = ManyToMany('Keyword')
+
+    # Followers
+    followers = ManyToMany('Follower')
+
     def __repr__(self):
        return "<Issue('%s', '%s')>" % (self.hash_id, self.short_hash_id)
+
+class Follower(Entity):
+    using_options(tablename='follower')
+
+    name = Field(Unicode(128), require=True)
+
+    email = Field(Unicode(128))
+
+    issue = ManyToMany('Issue')
+
+    def __repr__(self):
+        return "<Follower('%s', '%s')>" % (self.name, self.email)
+
+class Keyword(Entity):
+    using_options(tablename='keyword')
+
+    keyword = Field(Unicode(50)
+
+    issues = ManyToMany('Issue')
+
+    def __repr__(self):
+        return "<Keyword('%s')>" % (self.keyword)
 
 class VersionEntry(Entity):
     using_options(tablename='version')
