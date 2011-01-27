@@ -58,6 +58,9 @@ class Issue(Entity):
     # The priority of the issue
     priority_type = OneToMany('PriorityType')
 
+    # Associated version
+    version = OneToMany('VersionEntry')
+
     # The original reporter of the issue
     reporter = Field(Unicode(128), require=True)
 
@@ -67,7 +70,26 @@ class Issue(Entity):
     def __repr__(self):
        return "<Issue('%s', '%s')>" % (self.hash_id, self.short_hash_id)
 
-class PriorityType(object):
+class VersionEntry(Entity):
+    using_options(tablename='version')
+
+    # The human-readable name for this version
+    name = Field(Unicode(100, required=True, unique=True)
+
+    # optional description for this version
+    description = Field(UnicodeText)
+
+    # whether this should be a default version or not
+    is_default = Field(Boolean, required=True)
+
+    # issue mapping
+    issue = ManyToOne('Issue')
+
+    def __repr__(self):
+        return "<VersionEntry('%s', default:'%s')>" % (self.name,
+                self.is_default)
+
+class PriorityType(Entity):
     using_options(tablename='priority_type')
 
     # The human-readable name for this priority type
@@ -182,15 +204,6 @@ class ComponentEntry(object):
 
     def __repr__(self):
         return "<ComponentEntry('%s', default:'%s')>" % (self.name,
-                self.isdefault)
-
-class VersionEntry(object):
-    def __init__(self, name, isdefault=False):
-        self.name = name
-        self.isdefault = isdefault
-
-    def __repr__(self):
-        return "<VersionEntry('%s', default:'%s')>" % (self.name,
                 self.isdefault)
 
 class MilestoneEntry(object):
