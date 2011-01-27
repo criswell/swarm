@@ -50,10 +50,60 @@ class Issue(Entity):
     severity_type = OneToMany('SeverityType')
 
     # The status of the issue
-    status_type = OneToMany('StatusType');
+    status_type = OneToMany('StatusType')
+
+    # The resolution of the issue
+    resolution_type = OneToMany('ResolutionType')
+
+    # The priority of the issue
+    priority_type = OneToMany('PriorityType')
+
+    # The original reporter of the issue
+    reporter = Field(Unicode(128), require=True)
+
+    # The owner of the issue
+    owner = Field(Unicode(128), require=True)
 
     def __repr__(self):
        return "<Issue('%s', '%s')>" % (self.hash_id, self.short_hash_id)
+
+class PriorityType(object):
+    using_options(tablename='priority_type')
+
+    # The human-readable name for this priority type
+    type_name = Field(Unicode(100, required=True, unique=True)
+
+    # optional description for this priority type
+    type_description = Field(UnicodeText)
+
+    # whether this should be a default priority or not
+    is_default = Field(Boolean, required=True)
+
+    # issue mapping
+    issue = ManyToOne('Issue')
+
+    def __repr__(self):
+        return "<PriorityType('%s', default:'%s')>" % (self.type_name,
+                self.is_default)
+
+class ResolutionType(Entity):
+    using_options(tablename='resolution_type')
+
+    # The human-readable name for this resolution type
+    type_name = Field(Unicode(100, required=True, unique=True)
+
+    # optional description for this resolution type
+    type_description = Field(UnicodeText)
+
+    # whether this should be a default resolution or not
+    is_default = Field(Boolean, required=True)
+
+    # issue mapping
+    issue = ManyToOne('Issue')
+
+    def __repr__(self):
+        return "<ResolutionType('%s', default:'%s')>" % (self.type_name,
+                self.is_default)
 
 class SeverityType(Entity):
     using_options(tablename='severity_type')
@@ -92,7 +142,6 @@ class StatusType(Entity):
     def __repr__(self):
         return "<StatusType('%s', default)>" % (self.type_name,
                 self.is_default)
-
 
 class IssueType(Entity):
     using_options(tablename='issue_type')
@@ -151,24 +200,6 @@ class MilestoneEntry(object):
 
     def __repr__(self):
         return "<MilestoneEntry('%s', default:'%s')>" % (self.name,
-                self.isdefault)
-
-class PriorityEntry(object):
-    def __init__(self, name, isdefault=False):
-        self.name = name
-        self.isdefault = isdefault
-
-    def __repr__(self):
-        return "<PriorityEntry('%s', default:'%s')>" % (self.name,
-                self.isdefault)
-
-class ResolutionEntry(object):
-    def __init__(self, name, isdefault=False):
-        self.name = name
-        self.isdefault = isdefault
-
-    def __repr__(self):
-        return "<ResolutionEntry('%s', default:'%s')>" % (self.name,
                 self.isdefault)
 
 class Upstream(object):
