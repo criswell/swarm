@@ -10,3 +10,8 @@ with it, I wont know will I?
 BTW, yes "dochemistry" is named because "alchemy" was a protoscience that
 eventually led to the "real" science of "chemistry". Yes, I'm being a snarky
 bastard here.
+
+License chosen as MIT for dochemistry just in case I ever borrow code from
+sqlalchemy (I'd really like to make this thing familiar to people coming
+from the sqlalchemy world, so I may liberally lift interfaces directly from
+sqlalchemy. Don't know yet... we'll have to wait and see...)
