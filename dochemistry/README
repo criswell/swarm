@@ -1,0 +1,12 @@
+For now, dochemistry exists as a sub-directory to swarm as it is entirely
+experimental. If I find I like it later on, I'll strip it out and make it its
+own project.
+
+The rather nebulous goal of dochemistry is to provide "something like"
+sqlalchemy but for document-oriented dbs (e.g., CouchDB, MongoDB, etc and so
+on). I'm not 100% certain that such a thing is even needed, but until I monkey
+with it, I wont know will I?
+
+BTW, yes "dochemistry" is named because "alchemy" was a protoscience that
+eventually led to the "real" science of "chemistry". Yes, I'm being a snarky
+bastard here.
