@@ -1,0 +1,19 @@
+NOTE:
+
+Currently this project WILL NOT RUN.
+
+It had previously depended on sqlite, however, it has become apparent that it
+should use a more generalized interface to a document-oriented DB backend
+(such as CouchDB, MongoDB, etc.). E.g., it needs something like SQLAlchemy,
+but for document-oriented databases.
+
+Unfortunately, right now, no such thing seems to exist (as near as I can
+tell). So, I'm being forced to write it.
+
+So, swarm is on hold until the project doChemistry,
+https://bitbucket.org/criswell/dochemistry , is more useable.
+
+Stay tuned (or help out with doChemistry).
+
+-Sam
+
